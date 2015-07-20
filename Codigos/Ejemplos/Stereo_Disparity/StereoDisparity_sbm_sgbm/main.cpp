@@ -16,6 +16,29 @@ std::string right_img_path = "../img/im1.png";
 cv::Mat left_img, right_img, left_gray, right_gray;
 cv::Mat disp, disp8;
 
+class rectifier{
+    private:
+        cv::Mat map_left1, map_left2, map_right1, map_right2;
+        std::string path;
+    public:
+        rectifier(cv::Size);
+        void show_rectified(cv::Size);
+};
+
+rectifier::rectifier(cv::Size image_size)
+{
+    cv::Mat left_cameraMatrix, left_distCoeffs, right_cameraMatrix, right_distCoeffs, R, T;
+    float left_matrix[] = {3989.963, 0, 1039.414,
+                        0, 3989.963, 956.875,
+                        0, 0, 1};
+    float right_matrix[] = {3989.963, 0, 1194.824,
+                         0, 3989.963, 956.875,
+                         0, 0, 1};
+    left_cameraMatrix = cv::Mat(3, 3, CV_32FC1, left_matrix);
+    right_cameraMatrix = cv::Mat(3, 3, CV_32FC1, right_matrix);
+
+    std::cout << left_cameraMatrix;
+}
 
 int StereoBlockMatching()
 {
@@ -95,7 +118,8 @@ int main(int argc, char *argv[])
     //std::cout << "Hola " << result;
 
     LoadImages();
-    StereoBlockMatching();
+    //StereoBlockMatching();
+    rectifier::rectifier(left_gray.size());
     //StereoSemiBlockMatching();
 
     //Reference: http://stackoverflow.com/questions/15901015/opencv-resizewindow-do-nothing
