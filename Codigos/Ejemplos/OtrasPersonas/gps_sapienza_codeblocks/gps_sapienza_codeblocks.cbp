@@ -32,8 +32,27 @@
 		<Linker>
 			<Add option="`opencv-config --ldstaticflags`" />
 		</Linker>
+		<Unit filename="Net.h" />
+		<Unit filename="capture.cpp" />
+		<Unit filename="capture.h" />
+		<Unit filename="convolve.h" />
+		<Unit filename="disjoint-set.h" />
+		<Unit filename="filter.h" />
+		<Unit filename="image.h" />
+		<Unit filename="imconv.h" />
+		<Unit filename="img_proc_fcns.cpp" />
+		<Unit filename="img_proc_fcns.h" />
+		<Unit filename="imutil.h" />
+		<Unit filename="init_structures.cpp" />
+		<Unit filename="init_structures.h" />
 		<Unit filename="lena.jpg" />
 		<Unit filename="main.cpp" />
+		<Unit filename="misc.h" />
+		<Unit filename="ms_communications_loop.h" />
+		<Unit filename="ms_overwrite_safe_buffer.cpp" />
+		<Unit filename="ms_overwrite_safe_buffer.h" />
+		<Unit filename="segment-graph.h" />
+		<Unit filename="segment-image.h" />
 		<Extensions>
 			<code_completion />
 			<debugger />
