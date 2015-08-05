@@ -62,7 +62,7 @@ int main( int argc, char** argv )
     IplImage *F_hsv2, *F_YCrCb2, *F_lab2, *F_sat2, *F_hue2; // Iplimage* Declarations
     bool disp_img, refresh;
    
-    VideoCapture cap(1); // Declare capture form
+    VideoCapture cap(0); // Declare capture form
     namedWindow( "HSV", 1 ); 
     namedWindow( "YCrCb", 1 ); 
     namedWindow( "Lab", 1 ); 
@@ -100,7 +100,10 @@ int main( int argc, char** argv )
               F_hsv2=cvCreateImage(cvSize(F_hsv.cols,F_hsv.rows),8,3); // Rezise
               IplImage ipltemp=F_hsv;
               cvCopy(&ipltemp,F_hsv2);
-              cvShowImage("Prueba",F_hsv2);
+              
+              Mat channel[3];
+              
+              cv::split(F_hsv,channel); //cvCvtPixToPlane Divides a multi-channel array into separate single-channel arrays
               //cvCvtPixToPlane( F_hsv2, F_hue2, F_sat2, 0, 0 );
             /*  
             
@@ -116,6 +119,7 @@ int main( int argc, char** argv )
               if (disp_img){	DISPLAY_IMAGE_XY(refresh, F_hue, 2, 0);	 
                             DISPLAY_IMAGE_XY(refresh, F_sat, 3, 0); }
                             */
+              imshow("Prueba",channel[0]);
               imshow("HSV",F_hsv);
               imshow("YCrCb",F_YCrCb);
               imshow("Lab",F_lab);

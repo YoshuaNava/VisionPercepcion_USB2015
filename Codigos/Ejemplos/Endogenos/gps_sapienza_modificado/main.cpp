@@ -274,6 +274,8 @@ int main(int argc, char** argv)
         cvCvtPixToPlane( F.hsv, F.hue, F.sat, 0, 0 ); //cvCvtPixToPlane Divides a multi-channel array into separate single-channel arrays
         cvCvtPixToPlane( F.YCrCb, 0, F.Cr, F.Cb, 0 );
         cvCvtPixToPlane( F.lab, 0, F.a, 0, 0 );
+//        cv::namedWindow( "Prueba", 1 );
+//        cvShowImage("Prueba",F.hue);
 
         //view iamges separately
         if (p.disp_img){	DISPLAY_IMAGE_XY(p.refresh, F.hue, 2, 0);
