@@ -6,6 +6,7 @@
 			<Cursor1 position="865" topLine="0" />
 		</Cursor>
 	</File>
+<<<<<<< HEAD
 	<File name="img_proc_fcns.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
 			<Cursor1 position="953" topLine="15" />
@@ -19,6 +20,10 @@
 	<File name="Net.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
 			<Cursor1 position="4097" topLine="206" />
+=======
+	<File name="segment-image.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="865" topLine="0" />
 		</Cursor>
 	</File>
 	<File name="init_structures.cpp" open="0" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
@@ -26,6 +31,18 @@
 			<Cursor1 position="16834" topLine="561" />
 		</Cursor>
 	</File>
+	<File name="img_proc_fcns.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="953" topLine="15" />
+>>>>>>> 81302f996356debb6e0dd663c9821663b18b6d03
+		</Cursor>
+	</File>
+	<File name="Net.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="4097" topLine="206" />
+		</Cursor>
+	</File>
+<<<<<<< HEAD
 	<File name="misc.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
 			<Cursor1 position="755" topLine="28" />
@@ -34,6 +51,16 @@
 	<File name="ms_communications_loop.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
 			<Cursor1 position="2056" topLine="19" />
+=======
+	<File name="main.cpp" open="1" top="1" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="7336" topLine="203" />
+		</Cursor>
+	</File>
+	<File name="misc.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="755" topLine="28" />
+>>>>>>> 81302f996356debb6e0dd663c9821663b18b6d03
 		</Cursor>
 	</File>
 </CodeBlocks_layout_file>
