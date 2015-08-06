@@ -1,0 +1,6 @@
+# depslib dependency file v1.0
+1437678514 source:/home/alfredoso/GitHub/VisionPercepcion_USB2015/Codigos/Ejemplos/PruebaInstalacion_PCL_CodeBlocks/main.cpp
+	<iostream>
+	<pcl/io/pcd_io.h>
+	<pcl/point_types.h>
+

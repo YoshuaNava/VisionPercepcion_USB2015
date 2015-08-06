@@ -1,0 +1,255 @@
+# depslib dependency file v1.0
+1406494994 source:/home/mecatronica/Github_Yoshua/VisionPercepcion_USB2015/Codigos/Ejemplos/OtrasPersonas/gps_sapienza_codeblocks/capture.cpp
+	<stdio.h>
+	"opencv/cv.h"
+	"opencv/highgui.h"
+	"capture.h"
+	"init_structures.h"
+
+1387499506 /home/mecatronica/Github_Yoshua/VisionPercepcion_USB2015/Codigos/Ejemplos/OtrasPersonas/gps_sapienza_codeblocks/capture.h
+
+1406496040 /home/mecatronica/Github_Yoshua/VisionPercepcion_USB2015/Codigos/Ejemplos/OtrasPersonas/gps_sapienza_codeblocks/init_structures.h
+	<iostream>
+	<string>
+	"Net.h"
+	"ms_overwrite_safe_buffer.h"
+
+1438186913 /home/mecatronica/Github_Yoshua/VisionPercepcion_USB2015/Codigos/Ejemplos/OtrasPersonas/gps_sapienza_codeblocks/Net.h
+	<winsock2.h>
+	<sys/socket.h>
+	<netinet/in.h>
+	<fcntl.h>
+	<assert.h>
+	<unistd.h>
+
+1406496088 /home/mecatronica/Github_Yoshua/VisionPercepcion_USB2015/Codigos/Ejemplos/OtrasPersonas/gps_sapienza_codeblocks/ms_overwrite_safe_buffer.h
+	<queue>
+
+1438186937 source:/home/mecatronica/Github_Yoshua/VisionPercepcion_USB2015/Codigos/Ejemplos/OtrasPersonas/gps_sapienza_codeblocks/img_proc_fcns.cpp
+	<opencv/cv.h>
+	<opencv/highgui.h>
+	<opencv/cxcore.h>
+	<stdio.h>
+	<algorithm>
+	"img_proc_fcns.h"
+	<cstdio>
+	<cstdlib>
+	<math.h>
+	"image.h"
+	"misc.h"
+	"segment-image.h"
+
+1406496018 /home/mecatronica/Github_Yoshua/VisionPercepcion_USB2015/Codigos/Ejemplos/OtrasPersonas/gps_sapienza_codeblocks/img_proc_fcns.h
+	"init_structures.h"
+
+1383677740 /home/mecatronica/Github_Yoshua/VisionPercepcion_USB2015/Codigos/Ejemplos/OtrasPersonas/gps_sapienza_codeblocks/image.h
+	<cstring>
+
+1383677740 /home/mecatronica/Github_Yoshua/VisionPercepcion_USB2015/Codigos/Ejemplos/OtrasPersonas/gps_sapienza_codeblocks/misc.h
+	<cmath>
+
+1438186963 /home/mecatronica/Github_Yoshua/VisionPercepcion_USB2015/Codigos/Ejemplos/OtrasPersonas/gps_sapienza_codeblocks/segment-image.h
+	<cstdlib>
+	"image.h"
+	"misc.h"
+	"filter.h"
+	"segment-graph.h"
+	<iostream>
+	<algorithm>
+	<math.h>
+
+1383677740 /home/mecatronica/Github_Yoshua/VisionPercepcion_USB2015/Codigos/Ejemplos/OtrasPersonas/gps_sapienza_codeblocks/filter.h
+	<vector>
+	<cmath>
+	"image.h"
+	"misc.h"
+	"convolve.h"
+	"imconv.h"
+
+1383677740 /home/mecatronica/Github_Yoshua/VisionPercepcion_USB2015/Codigos/Ejemplos/OtrasPersonas/gps_sapienza_codeblocks/convolve.h
+	<vector>
+	<algorithm>
+	<cmath>
+	"image.h"
+
+1383677740 /home/mecatronica/Github_Yoshua/VisionPercepcion_USB2015/Codigos/Ejemplos/OtrasPersonas/gps_sapienza_codeblocks/imconv.h
+	<climits>
+	"image.h"
+	"imutil.h"
+	"misc.h"
+
+1383677740 /home/mecatronica/Github_Yoshua/VisionPercepcion_USB2015/Codigos/Ejemplos/OtrasPersonas/gps_sapienza_codeblocks/imutil.h
+	"image.h"
+	"misc.h"
+
+1383677740 /home/mecatronica/Github_Yoshua/VisionPercepcion_USB2015/Codigos/Ejemplos/OtrasPersonas/gps_sapienza_codeblocks/segment-graph.h
+	<algorithm>
+	<cmath>
+	"disjoint-set.h"
+
+1383677740 /home/mecatronica/Github_Yoshua/VisionPercepcion_USB2015/Codigos/Ejemplos/OtrasPersonas/gps_sapienza_codeblocks/disjoint-set.h
+
+1438186814 source:/home/mecatronica/Github_Yoshua/VisionPercepcion_USB2015/Codigos/Ejemplos/OtrasPersonas/gps_sapienza_codeblocks/init_structures.cpp
+	<opencv/cv.h>
+	<opencv/highgui.h>
+	<opencv/cxcore.h>
+	<stdio.h>
+	<algorithm>
+	<math.h>
+	<string>
+	"init_structures.h"
+	"Net.h"
+
+1438187771 source:/home/mecatronica/Github_Yoshua/VisionPercepcion_USB2015/Codigos/Ejemplos/OtrasPersonas/gps_sapienza_codeblocks/main.cpp
+	<opencv/cv.h>
+	<opencv/highgui.h>
+	<opencv/cxcore.h>
+	<stdio.h>
+	<algorithm>
+	<stdlib.h>
+	<time.h>
+	<string.h>
+	"init_structures.h"
+	"img_proc_fcns.h"
+	"capture.h"
+	<iostream>
+	<fstream>
+	<vector>
+	<thread>
+	"Net.h"
+
+1406496088 source:/home/mecatronica/Github_Yoshua/VisionPercepcion_USB2015/Codigos/Ejemplos/OtrasPersonas/gps_sapienza_codeblocks/ms_overwrite_safe_buffer.cpp
+	<iostream>
+	<string>
+	<cassert>
+	<thread>
+	<mutex>
+	"ms_overwrite_safe_buffer.h"
+
+1438190069 source:/home/rafael/VisionPercepcion_USB2015/Codigos/Ejemplos/OtrasPersonas/gps_sapienza_codeblocks/capture.cpp
+	<stdio.h>
+	"opencv/cv.h"
+	"opencv/highgui.h"
+	"capture.h"
+	"init_structures.h"
+
+1438190069 /home/rafael/VisionPercepcion_USB2015/Codigos/Ejemplos/OtrasPersonas/gps_sapienza_codeblocks/capture.h
+
+1438190069 /home/rafael/VisionPercepcion_USB2015/Codigos/Ejemplos/OtrasPersonas/gps_sapienza_codeblocks/init_structures.h
+	<iostream>
+	<string>
+	"Net.h"
+	"ms_overwrite_safe_buffer.h"
+
+1438190069 /home/rafael/VisionPercepcion_USB2015/Codigos/Ejemplos/OtrasPersonas/gps_sapienza_codeblocks/Net.h
+	<winsock2.h>
+	<sys/socket.h>
+	<netinet/in.h>
+	<fcntl.h>
+	<assert.h>
+	<unistd.h>
+
+1438190069 /home/rafael/VisionPercepcion_USB2015/Codigos/Ejemplos/OtrasPersonas/gps_sapienza_codeblocks/ms_overwrite_safe_buffer.h
+	<queue>
+
+1438190069 source:/home/rafael/VisionPercepcion_USB2015/Codigos/Ejemplos/OtrasPersonas/gps_sapienza_codeblocks/img_proc_fcns.cpp
+	<opencv/cv.h>
+	<opencv/highgui.h>
+	<opencv/cxcore.h>
+	<stdio.h>
+	<algorithm>
+	"img_proc_fcns.h"
+	<cstdio>
+	<cstdlib>
+	<math.h>
+	"image.h"
+	"misc.h"
+	"segment-image.h"
+
+1438190069 /home/rafael/VisionPercepcion_USB2015/Codigos/Ejemplos/OtrasPersonas/gps_sapienza_codeblocks/img_proc_fcns.h
+	"init_structures.h"
+
+1438190069 /home/rafael/VisionPercepcion_USB2015/Codigos/Ejemplos/OtrasPersonas/gps_sapienza_codeblocks/image.h
+	<cstring>
+
+1438190069 /home/rafael/VisionPercepcion_USB2015/Codigos/Ejemplos/OtrasPersonas/gps_sapienza_codeblocks/misc.h
+	<cmath>
+
+1438190069 /home/rafael/VisionPercepcion_USB2015/Codigos/Ejemplos/OtrasPersonas/gps_sapienza_codeblocks/segment-image.h
+	<cstdlib>
+	"image.h"
+	"misc.h"
+	"filter.h"
+	"segment-graph.h"
+	<iostream>
+	<algorithm>
+	<math.h>
+
+1438190069 /home/rafael/VisionPercepcion_USB2015/Codigos/Ejemplos/OtrasPersonas/gps_sapienza_codeblocks/filter.h
+	<vector>
+	<cmath>
+	"image.h"
+	"misc.h"
+	"convolve.h"
+	"imconv.h"
+
+1438190069 /home/rafael/VisionPercepcion_USB2015/Codigos/Ejemplos/OtrasPersonas/gps_sapienza_codeblocks/convolve.h
+	<vector>
+	<algorithm>
+	<cmath>
+	"image.h"
+
+1438190069 /home/rafael/VisionPercepcion_USB2015/Codigos/Ejemplos/OtrasPersonas/gps_sapienza_codeblocks/imconv.h
+	<climits>
+	"image.h"
+	"imutil.h"
+	"misc.h"
+
+1438190069 /home/rafael/VisionPercepcion_USB2015/Codigos/Ejemplos/OtrasPersonas/gps_sapienza_codeblocks/imutil.h
+	"image.h"
+	"misc.h"
+
+1438190069 /home/rafael/VisionPercepcion_USB2015/Codigos/Ejemplos/OtrasPersonas/gps_sapienza_codeblocks/segment-graph.h
+	<algorithm>
+	<cmath>
+	"disjoint-set.h"
+
+1438190069 /home/rafael/VisionPercepcion_USB2015/Codigos/Ejemplos/OtrasPersonas/gps_sapienza_codeblocks/disjoint-set.h
+
+1438190069 source:/home/rafael/VisionPercepcion_USB2015/Codigos/Ejemplos/OtrasPersonas/gps_sapienza_codeblocks/init_structures.cpp
+	<opencv/cv.h>
+	<opencv/highgui.h>
+	<opencv/cxcore.h>
+	<stdio.h>
+	<algorithm>
+	<math.h>
+	<string>
+	"init_structures.h"
+	"Net.h"
+
+1438190069 source:/home/rafael/VisionPercepcion_USB2015/Codigos/Ejemplos/OtrasPersonas/gps_sapienza_codeblocks/main.cpp
+	<opencv/cv.h>
+	<opencv/highgui.h>
+	<opencv/cxcore.h>
+	<stdio.h>
+	<algorithm>
+	<stdlib.h>
+	<time.h>
+	<string.h>
+	"init_structures.h"
+	"img_proc_fcns.h"
+	"capture.h"
+	<iostream>
+	<fstream>
+	<vector>
+	<thread>
+	"Net.h"
+
+1438190069 source:/home/rafael/VisionPercepcion_USB2015/Codigos/Ejemplos/OtrasPersonas/gps_sapienza_codeblocks/ms_overwrite_safe_buffer.cpp
+	<iostream>
+	<string>
+	<cassert>
+	<thread>
+	<mutex>
+	"ms_overwrite_safe_buffer.h"
+

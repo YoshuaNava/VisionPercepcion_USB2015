@@ -1,0 +1,11 @@
+# depslib dependency file v1.0
+1437578923 source:/home/alfredoso/GitHub/VisionPercepcion_USB2015/Codigos/Ejemplos/PruebaInstalacionCodeBlocks/main.cpp
+	<opencv2/core/core.hpp>
+	<opencv2/imgproc/imgproc.hpp>
+	<opencv2/highgui/highgui.hpp>
+
+1438190068 source:/home/rafael/VisionPercepcion_USB2015/Codigos/Ejemplos/Endogenos/PruebaInstalacionCodeBlocks/main.cpp
+	<opencv2/core/core.hpp>
+	<opencv2/imgproc/imgproc.hpp>
+	<opencv2/highgui/highgui.hpp>
+

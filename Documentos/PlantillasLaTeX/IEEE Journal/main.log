@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 This is pdfTeX, Version 3.1415926-2.5-1.40.14 (TeX Live 2013/Debian) (format=pdflatex 2015.7.22)  22 JUL 2015 20:06
+=======
+This is pdfTeX, Version 3.1415926-2.5-1.40.14 (TeX Live 2013/Debian) (format=pdflatex 2015.7.20)  28 JUL 2015 15:24
+>>>>>>> d86b3764cedbcb26a2f7acb8b97eff6e20501818
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -92,6 +96,7 @@ LaTeX Font Info:    Font shape `OT1/ptm/bx/it' in size <24> not available
 \@IEEEtmpitemindent=\dimen116
 \c@IEEEbiography=\count90
 \@IEEEtranrubishbin=\box26
+<<<<<<< HEAD
 ) (/usr/share/texlive/texmf-dist/tex/latex/blindtext/blindtext.sty
 Package: blindtext 2012/01/06 V2.0 blindtext-Package
 
@@ -272,3 +277,30 @@ PDF statistics:
  0 named destinations out of 1000 (max. 500000)
  18 words of extra memory for PDF output out of 10000 (max. 10000000)
 
+=======
+)
+
+! LaTeX Error: File `blindtext.sty' not found.
+
+Type X to quit or <RETURN> to proceed,
+or enter new name. (Default extension: sty)
+
+Enter file name: 
+! Emergency stop.
+<read *> 
+         
+l.68 \usepackage
+                {graphicx}^^M
+*** (cannot \read from terminal in nonstop modes)
+
+ 
+Here is how much of TeX's memory you used:
+ 879 strings out of 495028
+ 15484 string characters out of 6181497
+ 60526 words of memory out of 5000000
+ 4175 multiletter control sequences out of 15000+600000
+ 24710 words of font info for 54 fonts, out of 8000000 for 9000
+ 14 hyphenation exceptions out of 8191
+ 26i,0n,19p,207b,103s stack positions out of 5000i,500n,10000p,200000b,80000s
+!  ==> Fatal error occurred, no output PDF file produced!
+>>>>>>> d86b3764cedbcb26a2f7acb8b97eff6e20501818
