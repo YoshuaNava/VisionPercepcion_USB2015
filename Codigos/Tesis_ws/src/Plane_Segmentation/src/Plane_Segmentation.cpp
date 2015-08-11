@@ -41,7 +41,7 @@
 
 double proc_W, proc_H;
 
-void combine_channels(Mat Cr, Mat Cb, Mat a, Mat iic){
+void combine_channels(cv::Mat Cr, cv::Mat Cb, cv::Mat a, cv::Mat& iic){
 	
 	//Reference: http://answers.opencv.org/question/13769/adding-matrices-without-saturation/
 	cv::Mat tempMatSum;
@@ -52,7 +52,6 @@ void combine_channels(Mat Cr, Mat Cb, Mat a, Mat iic){
 	cv::addWeighted(Cr, 0.5, Cb, 0.5, 0.0, tempMatSum, CV_32S);
 	cv::addWeighted(tempMatSum, 0.5, tempMatA, 0.5, 0.0, tempMatIIC, CV_32S);
 	tempMatIIC.convertTo(iic, CV_8UC1);
-	imshow("Prueba", iic);
 }
 
 /*
@@ -119,56 +118,11 @@ int main( int argc, char** argv )
               
               cv::split(F_lab,channel_3);
               F_a=channel_3[1];
-              combine_channels(F_Cr, F_Cb, F_a, F_iic);
+              combine_channels(F_Cr, F_Cb, F_a, F_iic); //D = (A + B + 2*C)/4 //illumination invariant color channel combination
           
-          /*
-          frame2 = cvCreateImage(cvSize(640,480), IPL_DEPTH_8U, 3);
-          frame2->imageData = (char *) frame.data;
-          
-          F_hsv2 = cvCreateImage(cvSize(640,480), IPL_DEPTH_8U, 3);
-          F_YCrCb2 = cvCreateImage(cvSize(640,480), IPL_DEPTH_8U, 3);
-          F_lab2 = cvCreateImage(cvSize(640,480), IPL_DEPTH_8U, 3);
-                    
-                    
-          F_hue2= cvCreateImage(cvSize(640,480), IPL_DEPTH_8U, 1);
-          F_sat2= cvCreateImage(cvSize(640,480), IPL_DEPTH_8U, 1);
-          
-          F_Cr2=cvCreateImage(cvSize(640,480), IPL_DEPTH_8U, 1);
-          F_Cb2= cvCreateImage(cvSize(640,480), IPL_DEPTH_8U, 1);
-                
-          cvCvtColor( frame2, F_hsv2, 	CV_BGR2HSV );	//Convert to HSV
-          cvCvtColor( frame2, F_YCrCb2, CV_BGR2YCrCb );	//Convert to YCrCb
-          cvCvtColor( frame2, F_lab2, 	CV_BGR2Lab );	//Convert to Lab
-          
-          cvCvtPixToPlane( F_hsv2, F_hue2, F_sat2, 0, 0 );
-          cvCvtPixToPlane( F_YCrCb2, 0, F_Cr2, F_Cb2, 0 );
-          
-          
-          F_iic2= cvCreateImage(cvSize(640,480), IPL_DEPTH_8U, 1);
-          F_iic2->imageData = (char *) frame.data;
-          combine_channels(F_Cr2, F_Cb2, F_a2, F_iic2);*/ //D = (A + B + 2*C)/4 //illumination invariant color channel combination
           
 
-//F_Cb2 = cvCreateImage(cvSize(640,480), IPL_DEPTH_8U, 3);
-//F_Cb2->imageData = (char *) F_Cb.data;
-
-//F_a2=cvCreateImage(cvSize(640,480), IPL_DEPTH_8U, 3);
-//F_a2->imageData = (char *) F_a.data;
-
-//F_iic2 = cvCreateImage(cvSize(640,480), IPL_DEPTH_8U, 3);
-
-
-              //combine_channels(F_Cr2, F_Cb2, F_a2, F_iic2); //D = (A + B + 2*C)/4 //illumination invariant color channel combination
-              //combine_channels(F_Cr, F_Cb, F_a, F_iic);
-              // cvCvtPixToPlane( F.hsv, F.hue, F.sat, 0, 0 );
-              //cvCvtPixToPlane( F.YCrCb, 0, F.Cr, F.Cb, 0 );
-              //c
-             /* 
-              IplImage* image_pub; // Transfer Mat to IplImage   
-              image_pub=cvCreateImage(cvSize(F_hue.cols,F_hue.rows),8,3); // Rezise
-              IplImage ipltemp=F_hue;
-               cvCopy(&ipltemp,image_pub);
-*/
+              
               imshow("HSV",F_hsv);
               imshow("YCrCb",F_YCrCb);
               imshow("Lab",F_lab);
@@ -177,7 +131,7 @@ int main( int argc, char** argv )
               imshow("F_Cr",F_Cr);
               imshow("F_Cb",F_Cb);
               imshow("F_a",F_a);
-//              imshow("Prueba",F_iic);
+              imshow("F_iic",F_iic);
              //cvShowImage("Prueba",F_Cb2);
         
           }
