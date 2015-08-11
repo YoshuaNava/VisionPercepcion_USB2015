@@ -29,7 +29,6 @@
  //#include "img_proc_fcns.h" //various image processing/computer vision functions
  #include "capture.h" //image capture 
  #include "ms_overwrite_safe_buffer.h"
- #include "ms_communications_loop.h"
 
  
  #define Window_W 1.02*proc_W //appriximate wht window width and hight as a function of the frame size
@@ -42,8 +41,13 @@
 
 double proc_W, proc_H;
 
-void combine_channels(IplImage* Cr, IplImage* Cb, IplImage* a, IplImage* iic){
-    unsigned char * CrPixelData = (unsigned char *)(Cr->imageData);
+void combine_channels(Mat Cr, Mat Cb, Mat a, Mat iic){
+	
+	cv::addWeighted((Cr+Cb), 0.5, a, 0.5, 0.0, iic);
+	//cv::divide(4, iic, iic, a.depth());
+	//iic = (add(Cr, Cb, + 2*a)/4;
+	imshow("Prueba",iic);
+/*    unsigned char * CrPixelData = (unsigned char *)(Cr->imageData);
     unsigned char * CbPixelData = (unsigned char *)(Cb->imageData);
     unsigned char * aPixelData = (unsigned char *)(a->imageData);
     unsigned char * iicPixelData = (unsigned char *)(iic->imageData);
@@ -60,7 +64,7 @@ void combine_channels(IplImage* Cr, IplImage* Cb, IplImage* a, IplImage* iic){
             iicPixelData[index] = cvRound((CrPixelData[index] + CbPixelData[index] + 2*(aPixelData[index]))/4);
         }
     }
-  
+  */
 }
 
 /*
@@ -127,7 +131,9 @@ int main( int argc, char** argv )
               
               cv::split(F_lab,channel_3);
               F_a=channel_3[1];
+              combine_channels(F_Cr, F_Cb, F_a, F_iic);
           
+          /*
           frame2 = cvCreateImage(cvSize(640,480), IPL_DEPTH_8U, 3);
           frame2->imageData = (char *) frame.data;
           
@@ -152,7 +158,8 @@ int main( int argc, char** argv )
           
           F_iic2= cvCreateImage(cvSize(640,480), IPL_DEPTH_8U, 1);
           F_iic2->imageData = (char *) frame.data;
-          combine_channels(F_Cr2, F_Cb2, F_a2, F_iic2); //D = (A + B + 2*C)/4 //illumination invariant color channel combination
+          combine_channels(F_Cr2, F_Cb2, F_a2, F_iic2);*/ //D = (A + B + 2*C)/4 //illumination invariant color channel combination
+          
 
 //F_Cb2 = cvCreateImage(cvSize(640,480), IPL_DEPTH_8U, 3);
 //F_Cb2->imageData = (char *) F_Cb.data;
@@ -182,8 +189,8 @@ int main( int argc, char** argv )
               imshow("F_Cr",F_Cr);
               imshow("F_Cb",F_Cb);
               imshow("F_a",F_a);
-              //imshow("Prueba",frame);
-             cvShowImage("Prueba",F_Cb2);
+//              imshow("Prueba",F_iic);
+             //cvShowImage("Prueba",F_Cb2);
         
           }
           
