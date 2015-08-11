@@ -43,28 +43,16 @@ double proc_W, proc_H;
 
 void combine_channels(Mat Cr, Mat Cb, Mat a, Mat iic){
 	
-	cv::addWeighted((Cr+Cb), 0.5, a, 0.5, 0.0, iic);
-	//cv::divide(4, iic, iic, a.depth());
-	//iic = (add(Cr, Cb, + 2*a)/4;
-	imshow("Prueba",iic);
-/*    unsigned char * CrPixelData = (unsigned char *)(Cr->imageData);
-    unsigned char * CbPixelData = (unsigned char *)(Cb->imageData);
-    unsigned char * aPixelData = (unsigned char *)(a->imageData);
-    unsigned char * iicPixelData = (unsigned char *)(iic->imageData);
-    
-    cvZero(iic);
-    
-    for (int y = 0; y < iic->height; y++) {
-        for (int x = 0; x < iic->width; x++) {
-            
-            //int Cr_index = (y*Cr.width+x);
-            //int Cb_index = (y*Cb.width+x);
-            //int a_index = (y*a.width+x);
-            int index = (y*iic->width+x);
-            iicPixelData[index] = cvRound((CrPixelData[index] + CbPixelData[index] + 2*(aPixelData[index]))/4);
-        }
-    }
-  */
+	//Reference: http://answers.opencv.org/question/13769/adding-matrices-without-saturation/
+	cv::Mat tempMatSum;
+	cv::Mat tempMatA;
+	cv::Mat tempMatIIC;
+
+	a.convertTo(tempMatA, CV_32S);
+	cv::addWeighted(Cr, 0.5, Cb, 0.5, 0.0, tempMatSum, CV_32S);
+	cv::addWeighted(tempMatSum, 0.5, tempMatA, 0.5, 0.0, tempMatIIC, CV_32S);
+	tempMatIIC.convertTo(iic, CV_8UC1);
+	imshow("Prueba", iic);
 }
 
 /*
