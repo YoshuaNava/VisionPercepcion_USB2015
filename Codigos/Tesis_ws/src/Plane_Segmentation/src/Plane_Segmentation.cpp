@@ -43,15 +43,14 @@ double proc_W, proc_H;
 
 void combine_channels(cv::Mat Cr, cv::Mat Cb, cv::Mat a, cv::Mat& iic){
 	
-	//Reference: http://answers.opencv.org/question/13769/adding-matrices-without-saturation/
-	cv::Mat tempMatSum;
-	cv::Mat tempMatA;
-	cv::Mat tempMatIIC;
-
-	a.convertTo(tempMatA, CV_32S);
-	cv::addWeighted(Cr, 0.5, Cb, 0.5, 0.0, tempMatSum, CV_32S);
-	cv::addWeighted(tempMatSum, 0.5, tempMatA, 0.5, 0.0, tempMatIIC, CV_32S);
-	tempMatIIC.convertTo(iic, CV_8UC1);
+	//Reference on passing parameters-by-reference in C/C++: http://stackoverflow.com/questions/11235187/opencv-changing-mat-inside-a-function-mat-scope
+	//Reference on adding matrices without saturation: http://answers.opencv.org/question/13769/adding-matrices-without-saturation/
+	Cr.convertTo(Cr, CV_32S);
+	Cb.convertTo(Cb, CV_32S);
+	a.convertTo(a, CV_32S);
+		//cv::addWeighted(Cr, 0.5, Cb, 0.5, 0.0, iic, CV_32S);
+	cv::addWeighted((Cr+Cb), 0.25, a, 0.5, 0.0, iic, CV_32S);
+	iic.convertTo(iic, CV_8UC1);
 }
 
 /*
@@ -80,7 +79,8 @@ int main( int argc, char** argv )
     namedWindow( "F_Cb", 1 ); 
     namedWindow( "F_Cr", 1 ); 
     namedWindow( "F_a", 1 ); 
-    cvNamedWindow( "Prueba", 1); 
+    cvNamedWindow( "F_iic", 1);
+    cvNamedWindow( "Prueba", 1);
     //Window Names
    
     while (nh.ok()) 
