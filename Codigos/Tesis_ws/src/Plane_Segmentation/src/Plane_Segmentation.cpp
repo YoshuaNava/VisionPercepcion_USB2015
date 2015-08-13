@@ -37,7 +37,7 @@
  using namespace std;
  using namespace cv;
 
-Mat frame, gray, prevgray, F_hsv, F_YCrCb, F_lab, F_sat, F_hue, F_Cr, F_Cb, F_a, channel_1[4], channel_2[4], channel_3[4], F_iic, src, src_out, dst, histImage; // Mat Declarations
+Mat frame, gray, prevgray, F_hsv, F_YCrCb, F_lab, F_sat, F_hue, F_Cr, F_Cb, F_a, channel_1[4], channel_2[4], channel_3[4], F_iic, src, src_out, dst, histImage, temp_grad[3], sobel[3], MAG, ANG; // Mat Declarations
 
 double proc_W, proc_H;
 
@@ -169,6 +169,7 @@ void ShowImages()
 	imshow("F_iic",F_iic);
 	imshow("Solve_Derivative", src_out);
 	imshow("Histogram", histImage);	
+	imshow("Prueba", ANG);
 }
 
 void CalculateImageFeatures()
@@ -213,7 +214,7 @@ int main( int argc, char** argv )
 
 
 
-	VideoCapture cap("./eng_stat_obst.avi"); // Declare capture form
+	VideoCapture cap("eng_stat_obst.avi"); // Declare capture form
 	//VideoCapture cap(0);
 
 
@@ -234,8 +235,45 @@ int main( int argc, char** argv )
 		{		  
 			CalculateImageFeatures();
 			waitKey(1);
-			ShowImages();
+			              //Sobel(gray, temp_grad[0], 1, 0, CV_SCHARR); //Find edges in x direction
+              Scharr(gray, temp_grad[0], gray.depth(), 1, 0, 1, 0, BORDER_DEFAULT );
+              convertScaleAbs(temp_grad[0], sobel[1], 1, 0);
+              
+              Scharr(gray, temp_grad[1], gray.depth(), 0, 1, 1, 0, BORDER_DEFAULT );
+              convertScaleAbs(temp_grad[1], sobel[2], 1, 0);
+              
+              Mat abs_grad_x=abs(temp_grad[0]);
+              Mat abs_grad_y=abs(temp_grad[1]);
+              MAG=abs_grad_x+abs_grad_y;
+              MAG= 255 - MAG;
+              ANG = 0*MAG;
+              float result;
+              //ANG = atan2( temp_grad[1] ,temp_grad[0]);
+              for (int y = 0; y < temp_grad[1].rows; y++) 
+              {
+				  for (int x = 0; x < temp_grad[1].cols; x++) 
+				  {
+					  float valueX = abs_grad_x.at<float>(y,x);
+					  float valueY = abs_grad_y.at<float>(y,x);
+					  float result = fastAtan2(valueY,valueX);
+					  ANG.at<uchar>(y, x) = (uchar)result;
+				   }
+               }
+               
+               normalize(MAG, MAG, 0, 255, CV_MINMAX);
+               convertScaleAbs(MAG, MAG, 1, 0); 
+               normalize(ANG, ANG, 0, 255, CV_MINMAX);
+               convertScaleAbs(ANG, ANG, 1, 0);
+              /*
+              convertScaleAbs(temp_grad[0], sobel[1], 0.2, 0); //convert 16bit image to 8-bit
+
+              Sobel(gray, temp_grad[1], 0, 1, CV_SCHARR);
+              convertScaleAbs(temp_grad[1], sobel[2], 0.2, 0); //convert 16bit image to 8-bit
+                     */     
+
 			//cvShowImage("Prueba",F_Cb2);
+			
+			ShowImages();
 		}
 
 		if(waitKey(30)>=0)
