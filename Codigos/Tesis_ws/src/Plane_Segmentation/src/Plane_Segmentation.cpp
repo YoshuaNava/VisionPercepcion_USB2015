@@ -37,7 +37,7 @@
  using namespace std;
  using namespace cv;
 
-Mat frame, gray, prevgray, F_hsv, F_YCrCb, F_lab, F_sat, F_hue, F_Cr, F_Cb, F_a, channel_1[4], channel_2[4], channel_3[4], F_iic, src, src_out, dst, histImage, temp_grad[3], sobel[3], MAG, ANG; // Mat Declarations
+Mat frame, gray, prevgray, F_hsv, F_YCrCb, F_lab, F_sat, F_hue, F_Cr, F_Cb, F_a, channel_1[4], channel_2[4], channel_3[4], F_iic, src, src_out, dst, histImage, temp_grad[3], sobel[3], MAG, ANG, LBP_IMG; // Mat Declarations
 
 double proc_W, proc_H;
 
@@ -153,6 +153,7 @@ void InitializeImageVisualizers()
     cvNamedWindow( "Histogram", 1);
     cvNamedWindow( "F_mag", 1);
     cvNamedWindow( "F_ang", 1);
+    cvNamedWindow( "LBP", 1);
     cvNamedWindow( "Prueba", 1);
     //Window Names
 }
@@ -173,6 +174,7 @@ void ShowImages()
 	imshow("Histogram", histImage);	
 	imshow("F_mag", MAG);
 	imshow("F_ang", ANG);
+	imshow("LBP", LBP_IMG);
 	//imshow("Prueba", ANG);
 }
 
@@ -235,6 +237,28 @@ void CalculateImageFeatures()
 
 	histogram(src,histImage); // Histogram Calculation
 	
+	
+	
+}
+
+Mat LBP(Mat img){
+    Mat dst = Mat::zeros(img.rows-2, img.cols-2, CV_8UC1);
+    for(int i=1;i<img.rows-1;i++) {
+        for(int j=1;j<img.cols-1;j++) {
+            uchar center = img.at<uchar>(i,j);
+            unsigned char code = 0;
+            code |= ((img.at<uchar>(i-1,j-1)) > center) << 7;
+                code |= ((img.at<uchar>(i-1,j)) > center) << 6;
+            code |= ((img.at<uchar>(i-1,j+1)) > center) << 5;
+            code |= ((img.at<uchar>(i,j+1)) > center) << 4;
+            code |= ((img.at<uchar>(i+1,j+1)) > center) << 3;
+            code |= ((img.at<uchar>(i+1,j)) > center) << 2;
+            code |= ((img.at<uchar>(i+1,j-1)) > center) << 1;
+            code |= ((img.at<uchar>(i,j-1)) > center) << 0;
+            dst.at<uchar>(i-1,j-1) = code;
+        }
+    }
+    return dst;
 }
 
 /*
@@ -277,7 +301,7 @@ int main( int argc, char** argv )
 			CalculateImageFeatures();
 			waitKey(1);
               
-			
+			LBP_IMG=LBP(gray);
 			ShowImages();
 		}
 
