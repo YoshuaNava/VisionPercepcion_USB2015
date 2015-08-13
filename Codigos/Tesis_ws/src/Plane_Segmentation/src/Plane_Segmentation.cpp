@@ -45,14 +45,97 @@ void combine_channels(cv::Mat Cr, cv::Mat Cb, cv::Mat a, cv::Mat& iic){
 	
 	//Reference on passing parameters-by-reference in C/C++: http://stackoverflow.com/questions/11235187/opencv-changing-mat-inside-a-function-mat-scope
 	//Reference on adding matrices without saturation: http://answers.opencv.org/question/13769/adding-matrices-without-saturation/
-	Cr.convertTo(Cr, CV_32S);
-	Cb.convertTo(Cb, CV_32S);
-	a.convertTo(a, CV_32S);
+	  Cr.convertTo(Cr, CV_32S);
+	  Cb.convertTo(Cb, CV_32S);
+	  a.convertTo(a, CV_32S);
 		//cv::addWeighted(Cr, 0.5, Cb, 0.5, 0.0, iic, CV_32S);
-	cv::addWeighted((Cr+Cb), 0.25, a, 0.5, 0.0, iic, CV_32S);
-	iic.convertTo(iic, CV_8UC1);
+	  cv::addWeighted((Cr+Cb), 0.25, a, 0.5, 0.0, iic, CV_32S);
+	  iic.convertTo(iic, CV_8UC1);
 }
 
+void solve_derivatives(cv::Mat src, cv::Mat& grad){
+
+    Mat src_gray;
+    int scale = 1;
+    int delta = 0;
+    int ddepth = CV_16S;
+    GaussianBlur( src, src, Size(3,3), 0, 0, BORDER_DEFAULT );
+
+    /// Convert it to gray 
+    cvtColor( src, src_gray, CV_RGB2GRAY );
+
+    /// Generate grad_x and grad_y
+    Mat grad_x, grad_y;
+    Mat abs_grad_x, abs_grad_y;
+
+    /// Gradient X
+    //Scharr( src_gray, grad_x, ddepth, 1, 0, scale, delta, BORDER_DEFAULT );
+    Sobel( src_gray, grad_x, ddepth, 1, 0, 3, scale, delta, BORDER_DEFAULT );
+    convertScaleAbs( grad_x, abs_grad_x );
+
+    /// Gradient Y
+    //Scharr( src_gray, grad_y, ddepth, 0, 1, scale, delta, BORDER_DEFAULT );
+    Sobel( src_gray, grad_y, ddepth, 0, 1, 3, scale, delta, BORDER_DEFAULT );
+    convertScaleAbs( grad_y, abs_grad_y );
+
+    /// Total Gradient (approximate)
+    addWeighted( abs_grad_x, 0.5, abs_grad_y, 0.5, 0, grad );
+              
+              
+
+}
+
+void histogram(cv::Mat src, cv::Mat& hist){
+              
+              Mat dst;
+              
+              vector<Mat> bgr_planes;
+              split( src, bgr_planes );
+
+              /// Establish the number of bins
+              int histSize = 256;
+
+              /// Set the ranges ( for B,G,R) )
+              float range[] = { 0, 256 } ;
+              const float* histRange = { range };
+
+              bool uniform = true; bool accumulate = false;
+
+              Mat b_hist, g_hist, r_hist;
+
+              /// Compute the histograms:
+              calcHist( &bgr_planes[0], 1, 0, Mat(), b_hist, 1, &histSize, &histRange, uniform, accumulate );
+              calcHist( &bgr_planes[1], 1, 0, Mat(), g_hist, 1, &histSize, &histRange, uniform, accumulate );
+              calcHist( &bgr_planes[2], 1, 0, Mat(), r_hist, 1, &histSize, &histRange, uniform, accumulate );
+
+              // Draw the histograms for B, G and R
+              int hist_w = 512; int hist_h = 400;
+              int bin_w = cvRound( (double) hist_w/histSize );
+
+              Mat histImage( hist_h, hist_w, CV_8UC3, Scalar( 0,0,0) );
+
+              /// Normalize the result to [ 0, histImage.rows ]
+              normalize(b_hist, b_hist, 0, histImage.rows, NORM_MINMAX, -1, Mat() );
+              normalize(g_hist, g_hist, 0, histImage.rows, NORM_MINMAX, -1, Mat() );
+              normalize(r_hist, r_hist, 0, histImage.rows, NORM_MINMAX, -1, Mat() );
+
+              /// Draw for each channel
+              for( int i = 1; i < histSize; i++ )
+              {
+                  line( histImage, Point( bin_w*(i-1), hist_h - cvRound(b_hist.at<float>(i-1)) ) ,
+                                   Point( bin_w*(i), hist_h - cvRound(b_hist.at<float>(i)) ),
+                                   Scalar( 255, 0, 0), 2, 8, 0  );
+                  line( histImage, Point( bin_w*(i-1), hist_h - cvRound(g_hist.at<float>(i-1)) ) ,
+                                   Point( bin_w*(i), hist_h - cvRound(g_hist.at<float>(i)) ),
+                                   Scalar( 0, 255, 0), 2, 8, 0  );
+                  line( histImage, Point( bin_w*(i-1), hist_h - cvRound(r_hist.at<float>(i-1)) ) ,
+                                   Point( bin_w*(i), hist_h - cvRound(r_hist.at<float>(i)) ),
+                                   Scalar( 0, 0, 255), 2, 8, 0  );
+              }
+              
+              hist=histImage;
+                  
+}
 /*
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -68,8 +151,11 @@ int main( int argc, char** argv )
     Mat frame, gray, prevgray, F_hsv, F_YCrCb, F_lab, F_sat, F_hue, F_Cr, F_Cb, F_a, channel_1[4], channel_2[4], channel_3[4], F_iic; // Mat Declarations
     IplImage *F_hsv2, *F_YCrCb2, *F_lab2, *F_sat2, *F_hue2, *F_Cr2, *F_Cb2, *F_a2, *F_iic2,  *gray_image, *frame2; // Iplimage* Declarations
     bool disp_img, refresh;
+    
+    Mat src,src_out,dst, histImage;
+
        
-    VideoCapture cap(0); // Declare capture form
+    VideoCapture cap(1); // Declare capture form
     
     namedWindow( "HSV", 1 ); 
     namedWindow( "YCrCb", 1 ); 
@@ -80,6 +166,8 @@ int main( int argc, char** argv )
     namedWindow( "F_Cr", 1 ); 
     namedWindow( "F_a", 1 ); 
     cvNamedWindow( "F_iic", 1);
+    cvNamedWindow( "Solve_Derivative", 1);
+    cvNamedWindow( "Histogram", 1);
     cvNamedWindow( "Prueba", 1);
     //Window Names
    
@@ -119,9 +207,25 @@ int main( int argc, char** argv )
               cv::split(F_lab,channel_3);
               F_a=channel_3[1];
               combine_channels(F_Cr, F_Cb, F_a, F_iic); //D = (A + B + 2*C)/4 //illumination invariant color channel combination
+              normalize(F_iic, F_iic, 0, 255, CV_MINMAX);
           
-          
+              src=frame;
+              solve_derivatives(src,src_out); // Solver Derivative Calculation
+              
+              histogram(src,histImage); // Histogram Calculation
+              
+        
+                          
+                          
+              
+              
+              
+              
+              
+             
 
+
+              waitKey(1);
               
               imshow("HSV",F_hsv);
               imshow("YCrCb",F_YCrCb);
@@ -132,6 +236,8 @@ int main( int argc, char** argv )
               imshow("F_Cb",F_Cb);
               imshow("F_a",F_a);
               imshow("F_iic",F_iic);
+              imshow("Solve_Derivative", src_out);
+              imshow("Histogram", histImage);
              //cvShowImage("Prueba",F_Cb2);
         
           }
