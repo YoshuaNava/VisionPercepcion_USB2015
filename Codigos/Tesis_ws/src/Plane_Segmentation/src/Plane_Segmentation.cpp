@@ -37,7 +37,7 @@
  using namespace std;
  using namespace cv;
 
-
+Mat frame, gray, prevgray, F_hsv, F_YCrCb, F_lab, F_sat, F_hue, F_Cr, F_Cb, F_a, channel_1[4], channel_2[4], channel_3[4], F_iic, src, src_out, dst, histImage; // Mat Declarations
 
 double proc_W, proc_H;
 
@@ -136,28 +136,11 @@ void histogram(cv::Mat src, cv::Mat& hist){
               hist=histImage;
                   
 }
-/*
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%            MAIN           %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-*/
-int main( int argc, char** argv ) 
-{
-    ros::init(argc, argv, "Plane_Segmentation");
-    ros::NodeHandle nh; 
-    
-    Mat frame, gray, prevgray, F_hsv, F_YCrCb, F_lab, F_sat, F_hue, F_Cr, F_Cb, F_a, channel_1[4], channel_2[4], channel_3[4], F_iic; // Mat Declarations
-    IplImage *F_hsv2, *F_YCrCb2, *F_lab2, *F_sat2, *F_hue2, *F_Cr2, *F_Cb2, *F_a2, *F_iic2,  *gray_image, *frame2; // Iplimage* Declarations
-    bool disp_img, refresh;
-    
-    Mat src,src_out,dst, histImage;
 
-       
-    VideoCapture cap(1); // Declare capture form
-    
-    namedWindow( "HSV", 1 ); 
+
+void InitializeImageVisualizers()
+{
+	namedWindow( "HSV", 1 ); 
     namedWindow( "YCrCb", 1 ); 
     namedWindow( "Lab", 1 ); 
     namedWindow( "F_hue", 1 ); 
@@ -170,92 +153,105 @@ int main( int argc, char** argv )
     cvNamedWindow( "Histogram", 1);
     cvNamedWindow( "Prueba", 1);
     //Window Names
-   
-    while (nh.ok()) 
-    {
+}
 
 
-  
-          cap >> frame; // Image from Cam to Mat Variable
-          cvtColor(frame, gray, CV_BGR2GRAY); // Convert to GrayScale
-          waitKey(1); // Wait Time
-          
-     
-          int input=cvWaitKey(40);
-          if ((char)input==32)
-          {
-              std::swap(prevgray, gray);
-          }
-          //safe window
-          
-          if( prevgray.data )
-          {
-              
-              cvtColor( frame, F_hsv, 	CV_BGR2HSV );	//Convert to HSV
-              cvtColor( frame, F_YCrCb, CV_BGR2YCrCb );	//Convert to YCrCb
-              cvtColor( frame, F_lab, 	CV_BGR2Lab );	//Convert to Lab
-              
-             
-              cv::split(F_hsv,channel_1); //cvsplit Divides a multi-channel array into separate single-channel arrays
-              F_hue=channel_1[0];
-              F_sat=channel_1[1];
-              
-              cv::split(F_YCrCb,channel_2);
-              F_Cr=channel_2[1];
-              F_Cb=channel_2[2];
-              
-              cv::split(F_lab,channel_3);
-              F_a=channel_3[1];
-              combine_channels(F_Cr, F_Cb, F_a, F_iic); //D = (A + B + 2*C)/4 //illumination invariant color channel combination
-              normalize(F_iic, F_iic, 0, 255, CV_MINMAX);
-          
-              src=frame;
-              solve_derivatives(src,src_out); // Solver Derivative Calculation
-              
-              histogram(src,histImage); // Histogram Calculation
-              
-        
-                          
-                          
-              
-              
-              
-              
-              
-             
+void ShowImages()
+{
+	imshow("HSV",F_hsv);
+	imshow("YCrCb",F_YCrCb);
+	imshow("Lab",F_lab);
+	imshow("F_hue",F_hue);
+	imshow("F_sat",F_sat);
+	imshow("F_Cr",F_Cr);
+	imshow("F_Cb",F_Cb);
+	imshow("F_a",F_a);
+	imshow("F_iic",F_iic);
+	imshow("Solve_Derivative", src_out);
+	imshow("Histogram", histImage);	
+}
+
+void CalculateImageFeatures()
+{
+	cvtColor( frame, F_hsv, 	CV_BGR2HSV );	//Convert to HSV
+	cvtColor( frame, F_YCrCb, CV_BGR2YCrCb );	//Convert to YCrCb
+	cvtColor( frame, F_lab, 	CV_BGR2Lab );	//Convert to Lab
+
+	cv::split(F_hsv,channel_1); //cvsplit Divides a multi-channel array into separate single-channel arrays
+	F_hue=channel_1[0];
+	F_sat=channel_1[1];
+
+	cv::split(F_YCrCb,channel_2);
+	F_Cr=channel_2[1];
+	F_Cb=channel_2[2];
+
+	cv::split(F_lab,channel_3);
+	F_a=channel_3[1];
+	combine_channels(F_Cr, F_Cb, F_a, F_iic); //D = (A + B + 2*C)/4 //illumination invariant color channel combination
+	normalize(F_iic, F_iic, 0, 255, CV_MINMAX);
+
+	src=frame;
+	solve_derivatives(src,src_out); // Solver Derivative Calculation
+
+	histogram(src,histImage); // Histogram Calculation
+}
+
+/*
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%            MAIN           %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+*/
+int main( int argc, char** argv ) 
+{
+	ros::init(argc, argv, "Plane_Segmentation");
+	ros::NodeHandle nh;
 
 
-              waitKey(1);
-              
-              imshow("HSV",F_hsv);
-              imshow("YCrCb",F_YCrCb);
-              imshow("Lab",F_lab);
-              imshow("F_hue",F_hue);
-              imshow("F_sat",F_sat);
-              imshow("F_Cr",F_Cr);
-              imshow("F_Cb",F_Cb);
-              imshow("F_a",F_a);
-              imshow("F_iic",F_iic);
-              imshow("Solve_Derivative", src_out);
-              imshow("Histogram", histImage);
-             //cvShowImage("Prueba",F_Cb2);
-        
-          }
-          
-         if(waitKey(30)>=0)
-         break;
-         std::swap(prevgray, gray);
-         waitKey(1);
-           
-        
-    }
-    
-    ros::spinOnce();
-    cap.release(); //Destroy the Capture from webcam
-    destroyAllWindows(); //Destroy the windows
-    
+	bool disp_img, refresh;
 
-    ros::spin();
 
-    return 0;
+
+	VideoCapture cap("./eng_stat_obst.avi"); // Declare capture form
+	//VideoCapture cap(0);
+
+
+	while (nh.ok()) 
+	{
+		cap >> frame; // Image from Cam to Mat Variable
+		cvtColor(frame, gray, CV_BGR2GRAY); // Convert to GrayScale
+		waitKey(1); // Wait Time
+
+		int input=cvWaitKey(40);
+		if ((char)input==32)
+		{
+			std::swap(prevgray, gray);
+		}
+		//safe window
+
+		if( prevgray.data )
+		{		  
+			CalculateImageFeatures();
+			waitKey(1);
+			ShowImages();
+			//cvShowImage("Prueba",F_Cb2);
+		}
+
+		if(waitKey(30)>=0)
+		{
+			break;
+		}
+		std::swap(prevgray, gray);
+		waitKey(1);
+	}
+
+	ros::spinOnce();
+	cap.release(); //Destroy the Capture from webcam
+	destroyAllWindows(); //Destroy the windows
+
+
+	ros::spin();
+
+	return 0;
 }
