@@ -33,13 +33,14 @@
  
  #define Window_W 1.02*proc_W //appriximate wht window width and hight as a function of the frame size
  #define Window_H 1.3*(proc_H)+20
- #define DISPLAY_IMAGE_XY(R,img,X,Y)		if(R){cvNamedWindow(#img); cvMoveWindow(#img, int(round(X*Window_W)), int(round(Y*Window_H))) ;} cvShowImage(#img, img);
+ #define DISPLAY_IMAGE_XY(R,img,X,Y)		if(R){cvNamedWindow(#img); cvMoveWindow(#img, int(round(X*Window_W)), int(round(Y*Window_H))) ;} cv::imshow(#img, img);
  using namespace std;
  using namespace cv;
 
-Mat frame, gray, prevgray, F_hsv, F_YCrCb, F_lab, F_sat, F_hue, F_Cr, F_Cb, F_a, channel_1[4], channel_2[4], channel_3[4], F_iic, src, src_out, dst, histImage, temp_grad[3], sobel[3], MAG, ANG, LBP_IMG; // Mat Declarations
+Mat frame, gray, prevgray, F_hsv, F_YCrCb, F_lab, F_sat, F_hue, F_Cr, F_Cb, F_a, channel_1[4], channel_2[4], channel_3[4], F_iic, src, src_out, dst, histImage, temp_grad[3], sobel[3], F_mag, F_ang, F_lbp; // Mat Declarations
 
 double proc_W, proc_H;
+VideoCapture cap;
 
 void combine_channels(cv::Mat Cr, cv::Mat Cb, cv::Mat a, cv::Mat& iic){
 	
@@ -51,6 +52,26 @@ void combine_channels(cv::Mat Cr, cv::Mat Cb, cv::Mat a, cv::Mat& iic){
 		//cv::addWeighted(Cr, 0.5, Cb, 0.5, 0.0, iic, CV_32S);
 	  cv::addWeighted((Cr+Cb), 0.25, a, 0.5, 0.0, iic, CV_32S);
 	  iic.convertTo(iic, CV_8UC1);
+}
+
+Mat LBP(Mat img){
+    Mat dst = Mat::zeros(img.rows-2, img.cols-2, CV_8UC1);
+    for(int i=1;i<img.rows-1;i++) {
+        for(int j=1;j<img.cols-1;j++) {
+            uchar center = img.at<uchar>(i,j);
+            unsigned char code = 0;
+            code |= ((img.at<uchar>(i-1,j-1)) > center) << 7;
+                code |= ((img.at<uchar>(i-1,j)) > center) << 6;
+            code |= ((img.at<uchar>(i-1,j+1)) > center) << 5;
+            code |= ((img.at<uchar>(i,j+1)) > center) << 4;
+            code |= ((img.at<uchar>(i+1,j+1)) > center) << 3;
+            code |= ((img.at<uchar>(i+1,j)) > center) << 2;
+            code |= ((img.at<uchar>(i+1,j-1)) > center) << 1;
+            code |= ((img.at<uchar>(i,j-1)) > center) << 0;
+            dst.at<uchar>(i-1,j-1) = code;
+        }
+    }
+    return dst;
 }
 
 void sobel_derivatives(cv::Mat src, cv::Mat& grad){
@@ -140,42 +161,71 @@ void histogram(cv::Mat src, cv::Mat& hist){
 
 void InitializeImageVisualizers()
 {
-	namedWindow( "HSV", 1 ); 
-    namedWindow( "YCrCb", 1 ); 
-    namedWindow( "Lab", 1 ); 
-    namedWindow( "F_hue", 1 ); 
-    namedWindow( "F_sat", 1 ); 
-    namedWindow( "F_Cb", 1 ); 
-    namedWindow( "F_Cr", 1 ); 
-    namedWindow( "F_a", 1 ); 
-    cvNamedWindow( "F_iic", 1);
-    cvNamedWindow( "Solve_Derivative", 1);
-    cvNamedWindow( "Histogram", 1);
-    cvNamedWindow( "F_mag", 1);
-    cvNamedWindow( "F_ang", 1);
-    cvNamedWindow( "LBP", 1);
-    cvNamedWindow( "Prueba", 1);
+	//namedWindow( "HSV", 1 ); 
+    //namedWindow( "YCrCb", 1 ); 
+    //namedWindow( "Lab", 1 ); 
+	cv::namedWindow( "frame", CV_WINDOW_NORMAL);
+	cv::resizeWindow("frame", proc_W, proc_H);
+	//namedWindow( "gray", 1 );
+    cv::namedWindow( "F_hue", 0);
+    cv::namedWindow( "F_sat", 0);
+    //namedWindow( "F_Cb", 1 );
+    //namedWindow( "F_Cr", 1 );
+    //namedWindow( "F_a", 1 );
+    cv::namedWindow( "F_iic", 0);
+    //cvNamedWindow( "Histogram", 1);
+    cv::namedWindow( "F_mag", 0);
+    cv::namedWindow( "F_ang", 0);
+    cv::namedWindow( "F_lbp", 0);
+    //cv::namedWindow( "Prueba", 0);
     //Window Names
 }
 
 
 void ShowImages()
 {
+	/*
 	imshow("HSV",F_hsv);
-	imshow("YCrCb",F_YCrCb);
-	imshow("Lab",F_lab);
+	//imshow("YCrCb",F_YCrCb);
+	//imshow("Lab",F_lab);
 	imshow("F_hue",F_hue);
 	imshow("F_sat",F_sat);
-	imshow("F_Cr",F_Cr);
-	imshow("F_Cb",F_Cb);
-	imshow("F_a",F_a);
+	//imshow("F_Cr",F_Cr);
+	//imshow("F_Cb",F_Cb);
+	//imshow("F_a",F_a);
 	imshow("F_iic",F_iic);
 	//imshow("Sobel_Derivative", src_out);
-	imshow("Histogram", histImage);	
-	imshow("F_mag", MAG);
-	imshow("F_ang", ANG);
-	imshow("LBP", LBP_IMG);
+	//imshow("Histogram", histImage);	
+	imshow("F_mag", F_mag);
+	imshow("F_ang", F_ang);
+	imshow("LBP", F_lbp);
 	//imshow("Prueba", ANG);
+	*/
+	
+	
+	//DISPLAY_IMAGE_XY(false, F_hsv, 0 , 0);
+	//DISPLAY_IMAGE_XY(false, F_YCrCb, 1 , 0);
+	//DISPLAY_IMAGE_XY(false, F_lab, 2 , 0);
+	DISPLAY_IMAGE_XY(true, frame, 0 , 0);
+	cv::resizeWindow("frame", proc_W, proc_H);
+	//DISPLAY_IMAGE_XY(true, gray, 1 , 0);
+	DISPLAY_IMAGE_XY(true, F_hue, 1 , 0);
+	cv::resizeWindow("F_hue", 160, 120);
+	//cv::resizeWindow("F_hue", 160, 120);
+	DISPLAY_IMAGE_XY(true, F_sat, 2 , 0);
+	cv::resizeWindow("F_sat", 160, 120);
+	//cv::resizeWindow("F_sat", 160, 120);
+	//DISPLAY_IMAGE_XY(true, F_Cr, 5 , 0);
+	//DISPLAY_IMAGE_XY(true, F_Cb, 6 , 0);
+	//DISPLAY_IMAGE_XY(true, F_a, 7 , 0);
+	DISPLAY_IMAGE_XY(true, F_iic, 3 , 0);
+	cv::resizeWindow("F_iic", 160, 120);
+	DISPLAY_IMAGE_XY(true, F_mag, 4 , 0);
+	cv::resizeWindow("F_mag", 160, 120);
+	DISPLAY_IMAGE_XY(true, F_ang, 5 , 0);
+	cv::resizeWindow("F_ang", 160, 120);
+	DISPLAY_IMAGE_XY(true, F_lbp, 6 , 0);
+	cv::resizeWindow("F_lbp", 160, 120);
 }
 
 void CalculateMagnitudeOrientationOfGradients()
@@ -188,9 +238,9 @@ void CalculateMagnitudeOrientationOfGradients()
 
 	Mat abs_grad_x = abs(temp_grad[0]);
 	Mat abs_grad_y = abs(temp_grad[1]);
-	MAG = abs_grad_x + abs_grad_y;
-	MAG= 255 - MAG;
-	ANG = 0*MAG;
+	F_mag = abs_grad_x + abs_grad_y;
+	F_mag = 255 - F_mag;
+	F_ang = 0*F_mag;
 	float result;
 	//ANG = atan2( temp_grad[1] ,temp_grad[0]);
 	for (int y = 0; y < temp_grad[1].rows; y++) 
@@ -200,14 +250,14 @@ void CalculateMagnitudeOrientationOfGradients()
 			float valueX = sobel[1].at<uchar>(y,x);
 			float valueY = sobel[2].at<uchar>(y,x);
 			float result = fastAtan2(valueY,valueX);
-			ANG.at<uchar>(y, x) = (uchar)result;
+			F_ang.at<uchar>(y, x) = (uchar)result;
 		}
 	}
 
-	normalize(MAG, MAG, 0, 255, CV_MINMAX);
-	convertScaleAbs(MAG, MAG, 1, 0); 
-	normalize(ANG, ANG, 0, 255, CV_MINMAX);
-	convertScaleAbs(ANG, ANG, 1, 0);	
+	normalize(F_mag, F_mag, 0, 255, CV_MINMAX);
+	convertScaleAbs(F_mag, F_mag, 1, 0); 
+	normalize(F_ang, F_ang, 0, 255, CV_MINMAX);
+	convertScaleAbs(F_ang, F_ang, 1, 0);	
 }
 
 
@@ -235,31 +285,26 @@ void CalculateImageFeatures()
 	
 	CalculateMagnitudeOrientationOfGradients();
 
+	F_lbp = LBP(gray);
+	
 	histogram(src,histImage); // Histogram Calculation
-	
-	
-	
 }
 
-Mat LBP(Mat img){
-    Mat dst = Mat::zeros(img.rows-2, img.cols-2, CV_8UC1);
-    for(int i=1;i<img.rows-1;i++) {
-        for(int j=1;j<img.cols-1;j++) {
-            uchar center = img.at<uchar>(i,j);
-            unsigned char code = 0;
-            code |= ((img.at<uchar>(i-1,j-1)) > center) << 7;
-                code |= ((img.at<uchar>(i-1,j)) > center) << 6;
-            code |= ((img.at<uchar>(i-1,j+1)) > center) << 5;
-            code |= ((img.at<uchar>(i,j+1)) > center) << 4;
-            code |= ((img.at<uchar>(i+1,j+1)) > center) << 3;
-            code |= ((img.at<uchar>(i+1,j)) > center) << 2;
-            code |= ((img.at<uchar>(i+1,j-1)) > center) << 1;
-            code |= ((img.at<uchar>(i,j-1)) > center) << 0;
-            dst.at<uchar>(i-1,j-1) = code;
-        }
-    }
-    return dst;
+
+void CameraSetup()
+{
+	cap = VideoCapture("eng_stat_obst.avi"); // Declare capture form
+	//VideoCapture cap(1);
+	
+	//InitializeImageVisualizers();
+	proc_W = 160;
+	proc_H = 120;
+	cap.set(CV_CAP_PROP_FRAME_WIDTH, 640);
+	cap.set(CV_CAP_PROP_FRAME_HEIGHT, 360);
+	// Good reference: http://superuser.com/questions/897420/how-to-know-which-framerate-should-i-use-to-capture-webcam-with-ffmpeg
+	cap.set(CV_CAP_PROP_FPS, 15);	
 }
+
 
 /*
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -273,35 +318,31 @@ int main( int argc, char** argv )
 	ros::init(argc, argv, "Plane_Segmentation");
 	ros::NodeHandle nh;
 
-
-	bool disp_img, refresh;
-
-
-
-	//VideoCapture cap("eng_stat_obst.avi"); // Declare capture form
-	VideoCapture cap(0);
-	//InitializeImageVisualizers();
-
+	CameraSetup();
 
 	while (nh.ok()) 
 	{
-		cap >> frame; // Image from Cam to Mat Variable
+		//cap >> frame; // Image from Cam to Mat Variable
+		if (!cap.read(frame)) {
+			std::cout << "Unable to retrieve frame from video stream." << std::endl;
+			continue;
+		}
+		cv:resize(frame, frame, Size(proc_W, proc_H), 0, 0, INTER_AREA);
 		cvtColor(frame, gray, CV_BGR2GRAY); // Convert to GrayScale
 		waitKey(1); // Wait Time
 
-		int input=cvWaitKey(40);
+		/*int input=cvWaitKey(40);
 		if ((char)input==32)
 		{
 			std::swap(prevgray, gray);
-		}
+		}*/
 		//safe window
 
 		if( prevgray.data )
 		{		  
 			CalculateImageFeatures();
-			waitKey(1);
+			//waitKey(1);
               
-			LBP_IMG=LBP(gray);
 			ShowImages();
 		}
 
