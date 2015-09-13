@@ -30,6 +30,8 @@
 #include "capture.h" //image capture 
 #include "ms_overwrite_safe_buffer.h"
 
+#include "../egbis/image.h"
+
 
 #define Window_W 1.02*proc_W //appriximate wht window width and hight as a function of the frame size
 #define Window_H 1.3*(proc_H)+20

@@ -420,7 +420,7 @@
 	"misc.h"
 	"segment-image.h"
 
-1438270184 /home/alfredoso/GitHub/VisionPercepcion_USB2015/Codigos/Ejemplos/Endogenos/gps_sapienza_modificado/img_proc_fcns.h
+1442149349 /home/alfredoso/GitHub/VisionPercepcion_USB2015/Codigos/Ejemplos/Endogenos/gps_sapienza_modificado/img_proc_fcns.h
 	"init_structures.h"
 
 1438270184 /home/alfredoso/GitHub/VisionPercepcion_USB2015/Codigos/Ejemplos/Endogenos/gps_sapienza_modificado/image.h
@@ -481,7 +481,7 @@
 	"init_structures.h"
 	"Net.h"
 
-1441767251 source:/home/alfredoso/GitHub/VisionPercepcion_USB2015/Codigos/Ejemplos/Endogenos/gps_sapienza_modificado/main.cpp
+1442149095 source:/home/alfredoso/GitHub/VisionPercepcion_USB2015/Codigos/Ejemplos/Endogenos/gps_sapienza_modificado/main.cpp
 	<opencv/cv.h>
 	<opencv/highgui.h>
 	<opencv/cxcore.h>

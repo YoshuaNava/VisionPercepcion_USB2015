@@ -27,9 +27,11 @@ using namespace std;
 #include <cstdio>
 #include <cstdlib>
 #include <math.h>
-#include "image.h"
-#include "misc.h"
-#include "segment-image.h"
+
+// Linking libraries for EGBIS by Felzenszwalb and Hutterloch
+#include "../egbis/image.h"
+#include "../egbis/misc.h"
+#include "../egbis/segment-image.h"
 
 namespace img_proc_fcns {
 
