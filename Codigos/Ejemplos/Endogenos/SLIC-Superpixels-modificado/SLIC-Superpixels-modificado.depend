@@ -1,0 +1,17 @@
+# depslib dependency file v1.0
+1442134543 source:/home/alfredoso/GitHub/VisionPercepcion_USB2015/Codigos/Ejemplos/Endogenos/SLIC-Superpixels-modificado/main.cpp
+	<opencv2/core/core.hpp>
+	<opencv2/imgproc/imgproc.hpp>
+	<opencv2/highgui/highgui.hpp>
+
+1442134344 source:/home/alfredoso/GitHub/VisionPercepcion_USB2015/Codigos/Ejemplos/Endogenos/SLIC-Superpixels-modificado/slic.cpp
+	"slic.h"
+
+1442134344 /home/alfredoso/GitHub/VisionPercepcion_USB2015/Codigos/Ejemplos/Endogenos/SLIC-Superpixels-modificado/slic.h
+	<opencv/cv.h>
+	<opencv/highgui.h>
+	<stdio.h>
+	<math.h>
+	<vector>
+	<float.h>
+
