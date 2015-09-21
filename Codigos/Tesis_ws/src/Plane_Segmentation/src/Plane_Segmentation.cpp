@@ -1,3 +1,20 @@
+/*
+ *  Copyright (C) <2014>  <Michael Sapienza>
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 //opencv header files
 #include "ros/ros.h"
 #include "std_msgs/String.h"
@@ -47,40 +64,12 @@ VideoCapture cap;
 
 void ShowImages()
 {
-	/*
-	imshow("HSV",F_hsv);
-	//imshow("YCrCb",F_YCrCb);
-	//imshow("Lab",F_lab);
-	imshow("F_hue",F_hue);
-	imshow("F_sat",F_sat);
-	//imshow("F_Cr",F_Cr);
-	//imshow("F_Cb",F_Cb);
-	//imshow("F_a",F_a);
-	imshow("F_iic",F_iic);
-	//imshow("Sobel_Derivative", src_out);
-	//imshow("Histogram", histImage);	
-	imshow("F_mag", F_mag);
-	imshow("F_ang", F_ang);
-	imshow("LBP", F_lbp);
-	//imshow("Prueba", ANG);
-	*/
-	
-	
-	//DISPLAY_IMAGE_XY(false, F_hsv, 0 , 0);
-	//DISPLAY_IMAGE_XY(false, F_YCrCb, 1 , 0);
-	//DISPLAY_IMAGE_XY(false, F_lab, 2 , 0);
 	DISPLAY_IMAGE_XY(true, frame, 0 , 0);
 	cv::resizeWindow("frame", proc_W, proc_H);
-	//DISPLAY_IMAGE_XY(true, gray, 1 , 0);
 	DISPLAY_IMAGE_XY(true, F_hue, 1 , 0);
 	cv::resizeWindow("F_hue", 160, 120);
-	//cv::resizeWindow("F_hue", 160, 120);
 	DISPLAY_IMAGE_XY(true, F_sat, 2 , 0);
 	cv::resizeWindow("F_sat", 160, 120);
-	//cv::resizeWindow("F_sat", 160, 120);
-	//DISPLAY_IMAGE_XY(true, F_Cr, 5 , 0);
-	//DISPLAY_IMAGE_XY(true, F_Cb, 6 , 0);
-	//DISPLAY_IMAGE_XY(true, F_a, 7 , 0);
 	DISPLAY_IMAGE_XY(true, F_iic, 3 , 0);
 	cv::resizeWindow("F_iic", 160, 120);
 	DISPLAY_IMAGE_XY(true, F_mag, 4 , 0);
@@ -231,7 +220,6 @@ void CalculateImageFeatures()
 	normalize(F_iic, F_iic, 0, 255, CV_MINMAX);
 
 	src=frame;
-	//sobel_derivatives(src,src_out); // Solver Derivative Calculation
 	
 	CalculateMagnitudeOrientationOfGradients();
 
@@ -281,12 +269,6 @@ int main( int argc, char** argv )
 		cvtColor(frame, gray, CV_BGR2GRAY); // Convert to GrayScale
 		waitKey(1); // Wait Time
 
-		/*int input=cvWaitKey(40);
-		if ((char)input==32)
-		{
-			std::swap(prevgray, gray);
-		}*/
-		//safe window
 
 		if( prevgray.data )
 		{		  
