@@ -15,6 +15,7 @@ find_package(OpenCV)
 include_directories(${catkin_INCLUDE_DIRS} ${OpenCV_INCLUDE_DIRS} include)
 
 
+
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 catkin_package(
 #  INCLUDE_DIRS include
@@ -23,11 +24,18 @@ catkin_package(
 #  DEPENDS system_lib
 )
 
+#hola
+#target_link_libraries (Plane_Segmentation slic)
+#add_library(slic slic.cpp)
 
+#add_executable(foo src/foo.cpp)
 
 
  add_executable(Plane_Segmentation src/Plane_Segmentation.cpp)
  target_link_libraries(Plane_Segmentation ${catkin_LIBRARIES})
  target_link_libraries(Plane_Segmentation ${OpenCV_LIBS})
+ 
+ add_library(slic src/slic.cpp)
+target_link_libraries(Plane_Segmentation slic)
  ##add_dependencies(Convert_Image ar_pose_generate_messages_cpp)
 

@@ -1,20 +1,3 @@
-/*
- *  Copyright (C) <2014>  <Michael Sapienza>
- *
- *  This program is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
- *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
-
 //opencv header files
 #include "ros/ros.h"
 #include "std_msgs/String.h"
@@ -33,6 +16,7 @@
 #include "fstream"
 #include "vector"
 #include "thread"
+#include <float.h>
 
 #include "opencv/cv.h"
 #include "opencv/highgui.h"
@@ -48,6 +32,7 @@
 #include "ms_overwrite_safe_buffer.h"
 
 #include "../egbis/image.h"
+#include "../src/slic.h"
 
 
 #define Window_W 1.02*proc_W //appriximate wht window width and hight as a function of the frame size
@@ -56,7 +41,9 @@
 using namespace std;
 using namespace cv;
 
-Mat frame, gray, prevgray, F_hsv, F_YCrCb, F_lab, F_sat, F_hue, F_Cr, F_Cb, F_a, channel_1[4], channel_2[4], channel_3[4], F_iic, src, src_out, dst, histImage, temp_grad[3], sobel[3], F_mag, F_ang, F_lbp; // Mat Declarations
+Mat frame, gray, prevgray, F_hsv, F_YCrCb, F_lab, F_sat, F_hue, F_Cr, F_Cb, F_a, channel_1[4], channel_2[4], channel_3[4], F_iic, src, src_out, dst, histImage, temp_grad[3], sobel[3], F_mag, F_ang, F_lbp, image_pub, hist_prueba, histImage2; // Mat Declarations
+
+IplImage *frame2, *F_iic2, *image_pub2;
 
 double proc_W, proc_H;
 VideoCapture cap;
@@ -64,12 +51,40 @@ VideoCapture cap;
 
 void ShowImages()
 {
+	/*
+	imshow("HSV",F_hsv);
+	//imshow("YCrCb",F_YCrCb);
+	//imshow("Lab",F_lab);
+	imshow("F_hue",F_hue);
+	imshow("F_sat",F_sat);
+	//imshow("F_Cr",F_Cr);
+	//imshow("F_Cb",F_Cb);
+	//imshow("F_a",F_a);
+	imshow("F_iic",F_iic);
+	//imshow("Sobel_Derivative", src_out);
+	//imshow("Histogram", histImage);	
+	imshow("F_mag", F_mag);
+	imshow("F_ang", F_ang);
+	imshow("LBP", F_lbp);
+	//imshow("Prueba", ANG);
+	*/
+	
+	
+	//DISPLAY_IMAGE_XY(false, F_hsv, 0 , 0);
+	//DISPLAY_IMAGE_XY(false, F_YCrCb, 1 , 0);
+	//DISPLAY_IMAGE_XY(false, F_lab, 2 , 0);
 	DISPLAY_IMAGE_XY(true, frame, 0 , 0);
 	cv::resizeWindow("frame", proc_W, proc_H);
+	//DISPLAY_IMAGE_XY(true, gray, 1 , 0);
 	DISPLAY_IMAGE_XY(true, F_hue, 1 , 0);
 	cv::resizeWindow("F_hue", 160, 120);
+	//cv::resizeWindow("F_hue", 160, 120);
 	DISPLAY_IMAGE_XY(true, F_sat, 2 , 0);
 	cv::resizeWindow("F_sat", 160, 120);
+	//cv::resizeWindow("F_sat", 160, 120);
+	//DISPLAY_IMAGE_XY(true, F_Cr, 5 , 0);
+	//DISPLAY_IMAGE_XY(true, F_Cb, 6 , 0);
+	//DISPLAY_IMAGE_XY(true, F_a, 7 , 0);
 	DISPLAY_IMAGE_XY(true, F_iic, 3 , 0);
 	cv::resizeWindow("F_iic", 160, 120);
 	DISPLAY_IMAGE_XY(true, F_mag, 4 , 0);
@@ -149,54 +164,55 @@ Mat CalculateLBP(Mat img){
 
 void Histogram(cv::Mat src, cv::Mat& hist){
               
-              Mat dst;
-              
-              vector<Mat> bgr_planes;
-              split( src, bgr_planes );
+  Mat dst;
+  
+  vector<Mat> bgr_planes;
+  split( src, bgr_planes );
 
-              /// Establish the number of bins
-              int histSize = 256;
+  /// Establish the number of bins
+  int histSize = 256;
 
-              /// Set the ranges ( for B,G,R) )
-              float range[] = { 0, 256 } ;
-              const float* histRange = { range };
+  /// Set the ranges ( for B,G,R) )
+  float range[] = { 0, 256 } ;
+  const float* histRange = { range };
 
-              bool uniform = true; bool accumulate = false;
+  bool uniform = true; bool accumulate = false;
 
-              Mat b_hist, g_hist, r_hist;
+  Mat b_hist, g_hist, r_hist;
 
-              /// Compute the histograms:
-              calcHist( &bgr_planes[0], 1, 0, Mat(), b_hist, 1, &histSize, &histRange, uniform, accumulate );
-              calcHist( &bgr_planes[1], 1, 0, Mat(), g_hist, 1, &histSize, &histRange, uniform, accumulate );
-              calcHist( &bgr_planes[2], 1, 0, Mat(), r_hist, 1, &histSize, &histRange, uniform, accumulate );
+  /// Compute the histograms:
+  calcHist( &bgr_planes[0], 1, 0, Mat(), b_hist, 1, &histSize, &histRange, uniform, accumulate );
+  calcHist( &bgr_planes[1], 1, 0, Mat(), g_hist, 1, &histSize, &histRange, uniform, accumulate );
+  calcHist( &bgr_planes[2], 1, 0, Mat(), r_hist, 1, &histSize, &histRange, uniform, accumulate );
 
-              // Draw the histograms for B, G and R
-              int hist_w = 512; int hist_h = 400;
-              int bin_w = cvRound( (double) hist_w/histSize );
+  // Draw the histograms for B, G and R
+  int hist_w = 512; int hist_h = 400;
+  int bin_w = cvRound( (double) hist_w/histSize );
 
-              Mat histImage( hist_h, hist_w, CV_8UC3, Scalar( 0,0,0) );
+  Mat histImage( hist_h, hist_w, CV_8UC3, Scalar( 0,0,0) );
 
-              /// Normalize the result to [ 0, histImage.rows ]
-              normalize(b_hist, b_hist, 0, histImage.rows, NORM_MINMAX, -1, Mat() );
-              normalize(g_hist, g_hist, 0, histImage.rows, NORM_MINMAX, -1, Mat() );
-              normalize(r_hist, r_hist, 0, histImage.rows, NORM_MINMAX, -1, Mat() );
+  /// Normalize the result to [ 0, histImage.rows ]
+  normalize(b_hist, b_hist, 0, histImage.rows, NORM_MINMAX, -1, Mat() );
+  normalize(g_hist, g_hist, 0, histImage.rows, NORM_MINMAX, -1, Mat() );
+  normalize(r_hist, r_hist, 0, histImage.rows, NORM_MINMAX, -1, Mat() );
 
-              /// Draw for each channel
-              for( int i = 1; i < histSize; i++ )
-              {
-                  line( histImage, Point( bin_w*(i-1), hist_h - cvRound(b_hist.at<float>(i-1)) ) ,
-                                   Point( bin_w*(i), hist_h - cvRound(b_hist.at<float>(i)) ),
-                                   Scalar( 255, 0, 0), 2, 8, 0  );
-                  line( histImage, Point( bin_w*(i-1), hist_h - cvRound(g_hist.at<float>(i-1)) ) ,
-                                   Point( bin_w*(i), hist_h - cvRound(g_hist.at<float>(i)) ),
-                                   Scalar( 0, 255, 0), 2, 8, 0  );
-                  line( histImage, Point( bin_w*(i-1), hist_h - cvRound(r_hist.at<float>(i-1)) ) ,
-                                   Point( bin_w*(i), hist_h - cvRound(r_hist.at<float>(i)) ),
-                                   Scalar( 0, 0, 255), 2, 8, 0  );
-              }
-              
-              hist=histImage;
-                  
+  /// Draw for each channel
+  for( int i = 1; i < histSize; i++ )
+  {
+      line( histImage, Point( bin_w*(i-1), hist_h - cvRound(b_hist.at<float>(i-1)) ) ,
+                       Point( bin_w*(i), hist_h - cvRound(b_hist.at<float>(i)) ),
+                       Scalar( 255, 0, 0), 2, 8, 0  );
+      line( histImage, Point( bin_w*(i-1), hist_h - cvRound(g_hist.at<float>(i-1)) ) ,
+                       Point( bin_w*(i), hist_h - cvRound(g_hist.at<float>(i)) ),
+                       Scalar( 0, 255, 0), 2, 8, 0  );
+      line( histImage, Point( bin_w*(i-1), hist_h - cvRound(r_hist.at<float>(i-1)) ) ,
+                       Point( bin_w*(i), hist_h - cvRound(r_hist.at<float>(i)) ),
+                       Scalar( 0, 0, 255), 2, 8, 0  );
+  }
+  
+  hist=histImage;
+  imshow("histograma",hist);
+      
 }
 
 
@@ -220,6 +236,7 @@ void CalculateImageFeatures()
 	normalize(F_iic, F_iic, 0, 255, CV_MINMAX);
 
 	src=frame;
+	//sobel_derivatives(src,src_out); // Solver Derivative Calculation
 	
 	CalculateMagnitudeOrientationOfGradients();
 
@@ -231,17 +248,68 @@ void CalculateImageFeatures()
 
 void CameraSetup()
 {
-	cap = VideoCapture("eng_stat_obst.avi"); // Declare capture form
+	cap = VideoCapture(1); // Declare capture form Video: "eng_stat_obst.avi"
 	//VideoCapture cap(0); //Camera integrada de la computadora
 	//VideoCapture cap(1); //Otra camara, conectada a la computadora mediante USB, por ejemplo.
 	
-	proc_W = 160;
-	proc_H = 120;
+	proc_W = 160;//160
+	proc_H = 120;//120
 	cap.set(CV_CAP_PROP_FRAME_WIDTH, 640);
 	cap.set(CV_CAP_PROP_FRAME_HEIGHT, 360);
 	// Good reference: http://superuser.com/questions/897420/how-to-know-which-framerate-should-i-use-to-capture-webcam-with-ffmpeg
 	cap.set(CV_CAP_PROP_FPS, 15);	
 }
+
+void imageCallback(const sensor_msgs::ImageConstPtr& msg)
+{
+  
+    // cv_bridge::CvImagePtr cv_ptr;
+    try
+    {
+    namedWindow( "view", 1 );
+        cv_bridge::CvImagePtr cv_ptr;
+        cv_ptr = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::MONO8);
+        image_pub=cv_ptr->image;
+        //image_pub=cv_bridge::toCvShare(msg, "bgr8")->image;
+            image_pub2 = cvCreateImage(cvSize(160,120), IPL_DEPTH_8U, 3);
+    image_pub2->imageData = (char *) image_pub.data;
+        imshow("view",image_pub);
+        // imshow("view", cv_bridge::toCvShare(msg, "bgr8")->image);
+        //  waitKey(30);       
+
+    }
+    catch (cv_bridge::Exception& e)
+    {
+        ROS_ERROR("Could not convert from '%s' to 'bgr8'.", msg->encoding.c_str());
+    }
+}
+
+void SuperPixels(cv::Mat src)
+{
+  namedWindow( "SuperPixels", 1 ); 
+  frame2 = cvCreateImage(cvSize(160,120), IPL_DEPTH_8U, 3);
+  frame2->imageData = (char *) src.data;
+  
+      /* Yield the number of superpixels and weight-factors from the user. */
+  IplImage *lab_image = cvCloneImage(frame2);
+  cvCvtColor(frame2, lab_image, CV_BGR2Lab);
+  int w = frame2->width, h = frame2->height;
+  //int nr_superpixels = atoi(argv[2]);
+  int nr_superpixels = 400;
+  //int nc = atoi(argv[3]);
+  int nc = 40;
+  double step = sqrt((w * h) / (double) nr_superpixels)*3;
+
+  /* Perform the SLIC superpixel algorithm. */
+ 
+  Slic slic;
+  slic.generate_superpixels(lab_image, step, nc);
+  slic.create_connectivity(lab_image);
+  slic.display_contours(frame2, CV_RGB(255,0,0));
+  cvShowImage("SuperPixels", frame2);
+  cvWaitKey(10);
+}
+
 
 
 /*
@@ -255,28 +323,149 @@ int main( int argc, char** argv )
 {
 	ros::init(argc, argv, "Plane_Segmentation");
 	ros::NodeHandle nh;
-
+  
+  image_transport::ImageTransport it(nh);
+  image_transport::Publisher pub = it.advertise("camera/image_raw", 1); //Publisher
+  ros::Rate loop_rate(5);
+  
 	CameraSetup();
-
+  waitKey(1);
+  image_transport::Subscriber sub = it.subscribe("camera/image_raw", 1, imageCallback); // Subscriber Function
+  
+  CvScalar s; 
+  
 	while (nh.ok()) 
 	{
 		//cap >> frame; // Image from Cam to Mat Variable
-		if (!cap.read(frame)) {
+		if (!cap.read(frame)) 
+		{
 			std::cout << "Unable to retrieve frame from video stream." << std::endl;
 			continue;
 		}
 		cv:resize(frame, frame, Size(proc_W, proc_H), 0, 0, INTER_AREA);
 		cvtColor(frame, gray, CV_BGR2GRAY); // Convert to GrayScale
 		waitKey(1); // Wait Time
-
+    
 
 		if( prevgray.data )
 		{		  
-			CalculateImageFeatures();
-			//waitKey(1);
-              
+			CalculateImageFeatures();       
 			ShowImages();
+				
+			
+			//Publisher	Code
+			sensor_msgs::ImagePtr msg = cv_bridge::CvImage(std_msgs::Header(), "mono8", F_lbp).toImageMsg();
+      pub.publish(msg);
+      waitKey(1);
+      ////////////////
+      IplImage* frame_ipl = cvCreateImage(cvSize(frame.cols,frame.rows), IPL_DEPTH_8U, 3);
+      frame_ipl->imageData = (char *) frame.data;
+      cvShowImage("frame_prueba",frame_ipl);
+      
+      int A=(((frame.cols/4)*3)-(frame.cols/4))-1;
+      int B=((frame.rows-(frame.rows/12))-((frame.rows/4)*3))-1;
+      IplImage* frame_window=NULL;
+      frame_window=cvCreateImage(cvSize(A,B),IPL_DEPTH_8U,3);
+      
+      for(int y = 0; y < frame.rows; y=y+1)
+      {
+          for(int x = 0; x < frame.cols; x=x+1)
+        	{
+              s=cvGet2D(frame_ipl,y,x); 
+              if (x>=(frame.cols/4) && x<=(frame.cols/4)*3 && y==(frame.rows/4)*3)
+              {
+                  s.val[0]=75;
+                  s.val[1]=248;
+                  s.val[2]=251;
+                  cvSet2D(frame_ipl,y,x,s);
+              } 
+              
+              if (x>=(frame.cols/4) && x<=(frame.cols/4)*3 && y==(frame.rows-(frame.rows/12)))
+              {
+                  s.val[0]=75;
+                  s.val[1]=248;
+                  s.val[2]=251;
+                  cvSet2D(frame_ipl,y,x,s);
+                                   
+              } 
+              
+              if (y>=(frame.rows/4)*3 && y<=(frame.rows-(frame.rows/12)) && x==(frame.cols/4))
+              {
+                  s.val[0]=75;
+                  s.val[1]=248;
+                  s.val[2]=251;
+                  cvSet2D(frame_ipl,y,x,s);
+                               
+              }
+              
+              if (y>=(frame.rows/4)*3 && y<=(frame.rows-(frame.rows/12)) && x==(frame.cols/4)*3)
+              {
+                  s.val[0]=75;
+                  s.val[1]=248;
+                  s.val[2]=251;
+                  cvSet2D(frame_ipl,y,x,s);
+                               
+              }
+          }                               
+      }
+     cvShowImage("frame_prueba",frame_ipl);
+     
+     
+     for(int y = 0; y < B; y=y+1)
+      {
+          for(int x = 0; x < A; x=x+1)
+        	{
+              
+             
+               s=cvGet2D(frame_ipl,y,x); 
+                   s.val[0]=0;
+                  s.val[1]=0;
+                  s.val[2]=0;
+               cvSet2D(frame_window,y,x,s);
+              
+               
+              
+              
+           
+          }                               
+      }  
+     
+      int xx=0;
+      int yy=0;
+      for(int y = 0; y < frame.rows; y=y+1)
+      {
+          for(int x = 0; x < frame.cols; x=x+1)
+        	{
+              
+              if (x>=(frame.cols/4)+1 && x<=(frame.cols/4)*3-1 && y>=((frame.rows/4)*3)+1 && y<=(frame.rows-(frame.rows/12)-1))
+              {
+               s=cvGet2D(frame_ipl,y,x); 
+               cvSet2D(frame_window,yy,xx,s);
+               xx=xx+1;
+               if(xx>((frame.cols/4)*3)-(frame.cols/4)-2)
+               {
+               xx=0;
+               yy=yy+1;
+               } 
+              } 
+              
+           
+          }                               
+      }      
+    //  cvShowImage("f2",frame_window); 
+      
+      cvShowImage("f2",frame_window); 
+      hist_prueba=frame_window;
+      Histogram(hist_prueba,histImage2);
+      imshow("histograma_ventana",histImage2);
+      
+      
+      
+      
+      SuperPixels(frame);	
 		}
+
+
 
 		if(waitKey(30)>=0)
 		{
@@ -284,14 +473,16 @@ int main( int argc, char** argv )
 		}
 		std::swap(prevgray, gray);
 		waitKey(1);
+	  ros::spinOnce();
 	}
 
-	ros::spinOnce();
+
+	loop_rate.sleep();
 	cap.release(); //Destroy the Capture from webcam
 	destroyAllWindows(); //Destroy the windows
 
 
-	ros::spin();
+	//ros::spin();
 
 	return 0;
 }
