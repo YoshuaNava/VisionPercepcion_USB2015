@@ -36,9 +36,14 @@ Superpixel::Superpixel(int id, point2D center)
 
 point2D Superpixel::get_center()
 {
-	return center;
+	return this->center;
 }
 
+
+RGBcolourFrequencyChart Superpixel::get_histogram()
+{
+	return this->histogram;
+}
 
 void Superpixel::add_point(point2D point)
 {

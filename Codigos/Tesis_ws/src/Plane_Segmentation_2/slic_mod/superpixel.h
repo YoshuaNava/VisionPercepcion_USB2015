@@ -44,6 +44,7 @@ class Superpixel
 		~Superpixel();
 
 		point2D get_center();
+		RGBcolourFrequencyChart get_histogram();
 
 		static RGBcolourFrequencyChart init_FrequencyChart();
 		void print_everything();

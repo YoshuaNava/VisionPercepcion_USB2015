@@ -248,7 +248,7 @@ void CalculateImageFeatures()
 
 void CameraSetup()
 {
-	cap = VideoCapture(0); // Declare capture form Video: "eng_stat_obst.avi"
+	cap = VideoCapture(1); // Declare capture form Video: "eng_stat_obst.avi"
 	//VideoCapture cap(0); //Camera integrada de la computadora
 	//VideoCapture cap(1); //Otra camara, conectada a la computadora mediante USB, por ejemplo.
 	
@@ -309,6 +309,7 @@ void SuperPixels(cv::Mat src)
   slic.display_contours(frame2, CV_RGB(255,0,0));
   //slic.display_center_grid(frame2, CV_RGB(0,255,0));
   slic.display_number_grid(frame2, CV_RGB(0,255,0));
+  slic.show_histograms(1,20);
   //slic.calculate_histograms(frame2);
   //slic.colour_with_cluster_means(frame2);
   cvShowImage("SuperPixels", frame2);

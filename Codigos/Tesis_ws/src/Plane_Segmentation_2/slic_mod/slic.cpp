@@ -324,19 +324,62 @@ void Slic::store_superpixels(IplImage *image)
 
 void Slic::display_number_grid(IplImage *image, CvScalar colour) 
 {
-    for (int i = 0; i < (int) superpixels.size(); i++) {
+    for (int i = 0; i < (int) superpixels.size()-1; i++) {
         //cvCircle(image, cvPoint(superpixels[i][0], superpixels[i][0]), 2, colour, 2);
         char buffer[25];
         sprintf(buffer, "%i", i);
         CvFont font;
-        cvInitFont(&font, CV_FONT_HERSHEY_SIMPLEX, 0.5, 0.5);
+        cvInitFont(&font, CV_FONT_HERSHEY_SIMPLEX, 0.3, 0.3);
         cvPutText(image, buffer, cvPoint(superpixels[i].get_center()[0], superpixels[i].get_center()[1]), &font, colour);
     }
 }
 
 
-void Slic::show_histograms(int superpixel_id_1, int superpixel_id_1)
+void Slic::show_histograms(int superpixel_id_1, int superpixel_id_2)
+{
+      // Draw the histograms for B, G and R
+    int histSize = 256;
+    int hist_w = 640; int hist_h = 480;
+    int bin_w = cvRound( (double) hist_w/histSize );
 
+
+    cv::Mat histImage( hist_h, hist_w, CV_8UC3, CV_RGB(0,0,0));
+
+    /// Normalize the result to [ 0, histImage.rows ]
+    /*normalize(superpixels[0].get_histogram(), b_hist, 0, histImage.rows, NORM_MINMAX, -1, Mat() );
+    normalize(g_hist, g_hist, 0, histImage.rows, NORM_MINMAX, -1, Mat() );
+    normalize(r_hist, r_hist, 0, histImage.rows, NORM_MINMAX, -1, Mat() );
+*/
+    /// Draw for each channel
+    RGBcolourFrequencyChart histogram_1 = superpixels[superpixel_id_1].get_histogram();
+    RGBcolourFrequencyChart histogram_2 = superpixels[superpixel_id_2].get_histogram();
+    
+    for( int i = 0; i < histSize; i++ )
+    {
+      line( histImage, cvPoint( bin_w*(i-1), hist_h - histogram_1[i][2]) ,
+                       cvPoint( bin_w*(i), hist_h - histogram_1[i][2]),
+                       CV_RGB(127,0,0), 2, 8, 0  );
+      line( histImage, cvPoint( bin_w*(i-1), hist_h - histogram_1[i][1]) ,
+                       cvPoint( bin_w*(i), hist_h - histogram_1[i][1]),
+                       CV_RGB(0,127,0), 2, 8, 0  );
+      line( histImage, cvPoint( bin_w*(i-1), hist_h - histogram_1[i][0]) ,
+                       cvPoint( bin_w*(i), hist_h - histogram_1[i][0]),
+                       CV_RGB(0,0,127), 2, 8, 0  );
+      line( histImage, cvPoint( bin_w*(i-1), hist_h - histogram_2[i][2]) ,
+                       cvPoint( bin_w*(i), hist_h - histogram_2[i][2]),
+                       CV_RGB(255,0,0), 2, 8, 0  );
+      line( histImage, cvPoint( bin_w*(i-1), hist_h - histogram_2[i][1]) ,
+                       cvPoint( bin_w*(i), hist_h - histogram_2[i][1]),
+                       CV_RGB(0,255,0), 2, 8, 0  );
+      line( histImage, cvPoint( bin_w*(i-1), hist_h - histogram_2[i][0]) ,
+                       cvPoint( bin_w*(i), hist_h - histogram_2[i][0]),
+                       CV_RGB(0,0,255), 2, 8, 0  );
+    }
+
+    /// Display
+    cv::namedWindow("calcHist Demo", CV_WINDOW_AUTOSIZE );
+    imshow("calcHist Demo", histImage );
+}
 
 /*
  * Display a single pixel wide contour around the clusters.
