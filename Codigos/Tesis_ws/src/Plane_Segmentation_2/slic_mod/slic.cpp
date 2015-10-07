@@ -297,13 +297,17 @@ void Slic::store_superpixels(IplImage *image)
 
     for (i = 0; i < (int) centers.size(); i++) 
     {
-        Superpixel sp(i, centers[i]);
+        temp_point.clear();
+        temp_point.push_back(centers[i][3]);
+        temp_point.push_back(centers[i][4]);
+        Superpixel sp(i, temp_point);
         superpixels.push_back(sp);
     }
     for (x = 0; x < image->width; x++)
     {
         for (y = 0; y < image->height; y++)
         {
+            temp_point.clear();
             int index = clusters[x][y];
             CvScalar colour = cvGet2D(image, y, x);
             //cout << "hola " << colour.val[0] << "\n"; 
@@ -312,11 +316,27 @@ void Slic::store_superpixels(IplImage *image)
             temp_point.push_back(y);
             //cout << "epale " << index << "\n";
             superpixels[index].add_point(temp_point);
-            temp_point.clear();
         }
     }
-    superpixels[0].print_everything();
+    //superpixels[0].print_everything();
 }
+
+
+void Slic::display_number_grid(IplImage *image, CvScalar colour) 
+{
+    for (int i = 0; i < (int) superpixels.size(); i++) {
+        //cvCircle(image, cvPoint(superpixels[i][0], superpixels[i][0]), 2, colour, 2);
+        char buffer[25];
+        sprintf(buffer, "%i", i);
+        CvFont font;
+        cvInitFont(&font, CV_FONT_HERSHEY_SIMPLEX, 0.5, 0.5);
+        cvPutText(image, buffer, cvPoint(superpixels[i].get_center()[0], superpixels[i].get_center()[1]), &font, colour);
+    }
+}
+
+
+void Slic::show_histograms(int superpixel_id_1, int superpixel_id_1)
+
 
 /*
  * Display a single pixel wide contour around the clusters.

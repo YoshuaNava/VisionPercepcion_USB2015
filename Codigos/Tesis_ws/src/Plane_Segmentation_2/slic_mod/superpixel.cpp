@@ -34,6 +34,11 @@ Superpixel::Superpixel(int id, point2D center)
 	this->histogram = init_FrequencyChart();
 }
 
+point2D Superpixel::get_center()
+{
+	return center;
+}
+
 
 void Superpixel::add_point(point2D point)
 {

@@ -80,6 +80,7 @@ class Slic {
         
         void calculate_histograms(IplImage *image);
         void store_superpixels(IplImage *image);
+        void display_number_grid(IplImage *image, CvScalar colour);
 };
 
 #endif

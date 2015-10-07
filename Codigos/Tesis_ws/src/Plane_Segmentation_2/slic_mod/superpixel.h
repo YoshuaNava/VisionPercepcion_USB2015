@@ -43,6 +43,8 @@ class Superpixel
 		Superpixel(int id, int num_points, point2D center, RGBcolourFrequencyChart histogram, point2Dvec points);
 		~Superpixel();
 
+		point2D get_center();
+
 		static RGBcolourFrequencyChart init_FrequencyChart();
 		void print_everything();
 		void add_point(point2D point);
