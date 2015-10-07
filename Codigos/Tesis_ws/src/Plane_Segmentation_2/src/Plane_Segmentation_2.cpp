@@ -242,7 +242,7 @@ void CalculateImageFeatures()
 
 	F_lbp = CalculateLBP(gray);
 	
-	Histogram(src,histImage); // Histogram Calculation
+//	Histogram(src,histImage); // Histogram Calculation
 }
 
 
@@ -307,7 +307,8 @@ void SuperPixels(cv::Mat src)
   slic.create_connectivity(lab_image);
   slic.display_contours(frame2, CV_RGB(255,0,0));
   slic.display_center_grid(frame2, CV_RGB(0,255,0));
-  slic.calculate_histograms(frame2);
+  slic.store_superpixels(frame2);
+  //slic.calculate_histograms(frame2);
   //slic.colour_with_cluster_means(frame2);
   cvShowImage("SuperPixels", frame2);
   cvWaitKey(10);
@@ -361,106 +362,106 @@ int main( int argc, char** argv )
       pub.publish(msg);
       waitKey(1);
       ////////////////
-      IplImage* frame_ipl = cvCreateImage(cvSize(frame.cols,frame.rows), IPL_DEPTH_8U, 3);
-      frame_ipl->imageData = (char *) frame.data;
-      cvShowImage("frame_prueba",frame_ipl);
+    //   IplImage* frame_ipl = cvCreateImage(cvSize(frame.cols,frame.rows), IPL_DEPTH_8U, 3);
+    //   frame_ipl->imageData = (char *) frame.data;
+    //   cvShowImage("frame_prueba",frame_ipl);
       
-      int A=(((frame.cols/4)*3)-(frame.cols/4))-1;
-      int B=((frame.rows-(frame.rows/12))-((frame.rows/4)*3))-1;
-      IplImage* frame_window=NULL;
-      frame_window=cvCreateImage(cvSize(A,B),IPL_DEPTH_8U,3);
+    //   int A=(((frame.cols/4)*3)-(frame.cols/4))-1;
+    //   int B=((frame.rows-(frame.rows/12))-((frame.rows/4)*3))-1;
+    //   IplImage* frame_window=NULL;
+    //   frame_window=cvCreateImage(cvSize(A,B),IPL_DEPTH_8U,3);
       
-      for(int y = 0; y < frame.rows; y=y+1)
-      {
-          for(int x = 0; x < frame.cols; x=x+1)
-        	{
-              s=cvGet2D(frame_ipl,y,x); 
-              if (x>=(frame.cols/4) && x<=(frame.cols/4)*3 && y==(frame.rows/4)*3)
-              {
-                  s.val[0]=75;
-                  s.val[1]=248;
-                  s.val[2]=251;
-                  cvSet2D(frame_ipl,y,x,s);
-              } 
+    //   for(int y = 0; y < frame.rows; y=y+1)
+    //   {
+    //       for(int x = 0; x < frame.cols; x=x+1)
+    //     	{
+    //           s=cvGet2D(frame_ipl,y,x); 
+    //           if (x>=(frame.cols/4) && x<=(frame.cols/4)*3 && y==(frame.rows/4)*3)
+    //           {
+    //               s.val[0]=75;
+    //               s.val[1]=248;
+    //               s.val[2]=251;
+    //               cvSet2D(frame_ipl,y,x,s);
+    //           } 
               
-              if (x>=(frame.cols/4) && x<=(frame.cols/4)*3 && y==(frame.rows-(frame.rows/12)))
-              {
-                  s.val[0]=75;
-                  s.val[1]=248;
-                  s.val[2]=251;
-                  cvSet2D(frame_ipl,y,x,s);
+    //           if (x>=(frame.cols/4) && x<=(frame.cols/4)*3 && y==(frame.rows-(frame.rows/12)))
+    //           {
+    //               s.val[0]=75;
+    //               s.val[1]=248;
+    //               s.val[2]=251;
+    //               cvSet2D(frame_ipl,y,x,s);
                                    
-              } 
+    //           } 
               
-              if (y>=(frame.rows/4)*3 && y<=(frame.rows-(frame.rows/12)) && x==(frame.cols/4))
-              {
-                  s.val[0]=75;
-                  s.val[1]=248;
-                  s.val[2]=251;
-                  cvSet2D(frame_ipl,y,x,s);
+    //           if (y>=(frame.rows/4)*3 && y<=(frame.rows-(frame.rows/12)) && x==(frame.cols/4))
+    //           {
+    //               s.val[0]=75;
+    //               s.val[1]=248;
+    //               s.val[2]=251;
+    //               cvSet2D(frame_ipl,y,x,s);
                                
-              }
+    //           }
               
-              if (y>=(frame.rows/4)*3 && y<=(frame.rows-(frame.rows/12)) && x==(frame.cols/4)*3)
-              {
-                  s.val[0]=75;
-                  s.val[1]=248;
-                  s.val[2]=251;
-                  cvSet2D(frame_ipl,y,x,s);
+    //           if (y>=(frame.rows/4)*3 && y<=(frame.rows-(frame.rows/12)) && x==(frame.cols/4)*3)
+    //           {
+    //               s.val[0]=75;
+    //               s.val[1]=248;
+    //               s.val[2]=251;
+    //               cvSet2D(frame_ipl,y,x,s);
                                
-              }
-          }                               
-      }
-     cvShowImage("frame_prueba",frame_ipl);
+    //           }
+    //       }                               
+    //   }
+    //  cvShowImage("frame_prueba",frame_ipl);
      
      
-     for(int y = 0; y < B; y=y+1)
-      {
-          for(int x = 0; x < A; x=x+1)
-        	{
+    //  for(int y = 0; y < B; y=y+1)
+    //   {
+    //       for(int x = 0; x < A; x=x+1)
+    //     	{
               
              
-               s=cvGet2D(frame_ipl,y,x); 
-                   s.val[0]=0;
-                  s.val[1]=0;
-                  s.val[2]=0;
-               cvSet2D(frame_window,y,x,s);
+    //            s=cvGet2D(frame_ipl,y,x); 
+    //                s.val[0]=0;
+    //               s.val[1]=0;
+    //               s.val[2]=0;
+    //            cvSet2D(frame_window,y,x,s);
               
                
               
               
            
-          }                               
-      }  
+    //       }                               
+    //   }  
      
-      int xx=0;
-      int yy=0;
-      for(int y = 0; y < frame.rows; y=y+1)
-      {
-          for(int x = 0; x < frame.cols; x=x+1)
-        	{
+    //   int xx=0;
+    //   int yy=0;
+    //   for(int y = 0; y < frame.rows; y=y+1)
+    //   {
+    //       for(int x = 0; x < frame.cols; x=x+1)
+    //     	{
               
-              if (x>=(frame.cols/4)+1 && x<=(frame.cols/4)*3-1 && y>=((frame.rows/4)*3)+1 && y<=(frame.rows-(frame.rows/12)-1))
-              {
-               s=cvGet2D(frame_ipl,y,x); 
-               cvSet2D(frame_window,yy,xx,s);
-               xx=xx+1;
-               if(xx>((frame.cols/4)*3)-(frame.cols/4)-2)
-               {
-               xx=0;
-               yy=yy+1;
-               } 
-              } 
+    //           if (x>=(frame.cols/4)+1 && x<=(frame.cols/4)*3-1 && y>=((frame.rows/4)*3)+1 && y<=(frame.rows-(frame.rows/12)-1))
+    //           {
+    //            s=cvGet2D(frame_ipl,y,x); 
+    //            cvSet2D(frame_window,yy,xx,s);
+    //            xx=xx+1;
+    //            if(xx>((frame.cols/4)*3)-(frame.cols/4)-2)
+    //            {
+    //            xx=0;
+    //            yy=yy+1;
+    //            } 
+    //           } 
               
            
-          }                               
-      }      
-    //  cvShowImage("f2",frame_window); 
+    //       }                               
+    //   }      
+    // //  cvShowImage("f2",frame_window); 
       
-      cvShowImage("f2",frame_window); 
-      hist_prueba=frame_window;
-      Histogram(hist_prueba,histImage2);
-      imshow("histograma_ventana",histImage2);
+    //   cvShowImage("f2",frame_window); 
+    //   hist_prueba=frame_window;
+    //   Histogram(hist_prueba,histImage2);
+    //   imshow("histograma_ventana",histImage2);
       
       
       

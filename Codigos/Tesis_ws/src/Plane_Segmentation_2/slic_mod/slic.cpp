@@ -149,17 +149,7 @@ void Slic::generate_superpixels(IplImage *image, int step, int nc) {
             }
         }
 
-        int id;
-        int num_points;
-        point2D center;
-        RGBcolourFrequencyChart histogram;
-        vector<int> rbg_colour;
-        point2Dvec points;
-        point2D temp_point;
         for (int j = 0; j < (int) centers.size(); j++) {
-            id = j+1;
-            num_points = 0;
-            center = centers[j];
             /* Only compare to pixels in a 2 x step by 2 x step region. */
             for (int k = centers[j][3] - step; k < centers[j][3] + step; k++) {
                 for (int l = centers[j][4] - step; l < centers[j][4] + step; l++) {
@@ -173,16 +163,12 @@ void Slic::generate_superpixels(IplImage *image, int step, int nc) {
                         if (d < distances[k][l]) {
                             distances[k][l] = d;
                             clusters[k][l] = j;
-                            num_points++;
-                            rbg_colour.push_back(colour.val[0]);
-                            rbg_colour.push_back(colour.val[1]);
-                            rbg_colour.push_back(colour.val[2]);
                         }
                     }
                 }
             }
-            Superpixel sp(id, num_points, center, histogram, points);
         }
+
         
         /* Clear the center values. */
         for (int j = 0; j < (int) centers.size(); j++) {
@@ -301,6 +287,35 @@ void Slic::display_center_grid(IplImage *image, CvScalar colour) {
     for (int i = 0; i < (int) centers.size(); i++) {
         cvCircle(image, cvPoint(centers[i][3], centers[i][4]), 2, colour, 2);
     }
+}
+
+
+void Slic::store_superpixels(IplImage *image)
+{
+    int i, x, y;
+    point2D temp_point;
+
+    for (i = 0; i < (int) centers.size(); i++) 
+    {
+        Superpixel sp(i, centers[i]);
+        superpixels.push_back(sp);
+    }
+    for (x = 0; x < image->width; x++)
+    {
+        for (y = 0; y < image->height; y++)
+        {
+            int index = clusters[x][y];
+            CvScalar colour = cvGet2D(image, y, x);
+            //cout << "hola " << colour.val[0] << "\n"; 
+            superpixels[index].add_histogram_colorFrequencies(colour.val[0], colour.val[1], colour.val[2]);
+            temp_point.push_back(x);
+            temp_point.push_back(y);
+            //cout << "epale " << index << "\n";
+            superpixels[index].add_point(temp_point);
+            temp_point.clear();
+        }
+    }
+    superpixels[0].print_everything();
 }
 
 /*

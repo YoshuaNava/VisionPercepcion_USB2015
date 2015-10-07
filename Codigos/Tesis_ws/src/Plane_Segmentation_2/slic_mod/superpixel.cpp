@@ -26,6 +26,28 @@ Superpixel::Superpixel(int id, int num_points, point2D center, RGBcolourFrequenc
 }
 
 
+Superpixel::Superpixel(int id, point2D center)
+{
+	this->id = id;
+	this->num_points = 0;
+	this->center = center;
+	this->histogram = init_FrequencyChart();
+}
+
+
+void Superpixel::add_point(point2D point)
+{
+	this->points.push_back(point);
+	this->num_points += 1;
+}
+
+
+void Superpixel::add_histogram_colorFrequencies(int R, int G, int B)
+{
+	this->histogram[R][0] += 1;
+	this->histogram[G][1] += 1;
+	this->histogram[B][2] += 1;
+}
 
 void Superpixel::init_structures(int num_points)
 {
@@ -51,6 +73,23 @@ void Superpixel::init_structures(int num_points)
 	{
 		points.push_back(invalidPoint);
 	}
+}
+
+
+RGBcolourFrequencyChart Superpixel::init_FrequencyChart()
+{
+	RGBcolourFrequencyChart histogram;
+	int i;
+
+    vector<int> colour;
+    for (i=0; i<3 ;i++) {
+        colour.push_back(0);
+    }
+	for (i=0; i<256 ;i++) 
+	{
+        histogram.push_back(colour);
+    }
+    return histogram;
 }
 
 void Superpixel::print_everything()

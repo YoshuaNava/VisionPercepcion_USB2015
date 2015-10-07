@@ -79,6 +79,7 @@ class Slic {
         
         
         void calculate_histograms(IplImage *image);
+        void store_superpixels(IplImage *image);
 };
 
 #endif

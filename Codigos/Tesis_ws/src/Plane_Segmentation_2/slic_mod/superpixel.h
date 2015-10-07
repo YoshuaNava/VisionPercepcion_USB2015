@@ -39,12 +39,14 @@ class Superpixel
 		/* Class constructors and deconstructors. */
 		Superpixel();
 		Superpixel(int id, int num_points);
+		Superpixel(int id, point2D center);
 		Superpixel(int id, int num_points, point2D center, RGBcolourFrequencyChart histogram, point2Dvec points);
 		~Superpixel();
 
-
+		static RGBcolourFrequencyChart init_FrequencyChart();
 		void print_everything();
-
+		void add_point(point2D point);
+		void add_histogram_colorFrequencies(int R, int G, int B);
 };
 
 #endif
