@@ -32,7 +32,7 @@
 #include "ms_overwrite_safe_buffer.h"
 
 #include "../egbis/image.h"
-#include "../slic_mod/slic.h"
+#include "../slic/slic.h"
 
 
 #define Window_W 1.02*proc_W //appriximate wht window width and hight as a function of the frame size

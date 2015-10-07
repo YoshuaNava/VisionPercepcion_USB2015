@@ -19,6 +19,7 @@
 #include <math.h>
 #include <vector>
 #include <float.h>
+#include "superpixel.h"
 using namespace std;
 
 /* 2d matrices are handled by 2d vectors. */
@@ -46,7 +47,7 @@ class Slic {
         /* The number of occurences of each center. */
         vector<int> center_counts;
         
-        vector<vector<int>> histogramsArray;
+        vector<Superpixel> superpixels;
 
         /* The step size per cluster, and the colour (nc) and distance (ns)
          * parameters. */

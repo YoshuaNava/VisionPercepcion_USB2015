@@ -149,7 +149,17 @@ void Slic::generate_superpixels(IplImage *image, int step, int nc) {
             }
         }
 
+        int id;
+        int num_points;
+        point2D center;
+        RGBcolourFrequencyChart histogram;
+        vector<int> rbg_colour;
+        point2Dvec points;
+        point2D temp_point;
         for (int j = 0; j < (int) centers.size(); j++) {
+            id = j+1;
+            num_points = 0;
+            center = centers[j];
             /* Only compare to pixels in a 2 x step by 2 x step region. */
             for (int k = centers[j][3] - step; k < centers[j][3] + step; k++) {
                 for (int l = centers[j][4] - step; l < centers[j][4] + step; l++) {
@@ -163,10 +173,15 @@ void Slic::generate_superpixels(IplImage *image, int step, int nc) {
                         if (d < distances[k][l]) {
                             distances[k][l] = d;
                             clusters[k][l] = j;
+                            num_points++;
+                            rbg_colour.push_back(colour.val[0]);
+                            rbg_colour.push_back(colour.val[1]);
+                            rbg_colour.push_back(colour.val[2]);
                         }
                     }
                 }
             }
+            Superpixel sp(id, num_points, center, histogram, points);
         }
         
         /* Clear the center values. */
@@ -417,13 +432,17 @@ void Slic::calculate_histograms(IplImage *image)
             //cvSet2D(image, j, i, ncolour);
         //}
     //}
-    
+    /*
 	for (int i = 0; i < image->width; i++) {
         for (int j = 0; j < image->height; j++) {
             cout << clusters[i][j] << " ";
         }
 		cout << "\n";
     }
+    */
+
+    Superpixel sp(0,5);
+    sp.print_everything();
     
     cout << "Numero de clusters = " << clusters.size();
     cout << "Numero de centros = " << centers.size();
