@@ -476,41 +476,23 @@ void Slic::show_histograms(int superpixel_id_1, int superpixel_id_2)
         histogram_2[i][1] = ((double)histogram_2[i][1]/35.0)*480.0;
         histogram_2[i][0] = ((double)histogram_2[i][0]/35.0)*480.0;
       */
-<<<<<<< HEAD
       line( histImage, cvPoint( bin_w*(i), hist_h - histogram_1[i][0]) ,
                        cvPoint( bin_w*(i+1), hist_h - histogram_1[i+1][0]),
-=======
-      line( histImage, cvPoint( bin_w*(i), hist_h - histogram_1[i][2]) ,
-                       cvPoint( bin_w*(i+1), hist_h - histogram_1[i+1][2]),
->>>>>>> 0888e57eaf1829c0ab506e13cea6a24ed73eb663
                        CV_RGB(127,0,0), 2, 8, 0  );
       line( histImage, cvPoint( bin_w*(i), hist_h - histogram_1[i][1]) ,
                        cvPoint( bin_w*(i+1), hist_h - histogram_1[i+1][1]),
                        CV_RGB(0,127,0), 2, 8, 0  );
-<<<<<<< HEAD
       line( histImage, cvPoint( bin_w*(i), hist_h - histogram_1[i][2]) ,
                        cvPoint( bin_w*(i+1), hist_h - histogram_1[i+1][2]),
                        CV_RGB(0,0,127), 2, 8, 0  );
       line( histImage, cvPoint( bin_w*(i), hist_h - histogram_2[i][0]) ,
                        cvPoint( bin_w*(i+1), hist_h - histogram_2[i+1][0]),
-=======
-      line( histImage, cvPoint( bin_w*(i), hist_h - histogram_1[i][0]) ,
-                       cvPoint( bin_w*(i+1), hist_h - histogram_1[i+1][0]),
-                       CV_RGB(0,0,127), 2, 8, 0  );
-      line( histImage, cvPoint( bin_w*(i), hist_h - histogram_2[i][2]) ,
-                       cvPoint( bin_w*(i+1), hist_h - histogram_2[i+1][2]),
->>>>>>> 0888e57eaf1829c0ab506e13cea6a24ed73eb663
                        CV_RGB(255,0,0), 2, 8, 0  );
       line( histImage, cvPoint( bin_w*(i), hist_h - histogram_2[i][1]) ,
                        cvPoint( bin_w*(i+1), hist_h - histogram_2[i+1][1]),
                        CV_RGB(0,255,0), 2, 8, 0  );
-<<<<<<< HEAD
       line( histImage, cvPoint( bin_w*(i), hist_h - histogram_2[i][2]) ,
                        cvPoint( bin_w*(i+1), hist_h - histogram_2[i+1][2]),
-=======
-      line( histImage, cvPoint( bin_w*(i), hist_h - histogram_2[i][0]) ,
-                       cvPoint( bin_w*(i+1), hist_h - histogram_2[i+1][0]),
->>>>>>> 0888e57eaf1829c0ab506e13cea6a24ed73eb663
                        CV_RGB(0,0,255), 2, 8, 0  );
     }
 
