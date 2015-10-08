@@ -59,7 +59,6 @@ class Slic {
         CvPoint find_local_minimum(IplImage *image, CvPoint center);
 
         /* Remove and initialize the 2d vectors. */
-        void clear_data();
         void init_data(IplImage *image);
 
     public:
@@ -78,6 +77,7 @@ class Slic {
         void colour_with_cluster_means(IplImage *image);
         
         
+        void clear_data();
         void calculate_histograms(IplImage *image);
         void store_superpixels(IplImage *image);
         void display_number_grid(IplImage *image, CvScalar colour);

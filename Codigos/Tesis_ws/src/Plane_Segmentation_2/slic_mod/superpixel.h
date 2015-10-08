@@ -11,7 +11,6 @@
  *
  */
 
-
 #include <iostream>
 #include <stdio.h>
 #include <math.h>
@@ -32,9 +31,8 @@ class Superpixel
 		RGBcolourFrequencyChart histogram;
 		point2Dvec points;
 
-		void clear_data();
 		void init_structures(int num_points);
-
+		void clear_data();
 	public:
 		/* Class constructors and deconstructors. */
 		Superpixel();
@@ -44,9 +42,11 @@ class Superpixel
 		~Superpixel();
 
 		point2D get_center();
+		point2Dvec get_points();
 		RGBcolourFrequencyChart get_histogram();
 
 		static RGBcolourFrequencyChart init_FrequencyChart();
+		
 		void print_everything();
 		void add_point(point2D point);
 		void add_histogram_colorFrequencies(int R, int G, int B);

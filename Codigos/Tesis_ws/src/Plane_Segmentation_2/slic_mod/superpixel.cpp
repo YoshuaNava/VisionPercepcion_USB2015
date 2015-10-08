@@ -45,6 +45,11 @@ RGBcolourFrequencyChart Superpixel::get_histogram()
 	return this->histogram;
 }
 
+point2Dvec Superpixel::get_points()
+{
+	return this->points;
+}
+
 void Superpixel::add_point(point2D point)
 {
 	this->points.push_back(point);
@@ -54,6 +59,11 @@ void Superpixel::add_point(point2D point)
 
 void Superpixel::add_histogram_colorFrequencies(int R, int G, int B)
 {
+	/*
+	if((this->id == 29) || (this->id == 29))
+		cout << "ID = " << id << ".		R = " << R << ".	G = " << G << ".	B = " << B << ".\n";
+	*/	
+
 	this->histogram[R][0] += 1;
 	this->histogram[G][1] += 1;
 	this->histogram[B][2] += 1;
