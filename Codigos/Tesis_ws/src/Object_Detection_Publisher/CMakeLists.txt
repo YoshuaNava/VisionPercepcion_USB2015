@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(Plane_Segmentation)
+project(Object_Detection_Publisher)
 
 Find_package(catkin REQUIRED COMPONENTS
   roscpp
@@ -16,7 +16,6 @@ include_directories(${catkin_INCLUDE_DIRS} ${OpenCV_INCLUDE_DIRS} include)
 
 
 
-SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 catkin_package(
 #  INCLUDE_DIRS include
 #  LIBRARIES convert_to_grayscale
@@ -24,18 +23,11 @@ catkin_package(
 #  DEPENDS system_lib
 )
 
-#hola
-#target_link_libraries (Plane_Segmentation slic)
-#add_library(slic slic.cpp)
-
-#add_executable(foo src/foo.cpp)
 
 
- add_executable(Plane_Segmentation src/Plane_Segmentation.cpp)
- target_link_libraries(Plane_Segmentation ${catkin_LIBRARIES})
- target_link_libraries(Plane_Segmentation ${OpenCV_LIBS})
- 
- add_library(slic src/slic.cpp)
- target_link_libraries(Plane_Segmentation slic)
+
+add_executable(Object_Detection_Publisher src/Object_Detection_Publisher.cpp)
+ target_link_libraries(Object_Detection_Publisher ${catkin_LIBRARIES})
+ target_link_libraries(Object_Detection_Publisher ${OpenCV_LIBS})
  ##add_dependencies(Convert_Image ar_pose_generate_messages_cpp)
 
