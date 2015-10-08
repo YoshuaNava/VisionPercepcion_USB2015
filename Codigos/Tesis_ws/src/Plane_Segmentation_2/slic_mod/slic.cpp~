@@ -382,9 +382,8 @@ void Slic::colour_with_cluster_means(IplImage *image) {
 
 void Slic::calculate_histograms(IplImage *image)
 {
-    
-    show_histograms(1,29);
     display_number_grid(image, CV_RGB(0,255,0));
+    show_histograms(1,29);
     /*
     cout << "Numero de clusters = " << clusters.size();
     cout << "Numero de centros = " << centers.size();
