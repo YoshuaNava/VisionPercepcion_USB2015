@@ -43,7 +43,7 @@ using namespace cv;
 
 Mat frame, gray, prevgray, F_hsv, F_YCrCb, F_lab, F_sat, F_hue, F_Cr, F_Cb, F_a, channel_1[4], channel_2[4], channel_3[4], F_iic, src, src_out, dst, histImage, temp_grad[3], sobel[3], F_mag, F_ang, F_lbp, image_pub, hist_prueba, histImage2; // Mat Declarations
 
-IplImage *frame2, *F_iic2, *image_pub2;
+IplImage *image_pub2;
 
 double proc_W, proc_H;
 VideoCapture cap;
@@ -250,7 +250,10 @@ void CalculateImageFeatures()
 
 void CameraSetup()
 {
-	cap = VideoCapture(1); // Declare capture form Video: "eng_stat_obst.avi"
+	//cap = VideoCapture(0); // Declare capture form Video: "eng_stat_obst.avi"
+  
+
+  cap = VideoCapture("eng_stat_obst.avi");
 	//VideoCapture cap(0); //Camera integrada de la computadora
 	//VideoCapture cap(1); //Otra camara, conectada a la computadora mediante USB, por ejemplo.
 	
@@ -277,7 +280,8 @@ void imageCallback(const sensor_msgs::ImageConstPtr& msg)
     image_pub2->imageData = (char *) image_pub.data;
         imshow("view",image_pub);
         // imshow("view", cv_bridge::toCvShare(msg, "bgr8")->image);
-        //  waitKey(30);       
+        //  waitKey(30);
+        cvReleaseImage(&image_pub2);
 
     }
     catch (cv_bridge::Exception& e)
@@ -289,13 +293,12 @@ void imageCallback(const sensor_msgs::ImageConstPtr& msg)
 void SuperPixels(cv::Mat src)
 {
   namedWindow( "SuperPixels", 1 ); 
-  frame2 = cvCreateImage(cvSize(160,120), IPL_DEPTH_8U, 3);
-  frame2->imageData = (char *) src.data;
+  IplImage frame2 = (IplImage)src; // Reference on deallocating memory: http://stackoverflow.com/questions/12635978/memory-deallocation-of-iplimage-initialised-from-cvmat
   
       /* Yield the number of superpixels and weight-factors from the user. */
-  IplImage *lab_image = cvCloneImage(frame2);
-  cvCvtColor(frame2, lab_image, CV_BGR2Lab);
-  int w = frame2->width, h = frame2->height;
+  IplImage *lab_image = cvCloneImage(&frame2);
+  cvCvtColor(&frame2, lab_image, CV_BGR2Lab);
+  int w = lab_image->width, h = lab_image->height;
   //int nr_superpixels = atoi(argv[2]);
   int nr_superpixels = 400;
   //int nc = atoi(argv[3]);
@@ -307,16 +310,18 @@ void SuperPixels(cv::Mat src)
   slic.clear_data();
   slic.generate_superpixels(lab_image, step, nc);
   slic.create_connectivity(lab_image);
-  slic.store_superpixels(frame2);
-  slic.calculate_histograms(frame2);
-  slic.display_contours(frame2, CV_RGB(255,0,0));
+  slic.store_superpixels(&frame2);
+  slic.calculate_histograms(&frame2);
+  slic.display_contours(&frame2, CV_RGB(255,0,0));
   
   //slic.display_center_grid(frame2, CV_RGB(0,255,0));
 //  slic.display_number_grid(frame2, CV_RGB(0,255,0));
 //  slic.show_histograms(1,32);
   //slic.calculate_histograms(frame2);
   //slic.colour_with_cluster_means(frame2);
-  cvShowImage("SuperPixels", frame2);
+  cvShowImage("SuperPixels", &frame2);
+  //cvReleaseImage(&frame2);
+  cvReleaseImage(&lab_image);
   cvWaitKey(10);
 }
 
