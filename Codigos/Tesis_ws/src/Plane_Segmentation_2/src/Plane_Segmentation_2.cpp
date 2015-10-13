@@ -121,35 +121,29 @@ void CalculateMagnitudeOrientationOfGradients()
 	F_mag = abs_grad_x + abs_grad_y;
 	F_mag = 255 - F_mag;
 	F_ang = 0*F_mag;
-  int cols_x_ptr = sobel[1].cols;
-  int rows_x_ptr = sobel[1].rows;
-  int cols_y_ptr = sobel[2].cols;
-  int rows_y_ptr = sobel[2].rows;
+  int cols = sobel[1].cols;
+  int rows = sobel[1].rows;
   int rows_ang_ptr = F_ang.rows;
   int cols_ang_ptr = F_ang.cols;
   float valueX, valueY, result;
+  float *sobel_x_ith_row, *sobel_y_ith_row;
 
-  if(sobel[1].isContinuous() && sobel[2].isContinuous() && F_ang.isContinuous())
+  if(sobel[1].isContinuous() && sobel[2].isContinuous())
   {
-      cols_x_ptr *= rows_x_ptr;
-      rows_x_ptr = 1;
-      cols_y_ptr *= rows_y_ptr;
-      rows_y_ptr = 1;
-      cols_ang_ptr *= rows_ang_ptr;
-      rows_ang_ptr = 1;
+      cols *= rows;
+      rows = 1;
   }
 	//ANG = atan2( temp_grad[1] ,temp_grad[0]);
-	for (int i = 0; i < rows_x_ptr; i++) 
+	for (int i = 0; i < rows; i++) 
 	{
-    const float* sobel_x_ith_row = sobel[1].ptr<float>(i);
-    const float* sobel_y_ith_row = sobel[2].ptr<float>(i);
-		uchar* ang_ith_row = F_ang.ptr<uchar>(i);
-    for (int j = 0; j < cols_x_ptr; j++) 
+    sobel_x_ith_row = sobel[1].ptr<float>(i);
+    sobel_y_ith_row = sobel[2].ptr<float>(i);
+    for (int j = 0; j < cols; j++) 
 		{
 		  valueX = sobel_x_ith_row[j];
 			valueY = sobel_y_ith_row[j];
 			result = fastAtan2(valueY,valueX);
-			ang_ith_row[j] = (uchar)result;
+			F_ang.ptr<uchar>(i)[j] = (uchar)result;
 		}
 	}
 
@@ -163,20 +157,20 @@ void CalculateMagnitudeOrientationOfGradients()
 // Can be optimized with intrinsics!!!
 Mat CalculateLBP(Mat img)
 {
-
   Mat dst = Mat::zeros(img.rows-2, img.cols-2, CV_8UC1);
   const int dx[8] = {-1, -1, -1, 0, +1, +1, +1, 0};
   const int dy[8] = {-1, 0, +1, +1, +1, 0, -1, -1};
+  uchar center, code, periphery_value;
 
   for(int i=1; i<img.rows-1 ;i++)
   {
     for(int j=1; j<img.cols-1 ;j++)
     {
-        uchar center = img.ptr<uchar>(i)[j];
-        uchar code = 0;
+        center = img.ptr<uchar>(i)[j];
+        code = 0;
         for(int k=0; k<8 ;k++)
         {
-          uchar periphery_value = (img.ptr<uchar>(i+dx[k]))[j+dy[k]];
+          periphery_value = (img.ptr<uchar>(i+dx[k]))[j+dy[k]];
           code |= (periphery_value > center) << 7-k;
       
         }
@@ -287,7 +281,7 @@ void CameraSetup()
 	cap.set(CV_CAP_PROP_FRAME_WIDTH, 640);
 	cap.set(CV_CAP_PROP_FRAME_HEIGHT, 360);
 	// Good reference: http://superuser.com/questions/897420/how-to-know-which-framerate-should-i-use-to-capture-webcam-with-ffmpeg
-	cap.set(CV_CAP_PROP_FPS, 15);	
+	cap.set(CV_CAP_PROP_FPS, 30);	
 }
 
 void imageCallback(const sensor_msgs::ImageConstPtr& msg)
@@ -336,11 +330,11 @@ void SuperPixels(cv::Mat src)
   slic.generate_superpixels(lab_image, step, nc);
   slic.create_connectivity(lab_image);
   slic.store_superpixels(&frame2);
-  slic.calculate_histograms(&frame2);
+  //slic.calculate_histograms(&frame2);
   slic.display_contours(&frame2, CV_RGB(255,0,0));
-  
+  slic.display_number_grid(&frame2, CV_RGB(0,255,0));
+
   //slic.display_center_grid(frame2, CV_RGB(0,255,0));
-//  slic.display_number_grid(frame2, CV_RGB(0,255,0));
 //  slic.show_histograms(1,32);
   //slic.calculate_histograms(frame2);
   //slic.colour_with_cluster_means(frame2);
@@ -366,11 +360,11 @@ int main( int argc, char** argv )
   
   image_transport::ImageTransport it(nh);
   image_transport::Publisher pub = it.advertise("camera/image_raw", 1); //Publisher
-  ros::Rate loop_rate(5);
+  ros::Rate loop_rate(40);
   
 	CameraSetup();
   waitKey(1);
-  image_transport::Subscriber sub = it.subscribe("camera/image_raw", 1, imageCallback); // Subscriber Function
+  //image_transport::Subscriber sub = it.subscribe("camera/image_raw", 1, imageCallback); // Subscriber Function
   
   CvScalar s; 
   
@@ -387,8 +381,15 @@ int main( int argc, char** argv )
 		waitKey(1); // Wait Time
     
 
+
+
+
 		if( prevgray.data )
 		{		  
+  //DISPLAY_IMAGE_XY(true, frame, 0 , 0);
+  //cv::resizeWindow("frame", proc_W, proc_H);
+//      waitKey(1);
+
 			CalculateImageFeatures();       
 			ShowImages();
 				
@@ -397,111 +398,6 @@ int main( int argc, char** argv )
 			sensor_msgs::ImagePtr msg = cv_bridge::CvImage(std_msgs::Header(), "mono8", F_lbp).toImageMsg();
       pub.publish(msg);
       waitKey(1);
-      ////////////////
-    //   IplImage* frame_ipl = cvCreateImage(cvSize(frame.cols,frame.rows), IPL_DEPTH_8U, 3);
-    //   frame_ipl->imageData = (char *) frame.data;
-    //   cvShowImage("frame_prueba",frame_ipl);
-      
-    //   int A=(((frame.cols/4)*3)-(frame.cols/4))-1;
-    //   int B=((frame.rows-(frame.rows/12))-((frame.rows/4)*3))-1;
-    //   IplImage* frame_window=NULL;
-    //   frame_window=cvCreateImage(cvSize(A,B),IPL_DEPTH_8U,3);
-      
-    //   for(int y = 0; y < frame.rows; y=y+1)
-    //   {
-    //       for(int x = 0; x < frame.cols; x=x+1)
-    //     	{
-    //           s=cvGet2D(frame_ipl,y,x); 
-    //           if (x>=(frame.cols/4) && x<=(frame.cols/4)*3 && y==(frame.rows/4)*3)
-    //           {
-    //               s.val[0]=75;
-    //               s.val[1]=248;
-    //               s.val[2]=251;
-    //               cvSet2D(frame_ipl,y,x,s);
-    //           } 
-              
-    //           if (x>=(frame.cols/4) && x<=(frame.cols/4)*3 && y==(frame.rows-(frame.rows/12)))
-    //           {
-    //               s.val[0]=75;
-    //               s.val[1]=248;
-    //               s.val[2]=251;
-    //               cvSet2D(frame_ipl,y,x,s);
-                                   
-    //           } 
-              
-    //           if (y>=(frame.rows/4)*3 && y<=(frame.rows-(frame.rows/12)) && x==(frame.cols/4))
-    //           {
-    //               s.val[0]=75;
-    //               s.val[1]=248;
-    //               s.val[2]=251;
-    //               cvSet2D(frame_ipl,y,x,s);
-                               
-    //           }
-              
-    //           if (y>=(frame.rows/4)*3 && y<=(frame.rows-(frame.rows/12)) && x==(frame.cols/4)*3)
-    //           {
-    //               s.val[0]=75;
-    //               s.val[1]=248;
-    //               s.val[2]=251;
-    //               cvSet2D(frame_ipl,y,x,s);
-                               
-    //           }
-    //       }                               
-    //   }
-    //  cvShowImage("frame_prueba",frame_ipl);
-     
-     
-    //  for(int y = 0; y < B; y=y+1)
-    //   {
-    //       for(int x = 0; x < A; x=x+1)
-    //     	{
-              
-             
-    //            s=cvGet2D(frame_ipl,y,x); 
-    //                s.val[0]=0;
-    //               s.val[1]=0;
-    //               s.val[2]=0;
-    //            cvSet2D(frame_window,y,x,s);
-              
-               
-              
-              
-           
-    //       }                               
-    //   }  
-     
-    //   int xx=0;
-    //   int yy=0;
-    //   for(int y = 0; y < frame.rows; y=y+1)
-    //   {
-    //       for(int x = 0; x < frame.cols; x=x+1)
-    //     	{
-              
-    //           if (x>=(frame.cols/4)+1 && x<=(frame.cols/4)*3-1 && y>=((frame.rows/4)*3)+1 && y<=(frame.rows-(frame.rows/12)-1))
-    //           {
-    //            s=cvGet2D(frame_ipl,y,x); 
-    //            cvSet2D(frame_window,yy,xx,s);
-    //            xx=xx+1;
-    //            if(xx>((frame.cols/4)*3)-(frame.cols/4)-2)
-    //            {
-    //            xx=0;
-    //            yy=yy+1;
-    //            } 
-    //           } 
-              
-           
-    //       }                               
-    //   }      
-    // //  cvShowImage("f2",frame_window); 
-      
-    //   cvShowImage("f2",frame_window); 
-    //   hist_prueba=frame_window;
-    //   Histogram(hist_prueba,histImage2);
-    //   imshow("histograma_ventana",histImage2);
-      
-      
-      
-      
       SuperPixels(frame);	
 		}
 
