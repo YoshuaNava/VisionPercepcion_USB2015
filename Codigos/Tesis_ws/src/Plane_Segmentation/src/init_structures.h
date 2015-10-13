@@ -20,8 +20,8 @@
 
 #include <iostream>
 #include <string>
-#include "Net.h" //header for UDP transmission
 #include "ms_overwrite_safe_buffer.h"
+#include "Net.h" //header for UDP transmission
 
 using namespace std;
 

@@ -442,7 +442,7 @@ void Slic::display_number_grid(IplImage *image, CvScalar colour)
         CvFont font;
         cvInitFont(&font, CV_FONT_HERSHEY_SIMPLEX, 0.3, 0.3);
         cvPutText(image, buffer, cvPoint(superpixels[i].get_center()[0], superpixels[i].get_center()[1]), &font, colour);
-        cout << "Superpixel # " << i << ".  Number of points = " << superpixels[i].get_points().size() << ".    Histogram length = " << superpixels[i].get_histogram().size() << "\n";
+ //       cout << "Superpixel # " << i << ".  Number of points = " << superpixels[i].get_points().size() << ".    Histogram length = " << superpixels[i].get_histogram().size() << "\n";
     }
 }
 

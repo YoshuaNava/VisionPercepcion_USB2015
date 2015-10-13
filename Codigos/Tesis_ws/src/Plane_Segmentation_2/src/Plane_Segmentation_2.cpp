@@ -26,10 +26,7 @@
 #include "opencv2/video/tracking.hpp"
 #include "opencv2/core/core.hpp"
 
-#include "init_structures.h" //initialise structures used in this algorithm
 //#include "img_proc_fcns.h" //various image processing/computer vision functions
-#include "capture.h" //image capture 
-#include "ms_overwrite_safe_buffer.h"
 
 #include "../egbis/image.h"
 #include "../slic_mod/slic.h"
@@ -124,16 +121,35 @@ void CalculateMagnitudeOrientationOfGradients()
 	F_mag = abs_grad_x + abs_grad_y;
 	F_mag = 255 - F_mag;
 	F_ang = 0*F_mag;
-	float result;
+  int cols_x_ptr = sobel[1].cols;
+  int rows_x_ptr = sobel[1].rows;
+  int cols_y_ptr = sobel[2].cols;
+  int rows_y_ptr = sobel[2].rows;
+  int rows_ang_ptr = F_ang.rows;
+  int cols_ang_ptr = F_ang.cols;
+  float valueX, valueY, result;
+
+  if(sobel[1].isContinuous() && sobel[2].isContinuous() && F_ang.isContinuous())
+  {
+      cols_x_ptr *= rows_x_ptr;
+      rows_x_ptr = 1;
+      cols_y_ptr *= rows_y_ptr;
+      rows_y_ptr = 1;
+      cols_ang_ptr *= rows_ang_ptr;
+      rows_ang_ptr = 1;
+  }
 	//ANG = atan2( temp_grad[1] ,temp_grad[0]);
-	for (int y = 0; y < temp_grad[1].rows; y++) 
+	for (int i = 0; i < rows_x_ptr; i++) 
 	{
-		for (int x = 0; x < temp_grad[1].cols; x++) 
+    const float* sobel_x_ith_row = sobel[1].ptr<float>(i);
+    const float* sobel_y_ith_row = sobel[2].ptr<float>(i);
+		uchar* ang_ith_row = F_ang.ptr<uchar>(i);
+    for (int j = 0; j < cols_x_ptr; j++) 
 		{
-			float valueX = sobel[1].at<uchar>(y,x);
-			float valueY = sobel[2].at<uchar>(y,x);
-			float result = fastAtan2(valueY,valueX);
-			F_ang.at<uchar>(y, x) = (uchar)result;
+		  valueX = sobel_x_ith_row[j];
+			valueY = sobel_y_ith_row[j];
+			result = fastAtan2(valueY,valueX);
+			ang_ith_row[j] = (uchar)result;
 		}
 	}
 
@@ -143,25 +159,34 @@ void CalculateMagnitudeOrientationOfGradients()
 	convertScaleAbs(F_ang, F_ang, 1, 0);	
 }
 
-Mat CalculateLBP(Mat img){
-    Mat dst = Mat::zeros(img.rows-2, img.cols-2, CV_8UC1);
-    for(int i=1;i<img.rows-1;i++) {
-        for(int j=1;j<img.cols-1;j++) {
-            uchar center = img.at<uchar>(i,j);
-            unsigned char code = 0;
-            code |= ((img.at<uchar>(i-1,j-1)) > center) << 7;
-                code |= ((img.at<uchar>(i-1,j)) > center) << 6;
-            code |= ((img.at<uchar>(i-1,j+1)) > center) << 5;
-            code |= ((img.at<uchar>(i,j+1)) > center) << 4;
-            code |= ((img.at<uchar>(i+1,j+1)) > center) << 3;
-            code |= ((img.at<uchar>(i+1,j)) > center) << 2;
-            code |= ((img.at<uchar>(i+1,j-1)) > center) << 1;
-            code |= ((img.at<uchar>(i,j-1)) > center) << 0;
-            dst.at<uchar>(i-1,j-1) = code;
+
+// Can be optimized with intrinsics!!!
+Mat CalculateLBP(Mat img)
+{
+
+  Mat dst = Mat::zeros(img.rows-2, img.cols-2, CV_8UC1);
+  const int dx[8] = {-1, -1, -1, 0, +1, +1, +1, 0};
+  const int dy[8] = {-1, 0, +1, +1, +1, 0, -1, -1};
+
+  for(int i=1; i<img.rows-1 ;i++)
+  {
+    for(int j=1; j<img.cols-1 ;j++)
+    {
+        uchar center = img.ptr<uchar>(i)[j];
+        uchar code = 0;
+        for(int k=0; k<8 ;k++)
+        {
+          uchar periphery_value = (img.ptr<uchar>(i+dx[k]))[j+dy[k]];
+          code |= (periphery_value > center) << 7-k;
+      
         }
+        (dst.ptr<uchar>(i-1))[j-1] = code;
     }
-    return dst;
+  }
+  return dst;
 }
+
+
 
 
 void Histogram(cv::Mat src, cv::Mat& hist){
