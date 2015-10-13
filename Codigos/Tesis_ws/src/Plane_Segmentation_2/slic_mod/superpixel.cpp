@@ -69,6 +69,13 @@ void Superpixel::add_histogram_colorFrequencies(int R, int G, int B)
 	this->histogram[B][2] += 1;
 }
 
+
+void Superpixel::add_pixel(CvScalar colour, int x, int y)
+{
+	cvSet2D(&pixels, y, x, colour);
+}
+
+
 void Superpixel::init_structures(int num_points)
 {
 	int i;
@@ -130,6 +137,8 @@ void Superpixel::print_everything()
 		cout << "Valor = " << i << ".	R = " << histogram[i][0] << ".	G = " << histogram[i][1] << ".	B = " << histogram[i][2] << ".\n";
 	}
 }
+
+
 
 
 

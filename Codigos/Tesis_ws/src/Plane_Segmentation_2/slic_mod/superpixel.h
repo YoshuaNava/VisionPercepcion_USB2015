@@ -15,6 +15,7 @@
 #include <stdio.h>
 #include <math.h>
 #include <vector>
+#include "opencv/cv.h"
 //#include <float.h>
 using namespace std;
 
@@ -30,6 +31,7 @@ class Superpixel
 		point2D center;
 		RGBcolourFrequencyChart histogram;
 		point2Dvec points;
+		cv::Mat pixels;
 
 		void init_structures(int num_points);
 		void clear_data();
@@ -50,6 +52,7 @@ class Superpixel
 		void print_everything();
 		void add_point(point2D point);
 		void add_histogram_colorFrequencies(int R, int G, int B);
+		void add_pixel(CvScalar colour, int x, int y);
 };
 
 #endif
