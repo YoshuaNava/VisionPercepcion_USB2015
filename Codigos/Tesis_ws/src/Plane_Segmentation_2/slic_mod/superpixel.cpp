@@ -139,7 +139,8 @@ void Superpixel::calculate_img_pixel_mask(IplImage *img)
 
 		this->pixel_mask.ptr<uchar>((int)points[i].x)[(int)points[i].y] = 255;
 	}
-
+	
+	cout << "hola";
 	this->bounding_rect = cv::boundingRect(this->points);
 	pixels = cv::Mat(this->bounding_rect.height, this->bounding_rect.width, CV_8UC3, cvScalar(0,0,0));
 
@@ -152,6 +153,13 @@ void Superpixel::calculate_img_pixel_mask(IplImage *img)
 	cv::imshow("pixel_mask", pixel_mask);
 	*/
 
+
+
+}
+
+
+void Superpixel::export_to_jpeg(IplImage *img)
+{
 	CvScalar colour;
 	this->pixels = cv::Mat::zeros(this->bounding_rect.width, this->bounding_rect.height, CV_8UC3);
 	int x_coord, y_coord;
@@ -176,12 +184,6 @@ void Superpixel::calculate_img_pixel_mask(IplImage *img)
 	}
 
 	cv::imshow("superpixel", this->pixels);
-}
-
-
-void Superpixel::export_to_jpeg(IplImage *img)
-{
-
 	string path = "/home/alfredoso/GitHub/VisionPercepcion_USB2015/Codigos/Tesis_ws/src/Plane_Segmentation_2/superpixel_images/";
 	string file_name = to_string(this->id) + ".jpg";
 	imwrite( path+file_name, pixels);

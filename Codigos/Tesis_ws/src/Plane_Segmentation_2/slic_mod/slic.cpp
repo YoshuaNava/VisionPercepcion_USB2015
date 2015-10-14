@@ -501,9 +501,9 @@ void Slic::show_histograms(int superpixel_id_1, int superpixel_id_2)
 
 void Slic::export_superpixels_to_files(IplImage *img)
 {
-    for(int i=0; i<superpixels.size()-10 ;i++)
+    for(int i=0; i<superpixels.size()-0 ;i++)
     {   
         superpixels[i].calculate_img_pixel_mask(img);
-        superpixels[i].export_to_jpeg(img);
+        //superpixels[i].export_to_jpeg(img);
     }
 }
