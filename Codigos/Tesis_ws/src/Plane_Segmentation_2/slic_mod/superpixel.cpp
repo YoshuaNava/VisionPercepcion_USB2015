@@ -169,21 +169,9 @@ void Superpixel::calculate_img_pixel_mask(IplImage *img)
 			cout << colour.val[0] << "    " << colour.val[1] << "    " << colour.val[2] << "\n\n\n";
 */
 
-			(this->pixels.at<cv::Vec3b>(y_coord, x_coord)).val[0] = colour.val[0];
-			(this->pixels.at<cv::Vec3b>(y_coord, x_coord)).val[1] = colour.val[1];
-			(this->pixels.at<cv::Vec3b>(y_coord, x_coord)).val[2] = colour.val[2];
-			//this->pixels.at<uchar>(y_coord, x_coord, 0) = 255;
-			//this->pixels.at<uchar>(y_coord, x_coord, 2) = 255;
-			//this->pixels.at<uchar>(y_coord, x_coord, 0) = colour.val[0];
-			//this->pixels.at<uchar>(y_coord, x_coord, 1) = colour.val[1];
-			//this->pixels.at<uchar>(y_coord, x_coord, 2) = colour.val[2];
-		//	this->pixels.at<cv::Vec3b>(j,i)[0] = colour.val[0];
-		//	this->pixels.at<cv::Vec3b>(j,i)[1] = colour.val[1];
-		//	this->pixels.at<cv::Vec3b>(j,i)[2] = colour.val[2];
-			/*this->pixels.ptr<uchar>(i)[j] = colour.val[2];
-			this->pixels.ptr<uchar>(i)[j] = colour.val[1];
-			this->pixels.ptr<uchar>(i)[j] = colour.val[0];
-*/
+			(this->pixels.at<cv::Vec3b>(x_coord, y_coord)).val[0] = colour.val[0];
+			(this->pixels.at<cv::Vec3b>(x_coord, y_coord)).val[1] = colour.val[1];
+			(this->pixels.at<cv::Vec3b>(x_coord, y_coord)).val[2] = colour.val[2];
 		}
 	}
 
