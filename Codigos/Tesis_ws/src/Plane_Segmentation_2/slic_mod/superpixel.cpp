@@ -170,7 +170,9 @@ void Superpixel::calculate_img_pixel_mask(IplImage *img)
 
 void Superpixel::export_to_jpeg()
 {
-	imwrite( "../../images/Gray_Image.jpg", this->pixels );
+	string path = "/home/alfredoso/GitHub/VisionPercepcion_USB2015/Codigos/Tesis_ws/src/Plane_Segmentation_2/superpixel_images/";
+	string file_name = to_string(this->id) + ".jpg";
+	imwrite( path+file_name, this->pixels);
 }
 
 
