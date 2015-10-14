@@ -331,9 +331,9 @@ void SuperPixels(cv::Mat src)
   slic.create_connectivity(lab_image);
   slic.store_superpixels(&frame2);
   //slic.calculate_histograms(&frame2);
+  slic.export_superpixels_to_files(&frame2);
   slic.display_contours(&frame2, CV_RGB(255,0,0));
   slic.display_number_grid(&frame2, CV_RGB(0,255,0));
-
   //slic.display_center_grid(frame2, CV_RGB(0,255,0));
 //  slic.show_histograms(1,32);
   //slic.calculate_histograms(frame2);

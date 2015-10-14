@@ -399,13 +399,11 @@ void Slic::calculate_histograms(IplImage *image)
 void Slic::store_superpixels(IplImage *image)
 {
     int i, x, y;
-    point2D temp_point;
+    cv::Point temp_point;
 
     for (i = 0; i < (int) centers.size(); i++) 
     {
-        temp_point.clear();
-        temp_point.push_back(centers[i][3]);
-        temp_point.push_back(centers[i][4]);
+        temp_point = cvPoint(centers[i][3], centers[i][4]);
         Superpixel sp(i, temp_point);
         superpixels.push_back(sp);
     }
@@ -413,7 +411,6 @@ void Slic::store_superpixels(IplImage *image)
     {
         for (y = 0; y < image->height; y++)
         {
-            temp_point.clear();
             int index = clusters[x][y];
             CvScalar colour = cvGet2D(image, y, x);
             /*if((index==29) || (index==29))
@@ -422,8 +419,7 @@ void Slic::store_superpixels(IplImage *image)
                 cout << "ID = " << index << ".     R = " << colour.val[2] << ".    G = " << colour.val[1] << ".    B = " << colour.val[0] << ".\n";
             }*/
             superpixels[index].add_histogram_colorFrequencies(colour.val[2], colour.val[1], colour.val[0]);
-            temp_point.push_back(x);
-            temp_point.push_back(y);
+            temp_point = cvPoint(x, y);
             //cout << "epale " << index << "\n";
             //cout << "Superpixel # " << index << ".  Number of points = " << superpixels[index].get_points().size() << ".    Histogram length = " << superpixels[index].get_histogram().size() << "\n";
             superpixels[index].add_point(temp_point);
@@ -441,8 +437,8 @@ void Slic::display_number_grid(IplImage *image, CvScalar colour)
         sprintf(buffer, "%i", i);
         CvFont font;
         cvInitFont(&font, CV_FONT_HERSHEY_SIMPLEX, 0.3, 0.3);
-        cvPutText(image, buffer, cvPoint(superpixels[i].get_center()[0], superpixels[i].get_center()[1]), &font, colour);
- //       cout << "Superpixel # " << i << ".  Number of points = " << superpixels[i].get_points().size() << ".    Histogram length = " << superpixels[i].get_histogram().size() << "\n";
+        cvPutText(image, buffer, cvPoint(superpixels[i].get_center().x, superpixels[i].get_center().y), &font, colour);
+        cout << "Superpixel # " << i << ".  Number of points = " << superpixels[i].get_points().size() << ".    Histogram length = " << superpixels[i].get_histogram().size() << "\n";
     }
 }
 
@@ -499,4 +495,11 @@ void Slic::show_histograms(int superpixel_id_1, int superpixel_id_2)
     /// Display
     cv::namedWindow("calcHist Demo", CV_WINDOW_AUTOSIZE );
     imshow("calcHist Demo", histImage );
+}
+
+
+
+void Slic::export_superpixels_to_files(IplImage *img)
+{
+    superpixels[0].calculate_img_pixel_mask(img);
 }

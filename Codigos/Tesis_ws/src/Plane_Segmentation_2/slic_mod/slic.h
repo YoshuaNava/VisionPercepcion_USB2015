@@ -82,6 +82,7 @@ class Slic {
         void store_superpixels(IplImage *image);
         void display_number_grid(IplImage *image, CvScalar colour);
         void show_histograms(int superpixel_id_1, int superpixel_id_2);
+        void export_superpixels_to_files(IplImage *img);
 };
 
 #endif
