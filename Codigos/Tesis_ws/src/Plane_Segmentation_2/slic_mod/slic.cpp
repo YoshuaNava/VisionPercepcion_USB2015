@@ -438,7 +438,7 @@ void Slic::display_number_grid(IplImage *image, CvScalar colour)
         CvFont font;
         cvInitFont(&font, CV_FONT_HERSHEY_SIMPLEX, 0.3, 0.3);
         cvPutText(image, buffer, cvPoint(superpixels[i].get_center().x, superpixels[i].get_center().y), &font, colour);
-        cout << "Superpixel # " << i << ".  Number of points = " << superpixels[i].get_points().size() << ".    Histogram length = " << superpixels[i].get_histogram().size() << "\n";
+        //cout << "Superpixel # " << i << ".  Number of points = " << superpixels[i].get_points().size() << ".    Histogram length = " << superpixels[i].get_histogram().size() << "\n";
     }
 }
 
@@ -501,6 +501,9 @@ void Slic::show_histograms(int superpixel_id_1, int superpixel_id_2)
 
 void Slic::export_superpixels_to_files(IplImage *img)
 {
-    superpixels[0].calculate_img_pixel_mask(img);
-    superpixels[0].export_to_jpeg();
+    for(int i=0; i<8 ;i++)
+    {   
+        superpixels[i].calculate_img_pixel_mask(img);
+        superpixels[i].export_to_jpeg(img);
+    }
 }

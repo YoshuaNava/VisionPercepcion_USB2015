@@ -134,29 +134,15 @@ void Superpixel::print_everything()
 void Superpixel::calculate_img_pixel_mask(IplImage *img)
 {
 	this->pixel_mask = cv::Mat::zeros(img->height, img->width, CV_8UC1);
-	for(int i=0; i<points.size() ;i++)
+	for(int i=0; i<this->points.size() ;i++)
 	{
+
 		this->pixel_mask.ptr<uchar>((int)points[i].x)[(int)points[i].y] = 255;
 	}
 
 	this->bounding_rect = cv::boundingRect(this->points);
+	pixels = cv::Mat(this->bounding_rect.height, this->bounding_rect.width, CV_8UC3, cvScalar(0,0,0));
 
-	this->pixels = cv::Mat::zeros(this->bounding_rect.height, this->bounding_rect.width, CV_8UC3);
-	for (int i = bounding_rect.x; i < bounding_rect.x + bounding_rect.width; i++)
-	{
-		for (int j = bounding_rect.y; j < bounding_rect.y + bounding_rect.height; j++)
-		{
-			CvScalar colour = cvGet2D(img, j, i);
-			this->pixels.at<cv::Vec3b>(j,i)[0] = colour.val[0];
-			this->pixels.at<cv::Vec3b>(j,i)[1] = colour.val[1];
-			this->pixels.at<cv::Vec3b>(j,i)[2] = colour.val[2];
-			/*this->pixels.ptr<uchar>(i)[j] = colour.val[2];
-			this->pixels.ptr<uchar>(i)[j] = colour.val[1];
-			this->pixels.ptr<uchar>(i)[j] = colour.val[0];
-*/
-		}
-	}
-	cv::imshow("superpixel", this->pixels);
 	/*cv::Point pt1, pt2;
 	pt1.x = rect.x;
 	pt1.y = rect.y;
@@ -165,14 +151,52 @@ void Superpixel::calculate_img_pixel_mask(IplImage *img)
 	rectangle(pixel_mask, pt1, pt2, CV_RGB(255,0,0), 1);
 	cv::imshow("pixel_mask", pixel_mask);
 	*/
+
+	CvScalar colour;
+	this->pixels = cv::Mat::zeros(this->bounding_rect.width, this->bounding_rect.height, CV_8UC3);
+	int x_coord, y_coord;
+	for (int i = bounding_rect.x; i < bounding_rect.x+bounding_rect.width -1; i++)
+	{
+		x_coord = i - bounding_rect.x;
+		for (int j = bounding_rect.y; j < bounding_rect.y+bounding_rect.height -1; j++)
+		{
+			y_coord = j - bounding_rect.y;
+			colour = cvGet2D(img, j, i);
+/*			cout << j << "    " << i << "\n";
+			cout << y_coord << "    " << x_coord << "\n";
+			cout << this->pixels.cols << "    " << this->pixels.rows << "\n";
+			cout << (uint)(this->pixels.at<cv::Vec3b>(y_coord, x_coord)).val[1] << "\n";
+			cout << colour.val[0] << "    " << colour.val[1] << "    " << colour.val[2] << "\n\n\n";
+*/
+
+			(this->pixels.at<cv::Vec3b>(y_coord, x_coord)).val[0] = colour.val[0];
+			(this->pixels.at<cv::Vec3b>(y_coord, x_coord)).val[1] = colour.val[1];
+			(this->pixels.at<cv::Vec3b>(y_coord, x_coord)).val[2] = colour.val[2];
+			//this->pixels.at<uchar>(y_coord, x_coord, 0) = 255;
+			//this->pixels.at<uchar>(y_coord, x_coord, 2) = 255;
+			//this->pixels.at<uchar>(y_coord, x_coord, 0) = colour.val[0];
+			//this->pixels.at<uchar>(y_coord, x_coord, 1) = colour.val[1];
+			//this->pixels.at<uchar>(y_coord, x_coord, 2) = colour.val[2];
+		//	this->pixels.at<cv::Vec3b>(j,i)[0] = colour.val[0];
+		//	this->pixels.at<cv::Vec3b>(j,i)[1] = colour.val[1];
+		//	this->pixels.at<cv::Vec3b>(j,i)[2] = colour.val[2];
+			/*this->pixels.ptr<uchar>(i)[j] = colour.val[2];
+			this->pixels.ptr<uchar>(i)[j] = colour.val[1];
+			this->pixels.ptr<uchar>(i)[j] = colour.val[0];
+*/
+		}
+	}
+
+	cv::imshow("superpixel", this->pixels);
 }
 
 
-void Superpixel::export_to_jpeg()
+void Superpixel::export_to_jpeg(IplImage *img)
 {
+
 	string path = "/home/alfredoso/GitHub/VisionPercepcion_USB2015/Codigos/Tesis_ws/src/Plane_Segmentation_2/superpixel_images/";
 	string file_name = to_string(this->id) + ".jpg";
-	imwrite( path+file_name, this->pixels);
+	imwrite( path+file_name, pixels);
 }
 
 

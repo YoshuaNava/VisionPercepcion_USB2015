@@ -61,7 +61,7 @@ class Superpixel
 		void add_point(cv::Point point);
 		void add_histogram_colorFrequencies(int R, int G, int B);
 		void calculate_img_pixel_mask(IplImage *img);
-		void export_to_jpeg();
+		void export_to_jpeg(IplImage *img);
 };
 
 #endif
