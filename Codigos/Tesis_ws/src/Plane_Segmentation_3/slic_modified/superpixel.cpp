@@ -70,6 +70,25 @@ void Superpixel::add_histogram_colorFrequencies(int R, int G, int B)
 	this->histogram[B][2] += 1;
 }
 
+void Superpixel::add_pixels_information(IplImage *img)
+{
+	CvScalar colour;
+	this->pixels = cv::Mat::zeros(this->bounding_rect.width, this->bounding_rect.height, CV_8UC3);
+	int x_coord, y_coord;
+	for (int i = bounding_rect.x; i < bounding_rect.x+bounding_rect.width -1; i++)
+	{
+		x_coord = i - bounding_rect.x;
+		for (int j = bounding_rect.y; j < bounding_rect.y+bounding_rect.height -1; j++)
+		{
+			y_coord = j - bounding_rect.y;
+			colour = cvGet2D(img, j, i);
+			(this->pixels.at<cv::Vec3b>(x_coord, y_coord)).val[0] = colour.val[0];
+			(this->pixels.at<cv::Vec3b>(x_coord, y_coord)).val[1] = colour.val[1];
+			(this->pixels.at<cv::Vec3b>(x_coord, y_coord)).val[2] = colour.val[2];
+		}
+	}
+}
+
 
 void Superpixel::init_structures(int num_points)
 {
@@ -132,7 +151,7 @@ void Superpixel::print_everything()
 }
 
 
-void Superpixel::calculate_bounding_rect(IplImage *img)
+void Superpixel::calculate_bounding_rect()
 {
 	this->bounding_rect = cv::boundingRect(this->points);
 //	cout << "numero de pixels = " << this->pixels.size() << "	numero de puntos = " << this->points.size()  << "		rectangulo, ancho = " << bounding_rect.width << "   largo =" << bounding_rect.height << "\n";
@@ -166,10 +185,9 @@ void Superpixel::export_to_jpeg(IplImage *img)
 		}
 	}
 
-	cv::imshow("superpixel", this->pixels);
+//	cv::imshow("superpixel", this->pixels);
 	string path = "/home/mecatronica/Github_Yoshua/VisionPercepcion_USB2015/Codigos/Tesis_ws/src/Plane_Segmentation_3/superpixel_images/";
 	string file_name = to_string(this->id) + ".jpg";
-
 
 	imwrite(path+file_name, pixels);
 }
