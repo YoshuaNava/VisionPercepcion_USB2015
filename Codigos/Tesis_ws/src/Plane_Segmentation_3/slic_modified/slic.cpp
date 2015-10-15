@@ -451,7 +451,7 @@ void Slic::store_superpixels(IplImage *image)
             }
         }
     }
-
+/*
     for(i=0; i<centers.size() ;++i)
     {
         for(k=0; k<centers.size() ;k++)    //Grow Columns by n
@@ -461,7 +461,7 @@ void Slic::store_superpixels(IplImage *image)
         cout << "\n";
     }
     cout << "**************************************************************************************\n";
-
+*/
     for (i = 0; i < (int) superpixels.size(); i++) 
     {
         superpixels[i].calculate_bounding_rect();
