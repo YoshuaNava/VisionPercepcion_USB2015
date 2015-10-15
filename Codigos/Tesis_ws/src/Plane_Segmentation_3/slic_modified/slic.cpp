@@ -504,9 +504,9 @@ void Slic::export_superpixels_to_files(IplImage *img)
 	//cout << "exportar a archivos \n";
     for(int i=0; i<superpixels.size()-0 ;i++)
     {   
-        superpixels[i].calculate_img_pixel_mask(img);
+        superpixels[i].calculate_bounding_rect(img);
         
         superpixels[i].export_to_jpeg(img);
-        cout << i << "\n";
+        //cout << i << "\n";
     }
 }

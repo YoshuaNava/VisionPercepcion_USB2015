@@ -115,6 +115,31 @@ void CalculateMagnitudeOrientationOfGradients()
 	Scharr(gray, temp_grad[1], gray.depth(), 0, 1, 1, 0, BORDER_DEFAULT);
 	convertScaleAbs(temp_grad[1], sobel[2], 1, 0);
 
+
+
+	Mat abs_grad_x = abs(temp_grad[0]);
+	Mat abs_grad_y = abs(temp_grad[1]);
+	F_mag = abs_grad_x + abs_grad_y;
+	F_mag = 255 - F_mag;
+	F_ang = 0*F_mag;
+	float result;
+	//ANG = atan2( temp_grad[1] ,temp_grad[0]);
+	for (int y = 0; y < temp_grad[1].rows; y++) 
+	{
+		for (int x = 0; x < temp_grad[1].cols; x++) 
+		{
+			float valueX = sobel[1].at<uchar>(y,x);
+			float valueY = sobel[2].at<uchar>(y,x);
+			float result = fastAtan2(valueY,valueX);
+			F_ang.at<uchar>(y, x) = (uchar)result;
+		}
+	}
+
+	normalize(F_mag, F_mag, 0, 255, CV_MINMAX);
+	convertScaleAbs(F_mag, F_mag, 1, 0); 
+	normalize(F_ang, F_ang, 0, 255, CV_MINMAX);
+	convertScaleAbs(F_ang, F_ang, 1, 0);	
+/*
 	Mat abs_grad_x = abs(temp_grad[0]);
 	Mat abs_grad_y = abs(temp_grad[1]);
 	F_mag = abs_grad_x + abs_grad_y;
@@ -127,6 +152,7 @@ void CalculateMagnitudeOrientationOfGradients()
   float valueX, valueY, result;
   float *sobel_x_ith_row, *sobel_y_ith_row;
 
+
   if(sobel[1].isContinuous() && sobel[2].isContinuous())
   {
       cols *= rows;
@@ -135,8 +161,8 @@ void CalculateMagnitudeOrientationOfGradients()
 	//ANG = atan2( temp_grad[1] ,temp_grad[0]);
 	for (int i = 0; i < rows; i++) 
 	{
-    sobel_x_ith_row = sobel[1].ptr<float>(i);
-    sobel_y_ith_row = sobel[2].ptr<float>(i);
+	    sobel_x_ith_row = sobel[1].ptr<float>(i);
+	    sobel_y_ith_row = sobel[2].ptr<float>(i);
     for (int j = 0; j < cols; j++) 
 		{
 		  valueX = sobel_x_ith_row[j];
@@ -150,6 +176,7 @@ void CalculateMagnitudeOrientationOfGradients()
 	convertScaleAbs(F_mag, F_mag, 1, 0); 
 	normalize(F_ang, F_ang, 0, 255, CV_MINMAX);
 	convertScaleAbs(F_ang, F_ang, 1, 0);	
+*/
 }
 
 

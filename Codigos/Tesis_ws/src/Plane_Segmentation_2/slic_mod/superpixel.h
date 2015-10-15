@@ -37,7 +37,6 @@ class Superpixel
 		cv::Point center;
 		RGBcolourFrequencyChart histogram;
 		point2Dvec points;
-		cv::Mat pixel_mask;
 		cv::Rect bounding_rect;
 		cv::Mat pixels;
 
@@ -60,7 +59,7 @@ class Superpixel
 		void print_everything();
 		void add_point(cv::Point point);
 		void add_histogram_colorFrequencies(int R, int G, int B);
-		void calculate_img_pixel_mask(IplImage *img);
+		void calculate_bounding_rect(IplImage *img);
 		void export_to_jpeg(IplImage *img);
 };
 
