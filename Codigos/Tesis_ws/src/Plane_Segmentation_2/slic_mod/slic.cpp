@@ -425,6 +425,11 @@ void Slic::store_superpixels(IplImage *image)
             superpixels[index].add_point(temp_point);
         }
     }
+    for (i = 0; i < (int) superpixels.size(); i++) 
+    {
+        superpixels[i].calculate_bounding_rect();
+        superpixels[i].add_pixels_information(image);
+    }
     //superpixels[0].print_everything();
 }
 
@@ -503,10 +508,8 @@ void Slic::export_superpixels_to_files(IplImage *img)
 {
 	//cout << "exportar a archivos \n";
     for(int i=0; i<superpixels.size()-0 ;i++)
-    {   
-        superpixels[i].calculate_bounding_rect(img);
-        
+    {           
         superpixels[i].export_to_jpeg(img);
-//        cout << i << "\n";
+        //cout << i << "\n";
     }
 }

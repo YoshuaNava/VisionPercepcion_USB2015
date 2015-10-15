@@ -58,8 +58,9 @@ class Superpixel
 		
 		void print_everything();
 		void add_point(cv::Point point);
+		void add_pixels_information(IplImage *img);
 		void add_histogram_colorFrequencies(int R, int G, int B);
-		void calculate_bounding_rect(IplImage *img);
+		void calculate_bounding_rect();
 		void export_to_jpeg(IplImage *img);
 };
 

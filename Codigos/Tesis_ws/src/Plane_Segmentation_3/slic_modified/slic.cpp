@@ -400,6 +400,13 @@ void Slic::store_superpixels(IplImage *image)
 {
     int i, x, y;
     cv::Point temp_point;
+    vector<vector<int>> adjacency_matrix;
+    adjacency_matrix.resize(centers.size());
+    for(i = 0 ; i < centers.size() ; ++i)
+    {
+        //Grow Columns by n
+        adjacency_matrix[i].resize(centers.size());
+    }
 
     for (i = 0; i < (int) centers.size(); i++) 
     {
