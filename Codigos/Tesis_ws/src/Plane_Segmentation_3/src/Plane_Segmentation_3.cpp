@@ -355,7 +355,7 @@ void SuperPixels(cv::Mat src)
   slic.clear_data();
   slic.generate_superpixels(lab_image, step, nc);
   slic.create_connectivity(lab_image);
-  	slic.colour_with_cluster_means(&frame2);
+  	//slic.colour_with_cluster_means(&frame2);
   slic.store_superpixels(&frame2);
   //slic.calculate_histograms(&frame2);
   

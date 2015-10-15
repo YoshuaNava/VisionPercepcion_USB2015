@@ -73,18 +73,22 @@ void Superpixel::add_histogram_colorFrequencies(int R, int G, int B)
 void Superpixel::add_pixels_information(IplImage *img)
 {
 	CvScalar colour;
-	this->pixels = cv::Mat::zeros(this->bounding_rect.width, this->bounding_rect.height, CV_8UC3);
+	this->pixels = cv::Mat::zeros(this->bounding_rect.height, this->bounding_rect.width, CV_8UC3);
 	int x_coord, y_coord;
-	for (int i = bounding_rect.x; i < bounding_rect.x+bounding_rect.width -1; i++)
+	for (int j = bounding_rect.y; j < bounding_rect.y+bounding_rect.height ;j++)
 	{
-		x_coord = i - bounding_rect.x;
-		for (int j = bounding_rect.y; j < bounding_rect.y+bounding_rect.height -1; j++)
+		y_coord = j - bounding_rect.y;
+		for (int i = bounding_rect.x; i < bounding_rect.x+bounding_rect.width ;i++)	
 		{
-			y_coord = j - bounding_rect.y;
+			x_coord = i - bounding_rect.x;
+			/*
+			cout << i << "   "	<< j << "\n";
+			cout << bounding_rect.x << "   "	<< bounding_rect.y << "\n\n\n";
+			*/
 			colour = cvGet2D(img, j, i);
-			(this->pixels.at<cv::Vec3b>(x_coord, y_coord)).val[0] = colour.val[0];
-			(this->pixels.at<cv::Vec3b>(x_coord, y_coord)).val[1] = colour.val[1];
-			(this->pixels.at<cv::Vec3b>(x_coord, y_coord)).val[2] = colour.val[2];
+			(this->pixels.at<cv::Vec3b>(y_coord, x_coord)).val[0] = colour.val[0];
+			(this->pixels.at<cv::Vec3b>(y_coord, x_coord)).val[1] = colour.val[1];
+			(this->pixels.at<cv::Vec3b>(y_coord, x_coord)).val[2] = colour.val[2];
 		}
 	}
 }
@@ -169,23 +173,12 @@ void Superpixel::calculate_bounding_rect()
 
 void Superpixel::export_to_jpeg(IplImage *img)
 {
-	CvScalar colour;
-	this->pixels = cv::Mat::zeros(this->bounding_rect.width, this->bounding_rect.height, CV_8UC3);
-	int x_coord, y_coord;
-	for (int i = bounding_rect.x; i < bounding_rect.x+bounding_rect.width -1; i++)
+	/*
+	if(this->id == 1)
 	{
-		x_coord = i - bounding_rect.x;
-		for (int j = bounding_rect.y; j < bounding_rect.y+bounding_rect.height -1; j++)
-		{
-			y_coord = j - bounding_rect.y;
-			colour = cvGet2D(img, j, i);
-			(this->pixels.at<cv::Vec3b>(x_coord, y_coord)).val[0] = colour.val[0];
-			(this->pixels.at<cv::Vec3b>(x_coord, y_coord)).val[1] = colour.val[1];
-			(this->pixels.at<cv::Vec3b>(x_coord, y_coord)).val[2] = colour.val[2];
-		}
+		cv::imshow("superpixel", this->pixels);
 	}
-
-//	cv::imshow("superpixel", this->pixels);
+	*/
 	string path = "/home/mecatronica/Github_Yoshua/VisionPercepcion_USB2015/Codigos/Tesis_ws/src/Plane_Segmentation_3/superpixel_images/";
 	string file_name = to_string(this->id) + ".jpg";
 
