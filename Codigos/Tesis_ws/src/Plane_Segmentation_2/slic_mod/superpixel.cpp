@@ -186,7 +186,8 @@ void Superpixel::export_to_jpeg(IplImage *img)
 	}
 
 //	cv::imshow("superpixel", this->pixels);
-	string path = "/home/mecatronica/Github_Yoshua/VisionPercepcion_USB2015/Codigos/Tesis_ws/src/Plane_Segmentation_3/superpixel_images/";
+	//string path = "/home/mecatronica/Github_Yoshua/VisionPercepcion_USB2015/Codigos/Tesis_ws/src/Plane_Segmentation_2/superpixel_images/";
+	string path = "/home/alfredoso/GitHub/VisionPercepcion_USB2015/Codigos/Tesis_ws/src/Plane_Segmentation_2/superpixel_images/";
 	string file_name = to_string(this->id) + ".jpg";
 
 	imwrite(path+file_name, pixels);
