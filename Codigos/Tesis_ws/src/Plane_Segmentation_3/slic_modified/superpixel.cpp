@@ -140,7 +140,7 @@ void Superpixel::calculate_img_pixel_mask(IplImage *img)
 		this->pixel_mask.ptr<uchar>((int)points[i].x)[(int)points[i].y] = 255;
 	}
 	
-	//cout << "hola";
+	cout << "hola";
 	this->bounding_rect = cv::boundingRect(this->points);
 	pixels = cv::Mat(this->bounding_rect.height, this->bounding_rect.width, CV_8UC3, cvScalar(0,0,0));
 

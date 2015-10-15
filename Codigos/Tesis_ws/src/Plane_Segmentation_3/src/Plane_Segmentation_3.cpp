@@ -28,7 +28,7 @@
 
 //#include "img_proc_fcns.h" //various image processing/computer vision functions
 
-#include "../slic_mod/slic.h"
+#include "../slic_modified/slic.h"
 
 
 #define Window_W 1.02*proc_W //appriximate wht window width and hight as a function of the frame size
@@ -330,7 +330,7 @@ void SuperPixels(cv::Mat src)
   slic.create_connectivity(lab_image);
   slic.store_superpixels(&frame2);
   //slic.calculate_histograms(&frame2);
-  slic.export_superpixels_to_files(&frame2);
+  //slic.export_superpixels_to_files(&frame2);
   slic.display_contours(&frame2, CV_RGB(255,0,0));
   slic.display_number_grid(&frame2, CV_RGB(0,255,0));
   //slic.display_center_grid(frame2, CV_RGB(0,255,0));
