@@ -13,6 +13,7 @@ Superpixel::Superpixel(int id, int num_points)
 	this->id = id;
 	this->num_points = num_points;
 	init_structures(num_points);
+	//this->pixels = cv::Mat(50, 50, CV_8UC3, cvScalar(0,0,0));
 }
 
 
@@ -133,17 +134,24 @@ void Superpixel::print_everything()
 
 void Superpixel::calculate_img_pixel_mask(IplImage *img)
 {
+	cout << "epale\n";
 	this->pixel_mask = cv::Mat::zeros(img->height, img->width, CV_8UC1);
+	/*
 	for(int i=0; i<this->points.size() ;i++)
 	{
-
 		this->pixel_mask.ptr<uchar>((int)points[i].x)[(int)points[i].y] = 255;
 	}
-	
-	cout << "hola";
-	this->bounding_rect = cv::boundingRect(this->points);
-	pixels = cv::Mat(this->bounding_rect.height, this->bounding_rect.width, CV_8UC3, cvScalar(0,0,0));
+	*/
 
+	
+	cout << "hola\n";
+	this->bounding_rect = cv::boundingRect(this->points);
+	cout << "numero de pixels = " << this->pixels.size() << "	numero de puntos = " << this->points.size()  << "		rectangulo, ancho = " << bounding_rect.width << "   largo =" << bounding_rect.height << "\n";
+	
+
+	//this->pixels = cv::Mat(this->bounding_rect.height, this->bounding_rect.width, CV_8UC3, cvScalar(0,0,0));
+	cout << "listo\n";
+	
 	/*cv::Point pt1, pt2;
 	pt1.x = rect.x;
 	pt1.y = rect.y;
@@ -152,9 +160,6 @@ void Superpixel::calculate_img_pixel_mask(IplImage *img)
 	rectangle(pixel_mask, pt1, pt2, CV_RGB(255,0,0), 1);
 	cv::imshow("pixel_mask", pixel_mask);
 	*/
-
-
-
 }
 
 
@@ -184,9 +189,11 @@ void Superpixel::export_to_jpeg(IplImage *img)
 	}
 
 	cv::imshow("superpixel", this->pixels);
-	string path = "/home/alfredoso/GitHub/VisionPercepcion_USB2015/Codigos/Tesis_ws/src/Plane_Segmentation_2/superpixel_images/";
+	string path = "/home/mecatronica/Github_Yoshua/VisionPercepcion_USB2015/Codigos/Tesis_ws/src/Plane_Segmentation_3/superpixel_images/";
 	string file_name = to_string(this->id) + ".jpg";
-	imwrite( path+file_name, pixels);
+
+
+	imwrite(path+file_name, pixels);
 }
 
 

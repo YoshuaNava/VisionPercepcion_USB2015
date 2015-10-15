@@ -37,8 +37,8 @@ catkin_package(
  target_link_libraries(Plane_Segmentation_3 ${OpenCV_LIBS})
  
  add_library(slic_modified slic_modified/slic.cpp)
- add_library(superpixel_2 slic_modified/superpixel.cpp)
- target_link_libraries(Plane_Segmentation_3 slic_mod)
- target_link_libraries(Plane_Segmentation_3 superpixel)
+ add_library(superpixel_modified slic_modified/superpixel.cpp)
+ target_link_libraries(Plane_Segmentation_3 slic_modified)
+ target_link_libraries(Plane_Segmentation_3 superpixel_modified)
  ##add_dependencies(Convert_Image ar_pose_generate_messages_cpp)
 
