@@ -76,9 +76,9 @@ void Superpixel::calculate_histogram()
 	cv::Mat b_hist, g_hist, r_hist;
 
 	/// Compute the histograms:
-	calcHist( &bgr_planes[0], 1, 0, cv::Mat(), b_hist, 1, &histSize, &histRange, uniform, accumulate );
-	calcHist( &bgr_planes[1], 1, 0, cv::Mat(), g_hist, 1, &histSize, &histRange, uniform, accumulate );
-	calcHist( &bgr_planes[2], 1, 0, cv::Mat(), r_hist, 1, &histSize, &histRange, uniform, accumulate );
+	calcHist( &bgr_planes[0], 1, 0, this->pixels_mask, b_hist, 1, &histSize, &histRange, uniform, accumulate );
+	calcHist( &bgr_planes[1], 1, 0, this->pixels_mask, g_hist, 1, &histSize, &histRange, uniform, accumulate );
+	calcHist( &bgr_planes[2], 1, 0, this->pixels_mask, r_hist, 1, &histSize, &histRange, uniform, accumulate );
 
 	// Draw the histograms for B, G and R
 	int hist_w = this->pixels.cols;
