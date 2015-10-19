@@ -27,7 +27,6 @@
 using namespace std;
 
 #define point2Dvec vector<cv::Point>
-
 class Superpixel 
 {
 	private:
@@ -38,6 +37,7 @@ class Superpixel
 		point2Dvec points;
 		cv::Rect bounding_rect;
 		cv::Mat pixels;
+		cv::Mat pixels_mask;
 
 		void init_structures(int num_points);
 		void clear_data();
@@ -55,7 +55,7 @@ class Superpixel
 		
 		void print_everything();
 		void add_point(cv::Point point);
-		void add_pixels_information(IplImage *img);
+		void add_pixels_information(IplImage *img, vector<vector<int>> clusters);
 		void calculate_histogram();
 		void calculate_bounding_rect();
 		void export_to_jpeg(IplImage *img);
