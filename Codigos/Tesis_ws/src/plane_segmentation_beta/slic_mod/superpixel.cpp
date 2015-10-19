@@ -93,25 +93,33 @@ void Superpixel::calculate_histogram()
 	normalize(r_hist, r_hist, 0, this->histogram.rows, cv::NORM_MINMAX, -1, cv::Mat() );
 }
 
-void Superpixel::add_pixels_information(IplImage *img)
+
+
+void Superpixel::add_pixels_information(IplImage *img, vector<vector<int>> clusters)
 {
 	CvScalar colour;
 	this->pixels = cv::Mat::zeros(this->bounding_rect.height, this->bounding_rect.width, CV_8UC3);
+	this->pixels_mask = cv::Mat::zeros(this->bounding_rect.height, this->bounding_rect.width, CV_8UC1);
+
 	int x_coord, y_coord;
 	for (int j = bounding_rect.y; j < bounding_rect.y+bounding_rect.height ;j++)
 	{
 		y_coord = j - bounding_rect.y;
 		for (int i = bounding_rect.x; i < bounding_rect.x+bounding_rect.width ;i++)	
 		{
-			x_coord = i - bounding_rect.x;
-			/*
-			cout << i << "   "	<< j << "\n";
-			cout << bounding_rect.x << "   "	<< bounding_rect.y << "\n\n\n";
-			*/
-			colour = cvGet2D(img, j, i);
-			(this->pixels.at<cv::Vec3b>(y_coord, x_coord)).val[0] = colour.val[0];
-			(this->pixels.at<cv::Vec3b>(y_coord, x_coord)).val[1] = colour.val[1];
-			(this->pixels.at<cv::Vec3b>(y_coord, x_coord)).val[2] = colour.val[2];
+			if(this->id == clusters[i][j])
+			{
+				x_coord = i - bounding_rect.x;
+				/*
+				cout << i << "   "	<< j << "\n";
+				cout << bounding_rect.x << "   "	<< bounding_rect.y << "\n\n\n";
+				*/
+				colour = cvGet2D(img, j, i);
+				(this->pixels.at<cv::Vec3b>(y_coord, x_coord)).val[0] = colour.val[0];
+				(this->pixels.at<cv::Vec3b>(y_coord, x_coord)).val[1] = colour.val[1];
+				(this->pixels.at<cv::Vec3b>(y_coord, x_coord)).val[2] = colour.val[2];
+				this->pixels_mask.at<uchar>(y_coord, x_coord) = 255;
+			}
 		}
 	}
 }
@@ -179,10 +187,12 @@ void Superpixel::export_to_jpeg(IplImage *img)
 	}
 	*/
 	//string path = "/home/mecatronica/Github_Yoshua/VisionPercepcion_USB2015/Codigos/Tesis_ws/src/Plane_Segmentation_3/superpixel_images/";
-	string path = "/home/alfredoso/GitHub/VisionPercepcion_USB2015/Codigos/Tesis_ws/src/Plane_Segmentation_3/superpixel_images/";
-	string file_name = to_string(this->id) + ".jpg";
+	string path = "/home/alfredoso/GitHub/VisionPercepcion_USB2015/Codigos/Tesis_ws/src/plane_segmentation_alpha/superpixel_images/";
+	string pixels_file_name = to_string(this->id) + ".jpg";
+	string pixels_mask_file_name = to_string(this->id) + "_mask.jpg";
 
-	imwrite(path+file_name, pixels);
+	imwrite(path+pixels_file_name, this->pixels);
+	imwrite(path+pixels_mask_file_name, this->pixels_mask);
 }
 
 

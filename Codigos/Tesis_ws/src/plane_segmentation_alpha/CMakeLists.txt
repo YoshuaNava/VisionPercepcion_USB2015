@@ -32,7 +32,7 @@ catkin_package(
 #add_executable(foo src/foo.cpp)
 
 
- add_executable(plane_segmentation_alpha src/Plane_Segmentation_alpha.cpp)
+ add_executable(plane_segmentation_alpha src/plane_segmentation_alpha.cpp)
  target_link_libraries(plane_segmentation_alpha ${catkin_LIBRARIES})
  target_link_libraries(plane_segmentation_alpha ${OpenCV_LIBS})
  

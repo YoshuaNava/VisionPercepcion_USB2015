@@ -372,8 +372,10 @@ void CameraSetup()
 	
 	proc_W = 160;//160
 	proc_H = 120;//120
+	//proc_W = 320;//160
+	//proc_H = 240;//120
 	cap.set(CV_CAP_PROP_FRAME_WIDTH, 640);
-	cap.set(CV_CAP_PROP_FRAME_HEIGHT, 380);
+	cap.set(CV_CAP_PROP_FRAME_HEIGHT, 480);
 	// Good reference: http://superuser.com/questions/897420/how-to-know-which-framerate-should-i-use-to-capture-webcam-with-ffmpeg
 	cap.set(CV_CAP_PROP_FPS, 30);
 }
@@ -389,7 +391,7 @@ void CameraSetup()
 */
 int main( int argc, char** argv ) 
 {
-	ros::init(argc, argv, "plane_segmentation");
+	ros::init(argc, argv, "Plane_Segmentation");
 	ros::NodeHandle nh;
   
   image_transport::ImageTransport it(nh);

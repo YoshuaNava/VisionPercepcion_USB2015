@@ -26,7 +26,7 @@ catkin_package(
 )
 
 #hola
-#target_link_libraries (plane_segmentation slic)
+#target_link_libraries (plane_segmentation_beta slic)
 #add_library(slic slic.cpp)
 
 #add_executable(foo src/foo.cpp)
