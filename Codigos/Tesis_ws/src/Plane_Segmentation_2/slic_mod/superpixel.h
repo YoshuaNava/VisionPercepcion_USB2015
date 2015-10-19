@@ -26,7 +26,6 @@
 //#include <float.h>
 using namespace std;
 
-#define RGBcolourFrequencyChart vector<vector<int>>	//Taken from the original slic class
 #define point2Dvec vector<cv::Point>
 
 class Superpixel 
@@ -35,7 +34,7 @@ class Superpixel
 		int id;
 		int num_points;
 		cv::Point center;
-		RGBcolourFrequencyChart histogram;
+		cv::Mat histogram;
 		point2Dvec points;
 		cv::Rect bounding_rect;
 		cv::Mat pixels;
@@ -47,19 +46,17 @@ class Superpixel
 		Superpixel();
 		Superpixel(int id, int num_points);
 		Superpixel(int id, cv::Point center);
-		Superpixel(int id, int num_points, cv::Point center, RGBcolourFrequencyChart histogram, point2Dvec points);
+		Superpixel(int id, int num_points, cv::Point center, cv::Mat histogram, point2Dvec points);
 		~Superpixel();
 
 		cv::Point get_center();
 		point2Dvec get_points();
-		RGBcolourFrequencyChart get_histogram();
-
-		static RGBcolourFrequencyChart init_FrequencyChart();
+		cv::Mat get_histogram();
 		
 		void print_everything();
 		void add_point(cv::Point point);
 		void add_pixels_information(IplImage *img);
-		void add_histogram_colorFrequencies(int R, int G, int B);
+		void calculate_histogram();
 		void calculate_bounding_rect();
 		void export_to_jpeg(IplImage *img);
 };

@@ -398,8 +398,18 @@ void Slic::calculate_histograms(IplImage *image)
 
 void Slic::store_superpixels(IplImage *image)
 {
-    int i, x, y;
+    int i, x, y, k;
     cv::Point temp_point;
+    superpixels_adjacency_matrix.resize(centers.size());
+    const int dx[8] = {-1, -1, -1, 0, +1, +1, +1, 0};
+    const int dy[8] = {-1, 0, +1, +1, +1, 0, -1, -1};
+
+    for(i = 0 ; i < centers.size() ; ++i)
+    {
+        //Grow Columns by n
+        superpixels_adjacency_matrix[i].resize(centers.size());
+        std::fill(superpixels_adjacency_matrix[i].begin(), superpixels_adjacency_matrix[i].end(), 0);
+    }
 
     for (i = 0; i < (int) centers.size(); i++) 
     {
@@ -418,17 +428,45 @@ void Slic::store_superpixels(IplImage *image)
                 //cout << "hola " << index << "\n"; 
                 cout << "ID = " << index << ".     R = " << colour.val[2] << ".    G = " << colour.val[1] << ".    B = " << colour.val[0] << ".\n";
             }*/
-            superpixels[index].add_histogram_colorFrequencies(colour.val[2], colour.val[1], colour.val[0]);
             temp_point = cvPoint(x, y);
             //cout << "epale " << index << "\n";
             //cout << "Superpixel # " << index << ".  Number of points = " << superpixels[index].get_points().size() << ".    Histogram length = " << superpixels[index].get_histogram().size() << "\n";
             superpixels[index].add_point(temp_point);
+            for(k=0; k<8 ;k++)
+            {
+                if(((x+dx[k]>=0) && (x+dx[k]<image->width)) && ((y+dy[k]>=0) && (y+dy[k]<image->height)))
+                {
+                    if(clusters[x+dx[k]][y+dy[k]] == index)
+                    {
+                        superpixels_adjacency_matrix[index][index] = -1;
+                    }
+                    else
+                    {
+                        //cout << "index = " << index << "    x+dx[k] = " << x+dx[k] << "     y+dy[k] = " << y+dy[k] << "\n";
+                        superpixels_adjacency_matrix[index][clusters[x+dx[k]][y+dy[k]]] = 1;
+                        superpixels_adjacency_matrix[clusters[x+dx[k]][y+dy[k]]][index] = 1;
+                    }
+                }
+
+            }
         }
     }
+/*
+    for(i=0; i<centers.size() ;++i)
+    {
+        for(k=0; k<centers.size() ;k++)    //Grow Columns by n
+        {
+            cout << (int) superpixels_adjacency_matrix[i][k] << "   ";
+        }
+        cout << "\n";
+    }
+    cout << "**************************************************************************************\n";
+*/
     for (i = 0; i < (int) superpixels.size(); i++) 
     {
         superpixels[i].calculate_bounding_rect();
         superpixels[i].add_pixels_information(image);
+        superpixels[i].calculate_histogram();
     }
     //superpixels[0].print_everything();
 }
@@ -454,52 +492,6 @@ void Slic::show_histograms(int superpixel_id_1, int superpixel_id_2)
     int histSize = 256.0;
     int hist_w = 640.0; int hist_h = 480.0;
     int bin_w = cvRound( (double) hist_w/histSize );
-
-
-    cv::Mat histImage( hist_h, hist_w, CV_8UC3, CV_RGB(0,0,0));
-
-    /// Normalize the result to [ 0, histImage.rows ]
-    /*normalize(superpixels[0].get_histogram(), b_hist, 0, histImage.rows, NORM_MINMAX, -1, Mat() );
-    normalize(g_hist, g_hist, 0, histImage.rows, NORM_MINMAX, -1, Mat() );
-    normalize(r_hist, r_hist, 0, histImage.rows, NORM_MINMAX, -1, Mat() );
-*/
-    /// Draw for each channel
-    RGBcolourFrequencyChart histogram_1 = superpixels[superpixel_id_1].get_histogram();
-    RGBcolourFrequencyChart histogram_2 = superpixels[superpixel_id_2].get_histogram();
-    
-    for( int i = 0; i < histSize-1; i++ )
-    {
-      /*
-        histogram_1[i][2] = ((double)histogram_1[i][2]/35.0)*480.0;
-        histogram_1[i][1] = ((double)histogram_1[i][1]/35.0)*480.0;
-        histogram_1[i][0] = ((double)histogram_1[i][0]/35.0)*480.0;
-        histogram_2[i][2] = ((double)histogram_2[i][2]/35.0)*480.0;
-        histogram_2[i][1] = ((double)histogram_2[i][1]/35.0)*480.0;
-        histogram_2[i][0] = ((double)histogram_2[i][0]/35.0)*480.0;
-      */
-      line( histImage, cvPoint( bin_w*(i), hist_h - histogram_1[i][0]) ,
-                       cvPoint( bin_w*(i+1), hist_h - histogram_1[i+1][0]),
-                       CV_RGB(127,0,0), 2, 8, 0  );
-      line( histImage, cvPoint( bin_w*(i), hist_h - histogram_1[i][1]) ,
-                       cvPoint( bin_w*(i+1), hist_h - histogram_1[i+1][1]),
-                       CV_RGB(0,127,0), 2, 8, 0  );
-      line( histImage, cvPoint( bin_w*(i), hist_h - histogram_1[i][2]) ,
-                       cvPoint( bin_w*(i+1), hist_h - histogram_1[i+1][2]),
-                       CV_RGB(0,0,127), 2, 8, 0  );
-      line( histImage, cvPoint( bin_w*(i), hist_h - histogram_2[i][0]) ,
-                       cvPoint( bin_w*(i+1), hist_h - histogram_2[i+1][0]),
-                       CV_RGB(255,0,0), 2, 8, 0  );
-      line( histImage, cvPoint( bin_w*(i), hist_h - histogram_2[i][1]) ,
-                       cvPoint( bin_w*(i+1), hist_h - histogram_2[i+1][1]),
-                       CV_RGB(0,255,0), 2, 8, 0  );
-      line( histImage, cvPoint( bin_w*(i), hist_h - histogram_2[i][2]) ,
-                       cvPoint( bin_w*(i+1), hist_h - histogram_2[i+1][2]),
-                       CV_RGB(0,0,255), 2, 8, 0  );
-    }
-
-    /// Display
-    cv::namedWindow("calcHist Demo", CV_WINDOW_AUTOSIZE );
-    imshow("calcHist Demo", histImage );
 }
 
 

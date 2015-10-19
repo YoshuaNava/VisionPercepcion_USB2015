@@ -364,18 +364,18 @@ void CameraSetup()
 	//cap = VideoCapture(0); // Declare capture form Video: "eng_stat_obst.avi"
   
 
-  cap = VideoCapture(0);
-	//VideoCapture cap(0); //Camera integrada de la computadora
+  cap = VideoCapture(1);
+	//cap = VideoCapture("eng_stat_obst.avi");
 	
 
 	//VideoCapture cap(1); //Otra camara, conectada a la computadora mediante USB, por ejemplo.
 	
 	proc_W = 160;//160
 	proc_H = 120;//120
-	//cap.set(CV_CAP_PROP_FRAME_WIDTH, 640);
-	//cap.set(CV_CAP_PROP_FRAME_HEIGHT, 360);
+	cap.set(CV_CAP_PROP_FRAME_WIDTH, 640);
+	cap.set(CV_CAP_PROP_FRAME_HEIGHT, 380);
 	// Good reference: http://superuser.com/questions/897420/how-to-know-which-framerate-should-i-use-to-capture-webcam-with-ffmpeg
-	//cap.set(CV_CAP_PROP_FPS, 15);	
+	cap.set(CV_CAP_PROP_FPS, 30);
 }
 
 
@@ -394,11 +394,11 @@ int main( int argc, char** argv )
   
   image_transport::ImageTransport it(nh);
   image_transport::Publisher pub = it.advertise("camera/image_raw", 1); //Publisher
-  ros::Rate loop_rate(5);
+  ros::Rate loop_rate(40);
   
 	CameraSetup();
 	cap.read(frame);
-  waitKey(1000);
+  waitKey(10);
   //image_transport::Subscriber sub = it.subscribe("camera/image_raw", 1, imageCallback); // Subscriber Function
   
   CvScalar s; 

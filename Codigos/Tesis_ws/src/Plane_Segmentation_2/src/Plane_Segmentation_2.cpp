@@ -293,22 +293,6 @@ void CalculateImageFeatures()
 }
 
 
-void CameraSetup()
-{
-	//cap = VideoCapture(0); // Declare capture form Video: "eng_stat_obst.avi"
-  
-
-  cap = VideoCapture("eng_stat_obst.avi");
-	//VideoCapture cap(0); //Camera integrada de la computadora
-	//VideoCapture cap(1); //Otra camara, conectada a la computadora mediante USB, por ejemplo.
-	
-	proc_W = 160;//160
-	proc_H = 120;//120
-	cap.set(CV_CAP_PROP_FRAME_WIDTH, 640);
-	cap.set(CV_CAP_PROP_FRAME_HEIGHT, 360);
-	// Good reference: http://superuser.com/questions/897420/how-to-know-which-framerate-should-i-use-to-capture-webcam-with-ffmpeg
-	cap.set(CV_CAP_PROP_FPS, 30);	
-}
 
 void imageCallback(const sensor_msgs::ImageConstPtr& msg)
 {
@@ -355,7 +339,7 @@ void SuperPixels(cv::Mat src)
   slic.clear_data();
   slic.generate_superpixels(lab_image, step, nc);
   slic.create_connectivity(lab_image);
-  	slic.colour_with_cluster_means(&frame2);
+  	//slic.colour_with_cluster_means(&frame2);
   slic.store_superpixels(&frame2);
   //slic.calculate_histograms(&frame2);
   
@@ -372,6 +356,26 @@ void SuperPixels(cv::Mat src)
   //cvReleaseImage(&frame2);
   cvReleaseImage(&lab_image);
   cvWaitKey(10);
+}
+
+
+void CameraSetup()
+{
+	//cap = VideoCapture(0); // Declare capture form Video: "eng_stat_obst.avi"
+  
+
+  cap = VideoCapture(1);
+	//cap = VideoCapture("eng_stat_obst.avi");
+	
+
+	//VideoCapture cap(1); //Otra camara, conectada a la computadora mediante USB, por ejemplo.
+	
+	proc_W = 160;//160
+	proc_H = 120;//120
+	cap.set(CV_CAP_PROP_FRAME_WIDTH, 640);
+	cap.set(CV_CAP_PROP_FRAME_HEIGHT, 380);
+	// Good reference: http://superuser.com/questions/897420/how-to-know-which-framerate-should-i-use-to-capture-webcam-with-ffmpeg
+	cap.set(CV_CAP_PROP_FPS, 30);
 }
 
 
@@ -393,7 +397,8 @@ int main( int argc, char** argv )
   ros::Rate loop_rate(40);
   
 	CameraSetup();
-  waitKey(1);
+	cap.read(frame);
+  waitKey(10);
   //image_transport::Subscriber sub = it.subscribe("camera/image_raw", 1, imageCallback); // Subscriber Function
   
   CvScalar s; 
@@ -408,7 +413,7 @@ int main( int argc, char** argv )
 		}
 		cv:resize(frame, frame, Size(proc_W, proc_H), 0, 0, INTER_AREA);
 		cvtColor(frame, gray, CV_BGR2GRAY); // Convert to GrayScale
-		waitKey(1); // Wait Time
+		waitKey(10); // Wait Time
     
 
 
