@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <package>
-  <name>Plane_Segmentation_2</name>
+  <name>plane_segmentation_beta</name>
   <version>0.0.0</version>
-  <description>The Plane_Segmentation package</description>
+  <description>The plane_segmentation beta package</description>
 
   <!-- One maintainer tag required, multiple allowed, one person per tag --> 
   <!-- Example:  -->

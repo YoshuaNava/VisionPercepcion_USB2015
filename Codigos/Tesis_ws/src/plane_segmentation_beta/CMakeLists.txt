@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(Plane_Segmentation_2)
+project(plane_segmentation_beta)
 
 Find_package(catkin REQUIRED COMPONENTS
   roscpp
@@ -26,19 +26,19 @@ catkin_package(
 )
 
 #hola
-#target_link_libraries (Plane_Segmentation slic)
+#target_link_libraries (plane_segmentation slic)
 #add_library(slic slic.cpp)
 
 #add_executable(foo src/foo.cpp)
 
 
- add_executable(Plane_Segmentation_2 src/Plane_Segmentation_2.cpp)
- target_link_libraries(Plane_Segmentation_2 ${catkin_LIBRARIES})
- target_link_libraries(Plane_Segmentation_2 ${OpenCV_LIBS})
+ add_executable(plane_segmentation_beta src/plane_segmentation_beta.cpp)
+ target_link_libraries(plane_segmentation_beta ${catkin_LIBRARIES})
+ target_link_libraries(plane_segmentation_beta ${OpenCV_LIBS})
  
  add_library(slic_mod slic_mod/slic.cpp)
  add_library(superpixel slic_mod/superpixel.cpp)
- target_link_libraries(Plane_Segmentation_2 slic_mod)
- target_link_libraries(Plane_Segmentation_2 superpixel)
+ target_link_libraries(plane_segmentation_beta slic_mod)
+ target_link_libraries(plane_segmentation_beta superpixel)
  ##add_dependencies(Convert_Image ar_pose_generate_messages_cpp)
 

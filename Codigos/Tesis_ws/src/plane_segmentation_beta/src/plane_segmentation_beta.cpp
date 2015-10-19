@@ -389,7 +389,7 @@ void CameraSetup()
 */
 int main( int argc, char** argv ) 
 {
-	ros::init(argc, argv, "Plane_Segmentation");
+	ros::init(argc, argv, "plane_segmentation");
 	ros::NodeHandle nh;
   
   image_transport::ImageTransport it(nh);
