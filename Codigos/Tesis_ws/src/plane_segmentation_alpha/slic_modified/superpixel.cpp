@@ -118,6 +118,7 @@ void Superpixel::add_pixels_information(IplImage *img, vector<vector<int>> clust
 				(this->pixels.at<cv::Vec3b>(y_coord, x_coord)).val[0] = colour.val[0];
 				(this->pixels.at<cv::Vec3b>(y_coord, x_coord)).val[1] = colour.val[1];
 				(this->pixels.at<cv::Vec3b>(y_coord, x_coord)).val[2] = colour.val[2];
+				this->pixels_mask.at<uchar>(y_coord, x_coord) = 255;
 			}
 		}
 	}
@@ -187,9 +188,11 @@ void Superpixel::export_to_jpeg(IplImage *img)
 	*/
 	//string path = "/home/mecatronica/Github_Yoshua/VisionPercepcion_USB2015/Codigos/Tesis_ws/src/Plane_Segmentation_3/superpixel_images/";
 	string path = "/home/alfredoso/GitHub/VisionPercepcion_USB2015/Codigos/Tesis_ws/src/plane_segmentation_alpha/superpixel_images/";
-	string file_name = to_string(this->id) + ".jpg";
+	string pixels_file_name = to_string(this->id) + ".jpg";
+	string pixels_mask_file_name = to_string(this->id) + "_mask.jpg";
 
-	imwrite(path+file_name, pixels);
+	imwrite(path+pixels_file_name, this->pixels);
+	imwrite(path+pixels_mask_file_name, this->pixels_mask);
 }
 
 
