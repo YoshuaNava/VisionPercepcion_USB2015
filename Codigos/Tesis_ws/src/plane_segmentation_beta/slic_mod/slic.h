@@ -21,6 +21,7 @@
 #include <float.h>
 #include "superpixel.h"
 using namespace std;
+using namespace cv;
 
 /* 2d matrices are handled by 2d vectors. */
 #define vec2dd vector<vector<double> >
@@ -84,6 +85,7 @@ class Slic {
         void display_number_grid(IplImage *image, CvScalar colour);
         void show_histograms(int superpixel_id_1, int superpixel_id_2);
         void export_superpixels_to_files(IplImage *img);
+        void export_superpixels_data(int number,Mat img_in,Mat& img_out,Mat& img_out_pixels,int& superpixelsxx,int& superpixelsyy,Mat& img_out_seed);
 };
 
 #endif

@@ -36,8 +36,7 @@ class Superpixel
 		cv::Mat histogram;
 		point2Dvec points;
 		cv::Rect bounding_rect;
-		cv::Mat pixels;
-		cv::Mat pixels_mask;
+
 
 		void init_structures(int num_points);
 		void clear_data();
@@ -52,6 +51,8 @@ class Superpixel
 		cv::Point get_center();
 		point2Dvec get_points();
 		cv::Mat get_histogram();
+		cv::Mat pixels;
+		cv::Mat pixels_mask;
 		
 		void print_everything();
 		void add_point(cv::Point point);

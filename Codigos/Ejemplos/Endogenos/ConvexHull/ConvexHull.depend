@@ -1,0 +1,11 @@
+# depslib dependency file v1.0
+1444609015 source:/home/rafael/VisionPercepcion_USB2015/Codigos/Ejemplos/Endogenos/ConvexHull/main.cpp
+	<iostream>
+	<vector>
+	<algorithm>
+	<stdio.h>
+	<stdlib.h>
+	<math.h>
+	<string.h>
+	<iomanip>
+
