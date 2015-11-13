@@ -1,0 +1,2 @@
+patch_1.txt rpbp-stand.xml
+patch_2.txt rpbp-walk2.xml

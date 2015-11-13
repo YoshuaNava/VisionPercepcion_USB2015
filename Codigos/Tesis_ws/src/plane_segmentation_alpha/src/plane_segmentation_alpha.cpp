@@ -364,7 +364,7 @@ void CameraSetup()
 	//cap = VideoCapture(0); // Declare capture form Video: "eng_stat_obst.avi"
   
 
-  cap = VideoCapture(1);
+  cap = VideoCapture(0);
 	//cap = VideoCapture("eng_stat_obst.avi");
 	
 

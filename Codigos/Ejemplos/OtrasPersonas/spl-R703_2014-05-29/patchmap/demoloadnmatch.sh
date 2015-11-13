@@ -1,0 +1,1 @@
+./test_patch_load -imucam_grabber "#1 -norgb -um6 -um6port /dev/ttyUSB0 -um6nomag -cal rpbp_imucam_cal_nomag.xml" -bc -br 200,0,0,0,0,0 -bo 0,-1,0 -drawcam 0.35,1 -ndv -nrv -downgrav -mvfd -mvcnn -mvcv -drawdown -bubcamloc 5,-2,-2 -campos 1,1,1 -indcam -vs 2

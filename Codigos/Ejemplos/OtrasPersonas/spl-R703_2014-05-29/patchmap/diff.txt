@@ -1,0 +1,132 @@
+Index: README.txt
+===================================================================
+--- README.txt	(revision 701)
++++ README.txt	(working copy)
+@@ -15,24 +15,28 @@
+ COMPILING FROM SOURCE
+ 
+ See the makefile and makefile.project for more info about compiling the code.  
+-Under spl/cpp path, run:
++Under spl/patchmap run:
+ > make
+ 
+ -------------------------------------------------------------------------------
+ DEPENDENCIES
+ 
+-TBD: imucam, rxkinfu
++imucam: http://www.ccs.neu.edu/research/gpc/imucam
+ 
++rxkinfu: http://www.ccs.neu.edu/research/gpc/rxkinfu
++
++PCL trunk: http://www.pointclouds.org (PCL modules common, io, visualization, features, filters, segmentation, surface)
++
+ -------------------------------------------------------------------------------
+ MODULES
+ 
+ FILTERS: filter_{approx_voxel_grid_organized, dec, lowres, nms}
+ PATCH FUNCTIONS: patch, patch_{fit, plot, select, sample, set}
+-SAMPLE HANDLING: sample_{filter, saliency}
++SAMPLE HANDLING: sample_{filter, saliency}, integral_image_features
+ SEGMENTATION: autoseg, task
+ PLANNING: patch_selection
+ MAPPING: map_{kinfu_app, patch, cell}
+-MATH TOOLS: lls, xform3
++MATH TOOLS: xform3
+ TEST PATCH FUNCTION: test_patch_{plot, sample, fit, residual}
+ TEST MAP FUNCTION: test_map_kinfu_app
+ TEST FUNCTION: test_{filter_nms, rexp}
+Index: integral_image_features.h
+===================================================================
+--- integral_image_features.h	(revision 701)
++++ integral_image_features.h	(working copy)
+@@ -49,7 +49,7 @@
+   * normal for a specific point from the covariance matrix of its local 
+   * neighborhood.
+   *
+-  * \note Similar to PCL IntegralImageNormalEstimation class.
++  * \note adapted from PCL IntegralImageNormalEstimation class.
+   *
+   * \author Dimitrios Kanoulas
+  */
+Index: lls.h
+===================================================================
+--- lls.h	(removed)
+===================================================================
+--- map_patch.h	(revision 701)
++++ map_patch.h	(working copy)
+@@ -46,7 +46,7 @@
+     * II. T,F: valid seed
+     * III. T,T: valid patch
+     *
+-    * There are the following transmissions:
++    * There are the following transitions:
+     * 1. I->II (when new seed is added)
+     * 2. II->I (when seed is deleted before fitting)
+     * 3. II->III (valid fitting)
+Index: patch_coverage.h
+===================================================================
+--- patch_coverage.h	(revision 701)
++++ patch_coverage.h	(working copy)
+@@ -56,8 +56,8 @@
+     * A grid of square cells is imposed on the local frame XY plane.  Cells are
+     * categorized as good if (a) they contain a sufficient number of in-bounds
+     * points relative to the portion of their area inside the patch boundary and
+-    * (b) they do not contain too many out-of-bounds points relative to their area
+-    * outside the patch boundary.
++    * (b) they do not contain too many out-of-bounds points relative to their
++    * area outside the patch boundary.
+     *
+     * \author Dimitrios Kanoulas
+     */
+Index: sample_saliency.h
+===================================================================
+--- sample_saliency.h	(revision 701)
++++ sample_saliency.h	(working copy)
+@@ -59,8 +59,8 @@
+ class SampleSaliency
+ {
+   /** \brief Extracts salient samples from a point cloud with respect to a
+-    * specific hiking task.  The saliency uses the curvature and the normal
+-    * ectors around points.
++    * specific task.  The saliency uses the curvature and the normal
++    * vectors around points.
+     *
+     * \author Dimitrios Kanoulas
+     */
+@@ -373,7 +373,9 @@
+     /** \brief Threshold between normal and gravity vector cos(angles). */
+     float ngca_thres_;
+ 
+-    /** \brief Angles between normals and gravity.  NAN if normal does not exist. */
++    /** \brief Angles between normals and gravity.
++     * NAN if normal does not exist.
++     */
+     vector <float> normal_gravity_cos_angles;
+     
+     /** \brioef Point to NMS object. */
+Index: test_map_kinfu_app.h
+===================================================================
+--- test_map_kinfu_app.h	(removed)
+===================================================================
+--- test_patch_coverage.cpp	(revision 701)
++++ test_patch_coverage.cpp	(working copy)
+@@ -79,5 +79,6 @@
+   PatchCoverage pc (p, cloud, false);
+   pc.setNc (50);
+   double pct = pc.findCoverage ();
++  cerr << "cov pct: " << pct << endl;
+   cerr << "cov time: " << timer_.getTime() - cov_ms_ << "ms" << endl;
+ }
+Index: xform3.h
+===================================================================
+--- xform3.h	(revision 701)
++++ xform3.h	(working copy)
+@@ -44,7 +44,7 @@
+ 
+ namespace pcl 
+ {
+-  /** \brief Solves the system J*a=b by linear least squares using SVD
++  /** \brief applies the rigid body transform (r,t) to 3D points
+    *  \author Dimitrios Kanoulas
+    */
+   class Xform3
