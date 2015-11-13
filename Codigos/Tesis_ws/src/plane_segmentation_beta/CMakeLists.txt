@@ -38,7 +38,9 @@ catkin_package(
  
  add_library(slic_mod slic_mod/slic.cpp)
  add_library(superpixel slic_mod/superpixel.cpp)
+ add_library(functions src/functions.cpp)
  target_link_libraries(plane_segmentation_beta slic_mod)
  target_link_libraries(plane_segmentation_beta superpixel)
+ target_link_libraries(plane_segmentation_beta functions)
  ##add_dependencies(Convert_Image ar_pose_generate_messages_cpp)
 

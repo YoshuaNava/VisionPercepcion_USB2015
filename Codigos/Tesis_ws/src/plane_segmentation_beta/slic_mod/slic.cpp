@@ -505,3 +505,67 @@ void Slic::export_superpixels_to_files(IplImage *img)
         //cout << i << "\n";
     }
 }
+
+void Slic::export_superpixels_data(int number,Mat img_in,Mat& img_out,Mat& img_out_pixels,int& superpixelsxx,int& superpixelsyy,Mat& img_out_seed)
+{
+  img_out= img_in.clone();
+  Size size(10,10);//the dst image size,e.g.AxB
+  resize(img_out,img_out,size);//resize image
+  superpixelsxx=superpixels[number].get_center().x;
+  superpixelsyy=superpixels[number].get_center().y;
+  int xx=superpixelsxx-5;
+  int yy=superpixelsyy-5;
+  
+  
+    for(int y = 0; y < img_out.rows; y=y+1)
+    {
+      for(int x = 0; x < img_out.cols; x=x+1)
+    	{
+    	    Vec3b color = img_in.at<Vec3b>(yy, xx);      
+          img_out.at<Vec3b>(y, x) = color; 
+          xx=xx+1;
+    	}
+    	xx=superpixelsxx-5;
+    	    yy=yy+1;
+    }
+    
+  img_out_pixels=superpixels[number].pixels;
+  img_out_seed=superpixels[19].pixels;
+
+/*
+int xx=0;
+      for(int x = 0; x < 34; x=x+1)
+    	{
+    	
+    	if (superpixels_adjacency_matrix[number][x]==1)
+    	{
+      lugares[xx]=x;
+      xx=xx+1;
+    	}
+    	
+	}
+  */ 
+  /*
+  img_out= img_in.clone();
+  Size size(12,12);//the dst image size,e.g.AxB
+  resize(img_out,img_out,size);//resize image
+  int superpixels_x=superpixels[number].get_center().x;
+  int superpixels_y=superpixels[number].get_center().y;
+  int xx=superpixels_x-6;
+  int yy=superpixels_y-6;
+  
+  
+    for(int y = 0; y < img_out.rows; y=y+1)
+    {
+      for(int x = 0; x < img_out.cols; x=x+1)
+    	{
+    	    Vec3b color = img_in.at<Vec3b>(yy, xx);      
+          img_out.at<Vec3b>(y, x) = color; 
+          xx=xx+1;
+    	}
+    	xx=superpixels_x-6;
+    	    yy=yy+1;
+    }
+    
+*/    
+}
