@@ -29,6 +29,7 @@
 //#include "img_proc_fcns.h" //various image processing/computer vision functions
 
 #include "../slic_modified/slic.h"
+#include "svo/config.h"
 
 
 #define Window_W 1.02*proc_W //appriximate wht window width and hight as a function of the frame size

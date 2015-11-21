@@ -1,6 +1,10 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(plane_segmentation_alpha)
 
+
+SET(CMAKE_BUILD_TYPE Release) # Release, RelWithDebInfo
+
+
 Find_package(catkin REQUIRED COMPONENTS
   roscpp
   rospy
@@ -10,19 +14,19 @@ Find_package(catkin REQUIRED COMPONENTS
   message_generation
 )
 
-find_package(OpenCV)
+find_package(OpenCV REQUIRED)
+FIND_PACKAGE(svo REQUIRED)
 
 include_directories(${catkin_INCLUDE_DIRS} ${OpenCV_INCLUDE_DIRS} include)
+include_directories(${catkin_INCLUDE_DIRS} ${svo_INCLUDE_DIRS} include)
 
 
 
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mmmx -msse -msse -msse2 -msse3 -mssse3")
 catkin_package(
-#  INCLUDE_DIRS include
-#  LIBRARIES convert_to_grayscale
-#  CATKIN_DEPENDS roscpp rospy std_msgs
-#  DEPENDS system_lib
+	DEPENDS OpenCV fast svo
+	CATKIN_DEPENDS roscpp
 )
 
 #hola
