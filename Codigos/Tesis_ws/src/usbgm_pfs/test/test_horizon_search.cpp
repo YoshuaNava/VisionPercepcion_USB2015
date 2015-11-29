@@ -23,8 +23,10 @@ using namespace cv;
 cv::Mat frame, seg_image, gray, prevgray; // Mat Declarations
 
 cv::Mat temp_grad[3], sobel[3], borders_sobel, borders_canny, borders_combined;
-cv::Mat img_lines;
+cv::Mat img_lines, contoured_img;
 vector<Vec4i> lines;
+vector<cv::Point> lines_points;
+vector<cv::Point> polynomial_fit;
 
 
 double proc_W, proc_H;
@@ -36,14 +38,16 @@ vector<Superpixel> superpixel_list;
 
 void showImages()
 {
-	DISPLAY_IMAGE_XY(true, frame, 0 , 0);
+	DISPLAY_IMAGE_XY(true, frame, 0, 0);
 	cv::resizeWindow("frame", proc_W, proc_H);
-	DISPLAY_IMAGE_XY(true, gray, 1 , 0);
+	DISPLAY_IMAGE_XY(true, gray, 1, 0);
 	cv::resizeWindow("gray", proc_W, proc_H);
-	DISPLAY_IMAGE_XY(true, borders_combined, 2 , 0);
+	DISPLAY_IMAGE_XY(true, borders_combined, 2, 0);
 	cv::resizeWindow("borders_combined", proc_W, proc_H);
-	DISPLAY_IMAGE_XY(true, img_lines, 3 , 0);
+	DISPLAY_IMAGE_XY(true, img_lines, 3, 0);
 	cv::resizeWindow("img_lines", proc_W, proc_H);
+	DISPLAY_IMAGE_XY(true, contoured_img, 4, 0);
+	cv::resizeWindow("contoured_img", proc_W, proc_H);
 }
 
 
@@ -66,6 +70,7 @@ void calculateSobel()
 	eroded.copyTo(borders_sobel);
 }
 
+
 void calculateCanny()
 {
 	int edgeThresh = 1;
@@ -79,26 +84,44 @@ void calculateCanny()
 	Canny(borders_canny, borders_canny, lowThreshold, lowThreshold*ratio, kernel_size, true);
 }
 
+
 void findLinesHough()
 {
 	float line_slope;
+	cv::Point aux_point;
 	img_lines = frame.clone();
+	lines_points.clear();
 	
-	HoughLinesP(borders_combined, lines, 1, CV_PI/180, 130, 10, 20);
+	HoughLinesP(borders_combined, lines, 1, CV_PI/180, 130, 20, 10);
 	for( size_t i = 0; i < lines.size(); i++ )
 	{
 		Vec4i l = lines[i];
+		aux_point = cv::Point(l[0], l[1]);
+		lines_points.push_back(aux_point);
+		aux_point = cv::Point(l[2], l[3]);
+		lines_points.push_back(aux_point);
+
 		if(abs(l[0] - l[2]) != 0)
 		{
 			line_slope = (l[1] - l[3])/(l[0] - l[2]);
 			if(abs(line_slope) < 1.0)
 			{
-				line(img_lines, Point(l[0], l[1]), Point(l[2], l[3]), Scalar(0,0,255), 3, CV_AA);
+				cv::line(img_lines, cv::Point(l[0], l[1]), cv::Point(l[2], l[3]), cv::Scalar(0,0,255), 3, CV_AA);
 			}
 		}
 	}
 }
 
+
+void fitPolynomialFloorContour()
+{
+	approxPolyDP(lines_points, polynomial_fit, 3, false);
+	contoured_img = frame.clone();
+	// for( size_t i = 0; i < polynomial_fit.size(); i++ )
+	// {
+	// 	cv::line(contoured_img, cv::Point(polynomial_fit[i].x, polynomial_fit[i].y), cv::Point(polynomial_fit[i+1].x, polynomial_fit[i+1].y), cv::Scalar(0,0,255), 3, CV_AA);
+	// }
+}
 
 
 void superpixels(cv::Mat src)
@@ -203,10 +226,12 @@ int main( int argc, char** argv )
 		CV_TIMER_STOP(B, "Superpixels processed")
 		calculateSobel();
 		calculateCanny();
-		CV_TIMER_STOP(C, "Canny and Sobel edge detectors")
 		addWeighted(borders_sobel, 0.5, borders_canny, 0.5, 0.0, borders_combined);
+		CV_TIMER_STOP(C, "Canny and Sobel edge detectors")
 		findLinesHough();
-
+		CV_TIMER_STOP(D, "Find lines using Hough Transform")
+		fitPolynomialFloorContour();
+		CV_TIMER_STOP(E, "Fit a polynomial to the points given by the Hough Transform")
 		showImages();
 		CV_TIMER_STOP(Z, "Loop finished")
 	 	ros::spinOnce();
