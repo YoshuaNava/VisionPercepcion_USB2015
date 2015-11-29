@@ -150,7 +150,7 @@ int main( int argc, char** argv )
 		// 	break;
 		// }
 		// waitKey(1);
-		CV_TIMER_STOP(D, "Loop finished")
+		CV_TIMER_STOP(Z, "Loop finished")
 	 	ros::spinOnce();
 	}
 

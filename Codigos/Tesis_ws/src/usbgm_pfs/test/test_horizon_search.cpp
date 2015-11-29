@@ -21,7 +21,9 @@ using namespace cv;
 
 
 cv::Mat frame, seg_image, gray, prevgray; // Mat Declarations
-cv::Mat temp_grad[3], sobel[3], F_mag, F_ang;
+
+cv::Mat temp_grad[3], sobel[3], borders_sobel, borders_canny;
+cv::Mat thrsh_sobel;
 
 
 double proc_W, proc_H;
@@ -35,11 +37,20 @@ void showImages()
 {
 	DISPLAY_IMAGE_XY(true, frame, 0 , 0);
 	cv::resizeWindow("frame", proc_W, proc_H);
+	DISPLAY_IMAGE_XY(true, gray, 1 , 0);
+	cv::resizeWindow("gray", proc_W, proc_H);
+	DISPLAY_IMAGE_XY(true, borders_sobel, 2 , 0);
+	cv::resizeWindow("borders_sobel", proc_W, proc_H);
+	DISPLAY_IMAGE_XY(true, borders_canny, 3 , 0);
+	cv::resizeWindow("borders_canny", proc_W, proc_H);
+	DISPLAY_IMAGE_XY(true, thrsh_sobel, 4 , 0);
+	cv::resizeWindow("thrsh_sobel", proc_W, proc_H);
 }
 
 
 void CalculateMagnitudeOrientationOfGradients()
 {
+	//GaussianBlur(gray, gray, Size(5, 5), 0, 0 );
 	cv::Scharr(gray, temp_grad[0], gray.depth(), 1, 0, 1, 0, BORDER_DEFAULT);
 	cv::convertScaleAbs(temp_grad[0], sobel[1], 1, 0);
 
@@ -48,26 +59,25 @@ void CalculateMagnitudeOrientationOfGradients()
 
 	cv::Mat abs_grad_x = abs(temp_grad[0]);
 	cv::Mat abs_grad_y = abs(temp_grad[1]);
-	F_mag = abs_grad_x + abs_grad_y;
-	F_mag = 255 - F_mag;
-	F_ang = 0*F_mag;
-	float result;
-	//ANG = atan2( temp_grad[1] ,temp_grad[0]);
-	for (int y = 0; y < temp_grad[1].rows; y++) 
-	{
-		for (int x = 0; x < temp_grad[1].cols; x++) 
-		{
-			float valueX = sobel[1].at<uchar>(y,x);
-			float valueY = sobel[2].at<uchar>(y,x);
-			float result = fastAtan2(valueY,valueX);
-			F_ang.at<uchar>(y, x) = (uchar)result;
-		}
-	}
+	borders_sobel = abs_grad_x + abs_grad_y;
+	borders_sobel = 255 - borders_sobel;
 
-	normalize(F_mag, F_mag, 0, 255, CV_MINMAX);
-	convertScaleAbs(F_mag, F_mag, 1, 0); 
-	normalize(F_ang, F_ang, 0, 255, CV_MINMAX);
-	convertScaleAbs(F_ang, F_ang, 1, 0);
+	normalize(borders_sobel, borders_sobel, 0, 255, CV_MINMAX);
+	convertScaleAbs(borders_sobel, borders_sobel, 1, 0); 
+	//F_mag = 255 - F_mag;
+}
+
+void CalculateCanny()
+{
+	int edgeThresh = 1;
+	int lowThreshold = 10;
+	int const max_lowThreshold = 100;
+	int ratio = 5;
+	int kernel_size = 3;
+	GaussianBlur(gray, borders_canny, Size(5, 5), 0, 0);
+
+	/// Canny detector
+	Canny(borders_canny, borders_canny, lowThreshold, lowThreshold*ratio, kernel_size, true);
 }
 
 
@@ -165,26 +175,23 @@ int main( int argc, char** argv )
 		}
 
 		CV_TIMER_STOP(A, "Received image from camera")
-
 		cv:resize(frame, frame, Size(proc_W, proc_H), 0, 0, INTER_AREA);
+		cvtColor(frame, gray, CV_BGR2GRAY);
 		waitKey(1); // Wait Time
 
 		
-		waitKey(1);
 		seg_image = frame.clone();
 		superpixels(seg_image);
 		CV_TIMER_STOP(B, "Superpixels processed")
+		CalculateMagnitudeOrientationOfGradients();
+		CalculateCanny();
+		CV_TIMER_STOP(C, "Magnitude and angle of image gradients calculated")
 
-		CV_TIMER_STOP(C, "Prior probability calculated")
+		cv::adaptiveThreshold(borders_sobel, thrsh_sobel, 255, ADAPTIVE_THRESH_GAUSSIAN_C, THRESH_BINARY_INV, proc_H/2+1, 0);
+		CV_TIMER_STOP(D, "Thresholding magnitude of image gradients");
+
 		showImages();
-
-
-		// if(waitKey(30)>=0)
-		// {
-		// 	break;
-		// }
-		// waitKey(1);
-		CV_TIMER_STOP(D, "Loop finished")
+		CV_TIMER_STOP(Z, "Loop finished")
 	 	ros::spinOnce();
 	}
 
