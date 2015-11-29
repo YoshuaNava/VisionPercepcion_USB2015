@@ -3,7 +3,7 @@
 
 
 
-cv::Mat GetFloorPrior(cv::Mat img, vector<Superpixel> superpixels)
+cv::Mat getFloorPrior(cv::Mat img, vector<Superpixel> superpixels)
 {
 	cv::Mat
 

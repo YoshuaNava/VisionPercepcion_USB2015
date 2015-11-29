@@ -146,9 +146,9 @@ void Slic::generate_superpixels(IplImage *image, int step, int nc) {
     for (int i = 0; i < NR_ITERATIONS; i++) {
         /* Reset distance values. */
         for (int j = 0; j < image->width; j++) {
-            for (int k = 0;k < image->height; k++) {
-                distances[j][k] = FLT_MAX;
-            }
+             for (int k = 0;k < image->height; k++) {
+                 distances[j][k] = FLT_MAX;
+             }
         }
 
         for (int j = 0; j < (int) centers.size(); j++) {
