@@ -19,9 +19,10 @@
 using namespace std;
 using namespace cv;
 
-Mat frame, seg_image, gray, prevgray, floor_prior; // Mat Declarations
 
-IplImage *image_pub2;
+cv::Mat frame, seg_image, gray, prevgray; // Mat Declarations
+cv::Mat temp_grad[3], sobel[3], F_mag, F_ang;
+
 
 double proc_W, proc_H;
 VideoCapture cap;
@@ -34,10 +35,40 @@ void showImages()
 {
 	DISPLAY_IMAGE_XY(true, frame, 0 , 0);
 	cv::resizeWindow("frame", proc_W, proc_H);
-	DISPLAY_IMAGE_XY(true, floor_prior, 1 , 0);
-	cv::resizeWindow("prior", proc_W, proc_H);	
 }
 
+
+void CalculateMagnitudeOrientationOfGradients()
+{
+	cv::Scharr(gray, temp_grad[0], gray.depth(), 1, 0, 1, 0, BORDER_DEFAULT);
+	cv::convertScaleAbs(temp_grad[0], sobel[1], 1, 0);
+
+	cv::Scharr(gray, temp_grad[1], gray.depth(), 0, 1, 1, 0, BORDER_DEFAULT);
+	cv::convertScaleAbs(temp_grad[1], sobel[2], 1, 0);
+
+	cv::Mat abs_grad_x = abs(temp_grad[0]);
+	cv::Mat abs_grad_y = abs(temp_grad[1]);
+	F_mag = abs_grad_x + abs_grad_y;
+	F_mag = 255 - F_mag;
+	F_ang = 0*F_mag;
+	float result;
+	//ANG = atan2( temp_grad[1] ,temp_grad[0]);
+	for (int y = 0; y < temp_grad[1].rows; y++) 
+	{
+		for (int x = 0; x < temp_grad[1].cols; x++) 
+		{
+			float valueX = sobel[1].at<uchar>(y,x);
+			float valueY = sobel[2].at<uchar>(y,x);
+			float result = fastAtan2(valueY,valueX);
+			F_ang.at<uchar>(y, x) = (uchar)result;
+		}
+	}
+
+	normalize(F_mag, F_mag, 0, 255, CV_MINMAX);
+	convertScaleAbs(F_mag, F_mag, 1, 0); 
+	normalize(F_ang, F_ang, 0, 255, CV_MINMAX);
+	convertScaleAbs(F_ang, F_ang, 1, 0);
+}
 
 
 
@@ -118,14 +149,11 @@ int main( int argc, char** argv )
 	ros::init(argc, argv, "Plane_Segmentation");
 	ros::NodeHandle nh;
 	ros::Rate loop_rate(100);
-  
+
 	cameraSetup();
 	cap.read(frame);
 	waitKey(10);
-  //image_transport::Subscriber sub = it.subscribe("camera/image_raw", 1, imageCallback); // Subscriber Function
-  
-  CvScalar s; 
-  
+    
 	while (nh.ok()) 
 	{
 		CV_TIMER_START(X)
@@ -147,19 +175,16 @@ int main( int argc, char** argv )
 		superpixels(seg_image);
 		CV_TIMER_STOP(B, "Superpixels processed")
 
-		floor_prior = ProbFns::getFloorPrior(frame, superpixel_list);
 		CV_TIMER_STOP(C, "Prior probability calculated")
 		showImages();
 
 
-
-
-		if(waitKey(30)>=0)
-		{
-			break;
-		}
-//		std::swap(prevgray, gray);
-		waitKey(1);
+		// if(waitKey(30)>=0)
+		// {
+		// 	break;
+		// }
+		// waitKey(1);
+		CV_TIMER_STOP(D, "Loop finished")
 	 	ros::spinOnce();
 	}
 

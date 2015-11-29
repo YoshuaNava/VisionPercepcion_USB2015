@@ -41,16 +41,19 @@ LIST(APPEND LINK_LIBS
 
 
 ADD_EXECUTABLE(pfs src/plane_segmentation_alpha.cpp)
-ADD_EXECUTABLE(test_prob_functions test/test_prob_functions.cpp)
+ADD_EXECUTABLE(test_prob_floor_prior test/test_prob_floor_prior.cpp)
+ADD_EXECUTABLE(test_horizon_search test/test_horizon_search.cpp)
 
 ADD_LIBRARY(slic_superpixels SHARED slic_modified/slic.cpp slic_modified/superpixel.cpp)
 TARGET_LINK_LIBRARIES(pfs ${LINK_LIBS})
 TARGET_LINK_LIBRARIES(pfs slic_superpixels)
 
 
-TARGET_LINK_LIBRARIES(test_prob_functions ${catkin_LIBRARIES})
-TARGET_LINK_LIBRARIES(test_prob_functions ${OpenCV_LIBS})
-TARGET_LINK_LIBRARIES(test_prob_functions slic_superpixels)
+TARGET_LINK_LIBRARIES(test_prob_floor_prior ${LINK_LIBS})
+TARGET_LINK_LIBRARIES(test_prob_floor_prior slic_superpixels)
+
+TARGET_LINK_LIBRARIES(test_horizon_search ${LINK_LIBS})
+TARGET_LINK_LIBRARIES(test_horizon_search slic_superpixels)
 
 
 
