@@ -38,6 +38,8 @@ class Superpixel
 		cv::Rect bounding_rect;
 		cv::Mat pixels;
 		cv::Mat pixels_mask;
+		float probability_floor;
+		float avg_depth;
 
 		void init_structures(int num_points);
 		void clear_data();
