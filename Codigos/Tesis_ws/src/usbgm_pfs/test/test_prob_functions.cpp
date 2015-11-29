@@ -1,6 +1,9 @@
 
 #include "../include/global.h"
 
+#include "../src/prob_fns.cpp"
+//#include "slic_superpixels/slic.h"
+
 
 
 //macros for stopwatch
@@ -16,7 +19,7 @@
 using namespace std;
 using namespace cv;
 
-Mat frame, gray, prevgray; // Mat Declarations
+Mat frame, seg_image, gray, prevgray, floor_prior; // Mat Declarations
 
 IplImage *image_pub2;
 
@@ -24,13 +27,15 @@ double proc_W, proc_H;
 VideoCapture cap;
 
 Slic slic;
-double timer;
+vector<Superpixel> superpixel_list;
 
 
 void showImages()
 {
 	DISPLAY_IMAGE_XY(true, frame, 0 , 0);
 	cv::resizeWindow("frame", proc_W, proc_H);
+	DISPLAY_IMAGE_XY(true, floor_prior, 1 , 0);
+	cv::resizeWindow("prior", proc_W, proc_H);	
 }
 
 
@@ -65,6 +70,7 @@ void superpixels(cv::Mat src)
   // slic.export_superpixels_to_files(&frame2);
    slic.display_contours(&frame2, CV_RGB(255,0,0));
    slic.display_number_grid(&frame2, CV_RGB(0,255,0));
+   superpixel_list = slic.get_superpixels();
   //slic.show_histograms(1,32);
 
   //slic.display_center_grid(frame2, CV_RGB(0,255,0));
@@ -88,10 +94,10 @@ void cameraSetup()
 
 	//VideoCapture cap(1); //Otra camara, conectada a la computadora mediante USB, por ejemplo.
 	
+//	proc_W = 160;//160
+//	proc_H = 120;//120
 	proc_W = 320;//160
 	proc_H = 240;//120
-//	proc_W = 320;//160
-//	proc_H = 240;//120
 	cap.set(CV_CAP_PROP_FRAME_WIDTH, 640);
 	cap.set(CV_CAP_PROP_FRAME_HEIGHT, 480);
 	// Good reference: http://superuser.com/questions/897420/how-to-know-which-framerate-should-i-use-to-capture-webcam-with-ffmpeg
@@ -133,21 +139,18 @@ int main( int argc, char** argv )
 		CV_TIMER_STOP(A, "Received image from camera")
 
 		cv:resize(frame, frame, Size(proc_W, proc_H), 0, 0, INTER_AREA);
-//		cvtColor(frame, gray, CV_BGR2GRAY); // Convert to GrayScale
 		waitKey(1); // Wait Time
 
 		
-    
-//		if( prevgray.data )
-		{		  
-			showImages();
-			//Publisher	Code
-			waitKey(1);
-			superpixels(frame);
-			CV_TIMER_STOP(B, "Superpixels processed")
+		waitKey(1);
+		seg_image = frame.clone();
+		superpixels(seg_image);
+		CV_TIMER_STOP(B, "Superpixels processed")
 
+		floor_prior = ProbFns::getFloorPrior(frame, superpixel_list);
+		CV_TIMER_STOP(C, "Prior probability calculated")
+		showImages();
 
-		}
 
 
 

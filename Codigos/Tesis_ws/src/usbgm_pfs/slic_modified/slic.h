@@ -27,7 +27,7 @@ using namespace std;
 #define vec2di vector<vector<int> >
 #define vec2db vector<vector<bool> >
 /* The number of iterations run by the clustering algorithm. */
-#define NR_ITERATIONS 10
+#define NR_ITERATIONS 5
 
 /*
  * class Slic.
@@ -86,6 +86,7 @@ class Slic {
         void display_number_grid(IplImage *image, CvScalar colour);
         void show_histograms(int superpixel_id_1, int superpixel_id_2);
         void export_superpixels_to_files(IplImage *img);
+        vector<Superpixel> get_superpixels();
 };
 
 #endif

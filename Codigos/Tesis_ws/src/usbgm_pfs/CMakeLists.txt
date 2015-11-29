@@ -29,7 +29,13 @@ CATKIN_PACKAGE(
 INCLUDE_DIRECTORIES(${catkin_INCLUDE_DIRS} ${OpenCV_INCLUDE_DIRS} include)
 INCLUDE_DIRECTORIES(${catkin_INCLUDE_DIRS} ${svo_INCLUDE_DIRS} include)
 
-
+LIST(APPEND LINK_LIBS 
+	${OpenCV_LIBS}
+	${svo_LIBRARIES}
+	${roscpp_LIBRARIES}
+	${cv_bridge_LIBRARIES}
+	${image_transport_LIBRARIES}
+)
 
 ##add_dependencies(Convert_Image ar_pose_generate_messages_cpp)
 
@@ -37,9 +43,8 @@ INCLUDE_DIRECTORIES(${catkin_INCLUDE_DIRS} ${svo_INCLUDE_DIRS} include)
 ADD_EXECUTABLE(pfs src/plane_segmentation_alpha.cpp)
 ADD_EXECUTABLE(test_prob_functions test/test_prob_functions.cpp)
 
-ADD_LIBRARY(slic_superpixels slic_modified/slic.cpp slic_modified/superpixel.cpp)
-TARGET_LINK_LIBRARIES(pfs ${catkin_LIBRARIES})
-TARGET_LINK_LIBRARIES(pfs ${OpenCV_LIBS})
+ADD_LIBRARY(slic_superpixels SHARED slic_modified/slic.cpp slic_modified/superpixel.cpp)
+TARGET_LINK_LIBRARIES(pfs ${LINK_LIBS})
 TARGET_LINK_LIBRARIES(pfs slic_superpixels)
 
 

@@ -505,3 +505,9 @@ void Slic::export_superpixels_to_files(IplImage *img)
         //cout << i << "\n";
     }
 }
+
+vector<Superpixel> Slic::get_superpixels()
+{
+    return this->superpixels;
+}
+
