@@ -22,8 +22,9 @@ using namespace cv;
 
 cv::Mat frame, seg_image, gray, prevgray; // Mat Declarations
 
-cv::Mat temp_grad[3], sobel[3], borders_sobel, borders_canny;
-cv::Mat thrsh_sobel;
+cv::Mat temp_grad[3], sobel[3], borders_sobel, borders_canny, borders_combined;
+cv::Mat img_lines;
+vector<Vec4i> lines;
 
 
 double proc_W, proc_H;
@@ -39,47 +40,64 @@ void showImages()
 	cv::resizeWindow("frame", proc_W, proc_H);
 	DISPLAY_IMAGE_XY(true, gray, 1 , 0);
 	cv::resizeWindow("gray", proc_W, proc_H);
-	DISPLAY_IMAGE_XY(true, borders_sobel, 2 , 0);
-	cv::resizeWindow("borders_sobel", proc_W, proc_H);
-	DISPLAY_IMAGE_XY(true, borders_canny, 3 , 0);
-	cv::resizeWindow("borders_canny", proc_W, proc_H);
-	DISPLAY_IMAGE_XY(true, thrsh_sobel, 4 , 0);
-	cv::resizeWindow("thrsh_sobel", proc_W, proc_H);
+	DISPLAY_IMAGE_XY(true, borders_combined, 2 , 0);
+	cv::resizeWindow("borders_combined", proc_W, proc_H);
+	DISPLAY_IMAGE_XY(true, img_lines, 3 , 0);
+	cv::resizeWindow("img_lines", proc_W, proc_H);
 }
 
 
-void CalculateMagnitudeOrientationOfGradients()
+void calculateSobel()
 {
-	//GaussianBlur(gray, gray, Size(5, 5), 0, 0 );
-	cv::Scharr(gray, temp_grad[0], gray.depth(), 1, 0, 1, 0, BORDER_DEFAULT);
-	cv::convertScaleAbs(temp_grad[0], sobel[1], 1, 0);
+	GaussianBlur(gray, gray, Size(5, 5), 0, 0 );
+	cv::Sobel(gray, temp_grad[0], gray.depth(), 2, 0, 3, 15, 0, BORDER_DEFAULT);
+	cv::Sobel(gray, temp_grad[1], gray.depth(), 0, 2, 3, 15, 0, BORDER_DEFAULT);
+	cv::convertScaleAbs(temp_grad[0], sobel[0]);
+	cv::convertScaleAbs(temp_grad[1], sobel[1]);
+	addWeighted(sobel[0], 0.5, sobel[1], 0.5, 0, borders_sobel);
 
-	cv::Scharr(gray, temp_grad[1], gray.depth(), 0, 1, 1, 0, BORDER_DEFAULT);
-	cv::convertScaleAbs(temp_grad[1], sobel[2], 1, 0);
-
-	cv::Mat abs_grad_x = abs(temp_grad[0]);
-	cv::Mat abs_grad_y = abs(temp_grad[1]);
-	borders_sobel = abs_grad_x + abs_grad_y;
-	borders_sobel = 255 - borders_sobel;
-
-	normalize(borders_sobel, borders_sobel, 0, 255, CV_MINMAX);
-	convertScaleAbs(borders_sobel, borders_sobel, 1, 0); 
-	//F_mag = 255 - F_mag;
+	cv::Mat element = getStructuringElement(MORPH_CROSS, Size(3, 3));
+	cv::Mat skel(borders_sobel.size(), CV_8UC1, cv::Scalar(0));
+	cv::Mat eroded, dilated;
+	cv::erode(borders_sobel, eroded, element);
+	cv::dilate(eroded, dilated, element); // temp = open(img)
+	cv::subtract(borders_sobel, dilated, dilated);
+	cv::bitwise_or(skel, dilated, skel);
+	eroded.copyTo(borders_sobel);
 }
 
-void CalculateCanny()
+void calculateCanny()
 {
 	int edgeThresh = 1;
-	int lowThreshold = 10;
+	int lowThreshold = 3;
 	int const max_lowThreshold = 100;
 	int ratio = 5;
 	int kernel_size = 3;
-	GaussianBlur(gray, borders_canny, Size(5, 5), 0, 0);
+	GaussianBlur(gray, borders_canny, Size(3, 3), 0, 0);
 
 	/// Canny detector
 	Canny(borders_canny, borders_canny, lowThreshold, lowThreshold*ratio, kernel_size, true);
 }
 
+void findLinesHough()
+{
+	float line_slope;
+	img_lines = frame.clone();
+	
+	HoughLinesP(borders_combined, lines, 1, CV_PI/180, 130, 10, 20);
+	for( size_t i = 0; i < lines.size(); i++ )
+	{
+		Vec4i l = lines[i];
+		if(abs(l[0] - l[2]) != 0)
+		{
+			line_slope = (l[1] - l[3])/(l[0] - l[2]);
+			if(abs(line_slope) < 1.0)
+			{
+				line(img_lines, Point(l[0], l[1]), Point(l[2], l[3]), Scalar(0,0,255), 3, CV_AA);
+			}
+		}
+	}
+}
 
 
 
@@ -129,8 +147,8 @@ void cameraSetup()
 	//cap = VideoCapture(0); // Declare capture form Video: "eng_stat_obst.avi"
   
 
-  cap = VideoCapture(0);
-	//cap = VideoCapture("eng_stat_obst.avi");
+  //cap = VideoCapture(0);
+	cap = VideoCapture("eng_stat_obst.avi");
 	
 
 	//VideoCapture cap(1); //Otra camara, conectada a la computadora mediante USB, por ejemplo.
@@ -183,12 +201,11 @@ int main( int argc, char** argv )
 		seg_image = frame.clone();
 		superpixels(seg_image);
 		CV_TIMER_STOP(B, "Superpixels processed")
-		CalculateMagnitudeOrientationOfGradients();
-		CalculateCanny();
-		CV_TIMER_STOP(C, "Magnitude and angle of image gradients calculated")
-
-		cv::adaptiveThreshold(borders_sobel, thrsh_sobel, 255, ADAPTIVE_THRESH_GAUSSIAN_C, THRESH_BINARY_INV, proc_H/2+1, 0);
-		CV_TIMER_STOP(D, "Thresholding magnitude of image gradients");
+		calculateSobel();
+		calculateCanny();
+		CV_TIMER_STOP(C, "Canny and Sobel edge detectors")
+		addWeighted(borders_sobel, 0.5, borders_canny, 0.5, 0.0, borders_combined);
+		findLinesHough();
 
 		showImages();
 		CV_TIMER_STOP(Z, "Loop finished")
