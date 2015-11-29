@@ -39,6 +39,9 @@ using namespace std;
 using namespace cv;
 
 Mat frame, gray, prevgray, F_hsv, F_YCrCb, F_lab, F_sat, F_hue, F_Cr, F_Cb, F_a, channel_1[4], channel_2[4], channel_3[4], F_iic, src, src_out, dst, histImage, temp_grad[3], sobel[3], F_mag, F_ang, F_lbp, image_pub, hist_prueba, histImage2, superpixel_img, Cluster, Window_Cluster, frame_out, Save_Window; // Mat Declarations
+double average_model_window_1,average_model_window_2,average_model_window_3;
+
+double acum_points_1[80],acum_points_2[80],acum_points_3[80];
 
 IplImage *image_pub2;
 
@@ -74,18 +77,18 @@ void ShowImages()
 	cv::resizeWindow("frame", proc_W, proc_H);
 	//DISPLAY_IMAGE_XY(true, gray, 1 , 0);
 	//DISPLAY_IMAGE_XY(true, F_hue, 1 , 0);
-	cv::resizeWindow("F_hue", 160, 120);
+	//cv::resizeWindow("F_hue", 160, 120);
 	//cv::resizeWindow("F_hue", 160, 120);
 	//DISPLAY_IMAGE_XY(true, F_sat, 2 , 0);
-	cv::resizeWindow("F_sat", 160, 120);
+	//cv::resizeWindow("F_sat", 160, 120);
 	//DISPLAY_IMAGE_XY(true, F_iic, 3 , 0);
-	cv::resizeWindow("F_iic", 160, 120);
+	//cv::resizeWindow("F_iic", 160, 120);
 	DISPLAY_IMAGE_XY(true, F_mag, 4 , 0);
 	cv::resizeWindow("F_mag", 160, 120);
 	//DISPLAY_IMAGE_XY(true, F_ang, 5 , 0);
-	cv::resizeWindow("F_ang", 160, 120);
+	//cv::resizeWindow("F_ang", 160, 120);
 	//DISPLAY_IMAGE_XY(true, F_lbp, 6 , 0);
-	cv::resizeWindow("F_lbp", 160, 120);
+	//cv::resizeWindow("F_lbp", 160, 120);
 	
 
 	
@@ -251,7 +254,7 @@ void SuperPixels(cv::Mat src)
   IplImage *lab_image = cvCloneImage(&frame2);
   cvCvtColor(&frame2, lab_image, CV_BGR2Lab);
   int w = lab_image->width, h = lab_image->height;
-  int nr_superpixels = 400;
+  int nr_superpixels = 800;
 
   int nc = 40;
   double step = sqrt((w * h) / (double) nr_superpixels)*3;
@@ -269,54 +272,97 @@ void SuperPixels(cv::Mat src)
   slic.export_superpixels_to_files(&frame2);
   slic.display_contours(&frame2, CV_RGB(255,0,0));
   slic.display_number_grid(&frame2, CV_RGB(0,255,0));
-
- 
-  Mat  img_ventanita1,img_ventanita2,seed1,seed2;
-  Mat img_prueba1,img_prueba2;
-  int xxx,yyy;
-  slic.export_superpixels_data(19,src,img_ventanita1,img_prueba1,xxx,yyy,seed1);
-  slic.export_superpixels_data(33,src,img_ventanita2,img_prueba2,xxx,yyy,seed2);
-  imshow("src",src);
-  imshow("img_prueba",img_prueba1);
-   imshow("img_prueba2",img_prueba2);
   Mat Superpixel=&frame2; 
-  Mat result;
-  //CompareCluster(src,Cluster,result);
+ 
 
-  // img_ventanita1,img_ventanita2,seed1,seed2;
-  //Mat img_prueba1,img_prueba2;
-  //int xxx,yyy;
-  //slic.export_superpixels_data(&frame2,19,Cluster,img_ventanita1,img_prueba1,xxx,yyy,seed1);
-  // slic.export_superpixels_data(&frame2,24,Cluster,img_ventanita2,img_prueba2,xxx,yyy,seed2);
- 
-  Mat histred, histgreen, histblue;
-  float B_max_x,B_max_y,G_max_x,G_max_y,R_max_x,R_max_y; 
-  float B_max_x2,B_max_y2,G_max_x2,G_max_y2,R_max_x2,R_max_y2; 
-  Histogram(img_prueba1,histred,histgreen,histblue,B_max_x,B_max_y,G_max_x,G_max_y,R_max_x,R_max_y);
-  imshow("histred1",histred);
-   imshow("histblue1",histblue); 
-      imshow("histgreen1",histgreen); 
-  Histogram(img_prueba2,histred,histgreen,histblue,B_max_x2,B_max_y2,G_max_x2,G_max_y2,R_max_x2,R_max_y2);  
-    imshow("histred2",histred); 
-       imshow("histblue2",histblue); 
-      imshow("histrgreen2",histgreen); 
-  cout << R_max_x << ";" << R_max_y << ";" << R_max_x2 << ";" << R_max_y2 << endl;
- 
-   
+ // slic.export_superpixels_data(33,src,img_ventanita2,img_prueba2,xxx,yyy,seed2);
+
+  
   imshow("Superpixels",Superpixel); // Image Frame with Superpixels 
   //imshow("Result",result);
   imshow("Cluster",Cluster);
 
 }
 
+void average_window(Mat model_window)
+{
+  average_model_window_1=0;
+   average_model_window_2=0;
+    average_model_window_3=0;
+  
+    Vec3b color_model_window; 
+    double model_window_1=color_model_window[0];
+    double model_window_2=color_model_window[1];
+    double model_window_3=color_model_window[2];
+    
+    for(int x = 0 ; x < model_window.cols ; x=x+1)
+       {
+                 
+          for(int y = 0; y < model_window.rows; y=y+1)
+             {
+              color_model_window=model_window.at<Vec3b>(y, x); 
+              model_window_1=color_model_window[0];
+              model_window_2=color_model_window[1];
+              model_window_3=color_model_window[2];
+              average_model_window_1=average_model_window_1+model_window_1;
+              average_model_window_2=average_model_window_2+model_window_2;
+              average_model_window_3=average_model_window_3+model_window_3;
+    
+             }              
+       }              
+average_model_window_1=average_model_window_1/(model_window.cols*model_window.rows);
+average_model_window_2=average_model_window_2/(model_window.cols*model_window.rows);
+average_model_window_3=average_model_window_3/(model_window.cols*model_window.rows);
+//cout << "hola: " << average_model_window_2 << endl;
+
+}
+
+void ground_superpixels(Mat src_in,double window_color_1,double window_color_2,double window_color_3)
+{
+//cout << "hola: " << average_model_window_2 << endl;
+   Mat src_cluster=src_in.clone();
+   imshow("Cluster_2",src_cluster);
+    Mat superpixel_data;
+    Vec3b pixel_color;
+    double pixel_color_1,pixel_color_2,pixel_color_3;
+    
+       int center_y,center_x;
+    slic.get_center_xy(0,center_x,center_y);
+    Mat hola;
+      Vec3b pixel_color2=src_cluster.at<Vec3b>(center_y, center_x);
+      /*
+      int aa= pixel_color2[0];
+      int bb= pixel_color2[1];
+      int cc = pixel_color2[2];
+      cout << aa << " " << bb << " " << cc << endl;
+      */
+      cout << window_color_1 << " " << window_color_2 << " " << window_color_3 << endl;
+    
+    for(int x = 0 ; x < 80 ; x=x+1)
+       {
+                 
+     
+        slic.get_center_xy(x,center_x,center_y);
+       
+        pixel_color=src_cluster.at<Vec3b>(center_y, center_x); 
+        pixel_color_1=pixel_color[0];
+        pixel_color_2=pixel_color[1];
+        pixel_color_3=pixel_color[2];
+        acum_points_1[x]=abs((((window_color_1-pixel_color_1)/window_color_1)*100)/2);
+        acum_points_2[x]=abs((((window_color_2-pixel_color_2)/window_color_2)*100)/2);
+        acum_points_3[x]=abs((((window_color_3-pixel_color_3)/window_color_3)*100)/2);
+        cout << "Superpixel: " << x  << "; Color: " << pixel_color_1 << " " << pixel_color_2 << " " << pixel_color_3 << "; Percent: " << acum_points_1[x] << " " << acum_points_2[x] << " " << acum_points_3[x] << endl;                 
+       } 
+}
+
 
 void CameraSetup()
 {
-	//cap = VideoCapture(0); // Declare capture form Video: "eng_stat_obst.avi"
-  
-
- // cap = VideoCapture("LaboratorioMaleta.avi");
-    cap = VideoCapture("PasilloLabA.avi");
+	//cap = VideoCapture(1); // Declare capture form Video: "eng_stat_obst.avi"
+ // cap = VideoCapture("Laboratorio.avi");
+ cap = VideoCapture("LaboratorioMaleta.avi");
+  //cap = VideoCapture("PasilloLabB.avi");
+   // cap = VideoCapture("eng_stat_obst.avi");
 	//cap = VideoCapture("eng_stat_obst.avi");
 	
 
@@ -324,8 +370,8 @@ void CameraSetup()
 	
 	proc_W = 160;//160
 	proc_H = 120;//120
-	//proc_W = 320;//160
-	//proc_H = 240;//120
+	//proc_W = 320;//
+	//proc_H = 240;//
 	cap.set(CV_CAP_PROP_FRAME_WIDTH, 640);
 	cap.set(CV_CAP_PROP_FRAME_HEIGHT, 480);
 	// Good reference: http://superuser.com/questions/897420/how-to-know-which-framerate-should-i-use-to-capture-webcam-with-ffmpeg
@@ -355,7 +401,7 @@ void Threshold_Demo( int, void* )
    */
 
   threshold( src_F_Mag, dst_filtered_F_Mag, threshold_value, max_BINARY_value,threshold_type );
-  imwrite( "/home/rafael/VisionPercepcion_USB2015/Codigos/Tesis_ws/src/plane_segmentation_beta/src/F_Mag_Image.jpg", dst_filtered_F_Mag );
+ // imwrite( "/home/rafael/VisionPercepcion_USB2015/Codigos/Tesis_ws/src/plane_segmentation_beta/src/F_Mag_Image.jpg", dst_filtered_F_Mag );
   imshow( window_name, dst_filtered_F_Mag );
 }
 
@@ -411,141 +457,58 @@ int main( int argc, char** argv )
 			SuperPixels(frame);	
       CreateSaveWindow(frame,Save_Window); // Create a Image of the Save Window
       SuperPixels(frame);// Calculate the Superpixels  
-      CreateWindowCluster(Cluster,Window_Cluster);// Get the Save Window of the Cluster Image 
- /*     
-    	Mat F_Mag=F_mag.clone();
-      Size size(640,480);
-      resize(F_Mag,F_Mag,size);
-      //imshow("F_MAG",F_Mag);
-
-      Mat FMAG=F_mag.clone();
-      Vec3b ColorBase;
-      ColorBase[0]=0;
-      ColorBase[1]=0;
-      ColorBase[2]=0;
-      
-      Vec3b Cub_1,Cub_2,Cub_3,Cub_4,Cub_5,Cub_6;
-
-      
-      
-           for(int y = F_mag.rows-1; y>1; y=y-1)
-              {
-                 for(int x = F_mag.cols-1; x >1  ; x=x-1)
-                	   {
-           
-                             Cub_1=FMAG.at<Vec3b>(y, x);  
-                             Cub_2=FMAG.at<Vec3b>(y, x-1); 
-                             Cub_3=FMAG.at<Vec3b>(y-1, x); 
-                             Cub_4=FMAG.at<Vec3b>(y-1, x-1);
-                             Cub_5=FMAG.at<Vec3b>(y-1, x-2);
-                             Cub_6=FMAG.at<Vec3b>(y, x-2); 
-                             double Promedio=(Cub_1[0]+Cub_1[1]+Cub_1[2]+Cub_2[0]+Cub_2[1]+Cub_2[2]+Cub_3[0]+Cub_3[1]+Cub_3[2]+Cub_4[0]+Cub_4[1]+Cub_4[2]+Cub_5[0]+Cub_5[1]+Cub_5[2]+Cub_6[0]+Cub_6[1]+Cub_6[2])/18;
-                             if (Promedio==0)
-                              {
-                              FMAG.at<Vec3b>(y-2, x)= ColorBase;
-                              FMAG.at<Vec3b>(y-2, x-1)= ColorBase;
-                              FMAG.at<Vec3b>(y-2, x-2)= ColorBase;
-                              } 
-                             
- 
-                       }                          
-               } 
-               */
-      //imshow("MAG",FMAG);
-  
-   src_F_Mag=F_mag.clone();     
- dst_filtered_F_Mag=F_mag.clone();
-
-
-  /// Create Trackbar to choose type of Threshold
-
-                  
-    
-  /// Call the function to initialize
-  Threshold_Demo( 0, 0 );  
-  
-  
-  
-  
- 
-    Mat dst_canny, cdst;
-    cdst=frame.clone();
-    Canny(dst_filtered_F_Mag, dst_canny, 50, 200, 3); 
- 
-     vector<Vec4i> lines;
-    HoughLinesP( dst_canny, lines, 1, CV_PI/180, 30, 30, 10);
-    
-
-    for( size_t i = 0; i < lines.size(); i++ )
-    {
-        line( cdst, Point(lines[i][0], lines[i][1]),
-            Point(lines[i][2], lines[i][3]), Scalar(0,0,255), 3, 8 );
-    }
+      CreateWindowCluster(Cluster,Window_Cluster);// Get the Save Window of the Cluster Image      
+      average_window(Window_Cluster); //b,g,r
+      ground_superpixels(Cluster,average_model_window_1,average_model_window_2,average_model_window_3);
 
     
-  imshow("canny",cdst);
+
+      ShowImages();
+ 
   
-  Mat red_line=frame.clone();
-int init_point_x=0;
-int init_point_y=(frame.rows/2)+10;
-int final_point_x,final_point_y;
-double rect_distance;
-double rect_distance_base=1000;
-Vec3b red_base;
-int base_1,base_2,base_3;
-cout << cdst.cols << endl;
-             for(int x = 40 ; x < cdst.cols ; x=x+1)
-              {
-                 
-                  for(int y = 0; y < cdst.rows; y=y+1)
-                	   {
-                      red_base=cdst.at<Vec3b>(y, x); 
-                      base_1=red_base[0];
-                                            base_2=red_base[1];
-                                                                  base_3=red_base[2];
-                      if ((base_1==0) && (base_2==0) && (base_3==255))
-                        {
-                        double value_a=(x-init_point_x)*(x-init_point_x);
-                        double value_b=(y-init_point_y)*(y-init_point_y);
-                        rect_distance=sqrt(abs(value_a)+abs(value_b));
-                        //cout << "hola" << endl;
-                        if(rect_distance<rect_distance_base)
-                        {
-                        rect_distance_base=rect_distance;
-                        final_point_x=x;
-                        final_point_y=y;
-                        
-                         } 
-                                }
+      src_F_Mag=F_mag.clone();     
+      dst_filtered_F_Mag=F_mag.clone();
+
+      Threshold_Demo( 0, 0 );  
  
-                             
+      Mat dst_Median;
+      medianBlur ( dst_filtered_F_Mag, dst_Median, 5 );
+  
+  
+  
+  
  
-                       } 
-                                                    line( red_line, Point(init_point_x, init_point_y),
-            Point(final_point_x, final_point_y), Scalar(0,0,255), 3, 8 ); 
-            init_point_x=final_point_x;
-            init_point_y=final_point_y;  
-            rect_distance_base=1000; 
-                  } 
-  imshow("red_lines",red_line);
-			ShowImages();
-				
-
-/*
-   int frame_width=   cap.get(CV_CAP_PROP_FRAME_WIDTH);
-   int frame_height=   cap.get(CV_CAP_PROP_FRAME_HEIGHT);
-   VideoWriter video("PasilloLabB.avi",CV_FOURCC('M','J','P','G'),10, Size(frame_width,frame_height),true);
-
-   for(;;){
-
-       cap >> frame;
-       video.write(frame);
-       imshow( "Frame", frame );
-       char c = (char)waitKey(33);
-       if( c == 27 ) break;
-    }
-    */
-			//Publisher	Code
+ 
+       Mat dst_canny, cdst;
+       Canny(dst_Median, dst_canny, 50, 200, 3);
+       cdst=frame.clone();
+       
+        vector<Vec4i> lines;
+        HoughLinesP(dst_canny, lines, 1, CV_PI/180, 35, 50, 100 );
+        for( size_t i = 0; i < lines.size(); i++ )
+        {
+          Vec4i l = lines[i];
+          if(l[2]-l[0]!=0)
+            {
+                float m = (l[3]-l[1])/(l[2]-l[0]);
+                
+                  if (abs(m) < 1)
+                  line( cdst, Point(l[0], l[1]), Point(l[2], l[3]), Scalar(0,0,255), 3, CV_AA);
+            }
+        }
+  
+  
+ 
+       Mat blue_img,blackground;
+       CreateGreenLine(frame,cdst,blue_img);
+       LookingforGround(frame,Cluster,blue_img,acum_points_1,acum_points_2,acum_points_3,blackground);
+       
+       imshow("prueba2",cdst);
+       imshow("Pruebaa",blue_img);
+       imshow("Blackground",blackground);
+       imshow("Prueba",dst_Median);
+       imshow("window",Window_Cluster);
+        
 			sensor_msgs::ImagePtr msg = cv_bridge::CvImage(std_msgs::Header(), "mono8", F_lbp).toImageMsg();
       pub.publish(msg);
       waitKey(1);
@@ -568,7 +531,6 @@ cout << cdst.cols << endl;
 	destroyAllWindows(); //Destroy the windows
 
 
-	//ros::spin();
 
 	return 0;
 }

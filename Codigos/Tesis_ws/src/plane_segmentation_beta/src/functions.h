@@ -40,5 +40,6 @@ void CreateSaveWindow(Mat frame,Mat& frame_window);
 void CreateWindowCluster(Mat Cluster,Mat& Window_Cluster);
 void CompareHistograms(Mat frame,double Valor_hist,Mat& img_out);
 void Histogram(cv::Mat src, cv::Mat& histred, cv::Mat& histgreen, cv::Mat& histblue,float& R_max_x,float& R_max_y,float& G_max_x,float& G_max_y,float& B_max_x,float& B_max_y);
-void CompareCluster(cv::Mat src,cv::Mat Cluster,cv::Mat& Result);
+void LookingforGround(cv::Mat src,cv::Mat Cluster,cv::Mat green_line,double points_1[80],double points_2[80],double points_3[80],cv::Mat& result);
+void CreateGreenLine(cv::Mat src,cv::Mat cdst,cv::Mat& blue_img);
 #endif

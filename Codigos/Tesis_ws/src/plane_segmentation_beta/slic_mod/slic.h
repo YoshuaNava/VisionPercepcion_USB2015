@@ -85,7 +85,9 @@ class Slic {
         void display_number_grid(IplImage *image, CvScalar colour);
         void show_histograms(int superpixel_id_1, int superpixel_id_2);
         void export_superpixels_to_files(IplImage *img);
-        void export_superpixels_data(int number,Mat img_in,Mat& img_out,Mat& img_out_pixels,int& superpixelsxx,int& superpixelsyy,Mat& img_out_seed);
+        void get_superpixel(int number_superpixel, Mat& data_superpixel);
+        void get_center_xy(int number_superpixel, int& center_x,int& center_y);
+        void export_superpixels_data(int number,Mat& img_out_pixels,int& superpixelsxx,int& superpixelsyy);
 };
 
 #endif

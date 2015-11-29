@@ -257,7 +257,8 @@ void Histogram(cv::Mat src, cv::Mat& histred, cv::Mat& histgreen, cv::Mat& histb
  
 }
 
-void CompareCluster(cv::Mat src,cv::Mat Cluster,cv::Mat& result)
+
+void LookingforGround(cv::Mat src,cv::Mat Cluster,cv::Mat green_line,double points_1[80],double points_2[80],double points_3[80],cv::Mat& result)
 {
 
   result=src.clone();
@@ -265,10 +266,12 @@ void CompareCluster(cv::Mat src,cv::Mat Cluster,cv::Mat& result)
   Mat img_out1,img_out2,img_out_pixels;
   int xx,yy,r,g,b,bb,rr,gg,r_seed,g_seed,b_seed;
   int superpixels_x, superpixels_y;  
-  Vec3b color,color_seed;
+  Vec3b color,red_base;
   Mat img_out_seed,img_out_seed2;
+  int base_1,base_2,base_3;
+  int value_y=0;
   
-  slic.export_superpixels_data(0,Cluster,img_out1,img_out_pixels,superpixels_x,superpixels_y,img_out_seed); 
+  slic.export_superpixels_data(0,img_out_pixels,superpixels_x,superpixels_y); 
   int init_val_y=(superpixels_y-(img_out_pixels.rows/2))+2;
   int final_val_y=(superpixels_y+(img_out_pixels.rows/2))+2;
   int init_val_x=(superpixels_x-(img_out_pixels.cols/2))+2;
@@ -292,22 +295,27 @@ void CompareCluster(cv::Mat src,cv::Mat Cluster,cv::Mat& result)
   }
 
  
-  for(int i = 1; i < 35; i=i+1)
+  for(int i = 1; i < 80; i=i+1)
   {
-      color = img_out1.at<Vec3b>(5, 5); 
-      b=color.val[0];
-      g=color.val[1];
-      r=color.val[2];
+            for(int loop_y = 0; loop_y < green_line.rows; loop_y=loop_y+1)
+                	   {
+                      red_base=green_line.at<Vec3b>(loop_y, superpixels_x); 
+                      base_1=red_base[0];
+                      base_2=red_base[1];
+                      base_3=red_base[2];
+ 
+                       
+                       if ((base_1==0) && (base_2==255) && (base_3==0))
+                        {
+                       value_y=loop_y;
+                     
+                         }
+                        
+                          } 
+                          if (superpixels_y>value_y)
+                           {
+      if( (points_1[i-1]<30) && (points_2[i-1]<30) && (points_3[i-1]<30) )
       
-      color_seed = img_out_seed.at<Vec3b>(img_out_seed.rows/2, img_out_seed.cols/2); 
-      b_seed=color_seed.val[0];
-      g_seed=color_seed.val[1];
-      r_seed=color_seed.val[2];
-      
-      //imshow("Seed_Image",img_out_seed);
-      //cout << b << ";" << g << ";" << r << ";" << b_seed << ";" << g_seed << ";" << r_seed << endl;
-      
-      if((b<=b_seed+30 && b>=b_seed-30) && (g<=g_seed+30 && g>=g_seed-30) && (r<=r_seed+30 && b>=r_seed-30))
       {
           xx=0;
           yy=0;
@@ -323,43 +331,39 @@ void CompareCluster(cv::Mat src,cv::Mat Cluster,cv::Mat& result)
                        int gg=color.val[1] ;
                        int rr=color.val[2]; 
                        
-                      //if(y>(result.rows/2)+15)
-                       //{
+                   
                           if(bb==0 && gg==0 && rr==0)
                           {
                           } 
                           else
                           {
-                                        
+                          
+                          
+        
+               
+         
+ 
+                            
+ 
+                        
+                                    
                                color.val[0]=0;
                                color.val[1]=0;
                                color.val[2]=0; 
                                result.at<Vec3b>(y, x) = color; 
-                               
-                               if(y+1<result.rows && x+1<result.cols && x-1>0 && y-1>0)
-                               {
-                                   for(int hy=y-1;hy<(y-1)+3;hy=hy+1)
-                                   {
-                                       for(int hx=x-1;hx<(x-1)+3;hx=hx+1)
-                                       {
-                                       result.at<Vec3b>(hy, hx) = color;
-                                        }  
-                                    }
-                                
-                               }
+                              
+                       
                                                   
-                           }
-                       // }
-                               
-                        xx=xx+1 ;
+                        }
+                      xx=xx+1 ;
                                    
               }
-              xx=0;
-              yy=yy+1;                          
+                          xx=0;
+              yy=yy+1;                       
           }
       }
-      
-      slic.export_superpixels_data(i,Cluster,img_out1,img_out_pixels,superpixels_x,superpixels_y,img_out_seed2);
+      }
+      slic.export_superpixels_data(i,img_out_pixels,superpixels_x,superpixels_y);
       init_val_y=(superpixels_y-(img_out_pixels.rows/2))+2;
       final_val_y=(superpixels_y+(img_out_pixels.rows/2))+2;
       init_val_x=(superpixels_x-(img_out_pixels.cols/2))+2;
@@ -385,73 +389,82 @@ void CompareCluster(cv::Mat src,cv::Mat Cluster,cv::Mat& result)
     }
 }
 
-/*
-void CompareHistograms(Mat frame,Double Valor_hist,Mat& img_out)
+void CreateGreenLine(cv::Mat src,cv::Mat cdst,cv::Mat& blue_img)
 {
- 
-  Mat ventana=frame;
-  Mat img_out=frame;
-  Size size(79,19);//the dst image size,e.g.100x100
-  resize(ventana,ventana,size);//resize image
-  
-  int yy=0;
-  int xx=0;
-  int vent_x=0;
-  int vent_y=0;
-  
-  for(int y = 0; y < frame.rows; y=y+20)
-      {
-        for(int x = 0; x < frame.cols; x=x+80)
-      	{ 
-              for(int yy = y; yy < y+19; yy=yy+1)
-              {
-                for(int xx = x; xx < x+79; xx=xx+1)
-              	{
-         
-                           Vec3b color = frame.at<Vec3b>(yy, xx);           
-                            ventana.at<Vec3b>(vent_y, vent_x) = color;
-                            
-                            vent_x=vent_x+1;
-                            
-                                                         
-                       
-                }
-                vent_x=0;   
-                vent_y=vent_y+1;                           
-              }
-              
-              vent_y=0; 
-              vent_x=0;
-              Mat hist_save_window_1=ventana;
-              Mat hist_save_window_2;
-              Histogram(hist_save_window_1,hist_save_window_2);
-              Comparison(model,img1,hist_save_window_1);
 
-              cout << valor_hist << endl;
-            
-              if(valor_hist>0.1)              
+ Mat red_line=src.clone();
+ int init_point_x=0;
+ int init_point_y=(src.rows/2)+20;
+ int final_point_x,final_point_y;
+ double rect_distance;
+ double rect_distance_base=1000;
+ Vec3b red_base;
+ int base_1,base_2,base_3;
+
+             for(int x = 12 ; x < cdst.cols ; x=x+1)
               {
-                for(int yy = y; yy < y+19; yy=yy+1)
-                  {
-                for(int xx = x; xx < x+79; xx=xx+1)
-              	   {
-         
-                           Vec3b color = frame.at<Vec3b>(yy, xx);  
-                          color.val[0]=255;
-                          color.val[1]=255;
-                           color.val[2]=255;      
-                            img_out.at<Vec3b>(yy, xx) = color;
+                 
+                  for(int y = 0; y < cdst.rows; y=y+1)
+                	   {
+                        red_base=cdst.at<Vec3b>(y, x); 
+                        base_1=red_base[0];
+                        base_2=red_base[1];
+                        base_3=red_base[2];
+                        
+                        if ((base_1==0) && (base_2==0) && (base_3==255))
+                          {
+                              double value_a=(x-init_point_x)*(x-init_point_x);
+                              double value_b=(y-init_point_y)*(y-init_point_y);
+                              rect_distance=sqrt(abs(value_a)+abs(value_b));
                             
+                              if(rect_distance<rect_distance_base)
+                                {
+                                    rect_distance_base=rect_distance;
+                                    final_point_x=x;
+                                    final_point_y=y;
                            
-                            
-                                                         
+                                } 
+                           }
+                             
+                       } 
                        
-                     }                          
-                  }
-              }
-              
-      }                               
-    }
-}
-*/
+              line( red_line, Point(init_point_x, init_point_y),
+              Point(final_point_x, final_point_y), Scalar(0,255,0), 3, 8 ); 
+              init_point_x=final_point_x;
+              init_point_y=final_point_y;  
+              rect_distance_base=1000; 
+                  } 
+                  
+             
+  
+    blue_img=red_line.clone();  
+    bool flag=false;
 
+           for(int x = 0 ; x < cdst.cols ; x=x+1)
+              {
+                 
+                  for(int y = 0; y < cdst.rows; y=y+1)
+                	   {
+                        red_base=red_line.at<Vec3b>(y, x); 
+                        base_1=red_base[0];
+                        base_2=red_base[1];
+                        base_3=red_base[2];
+   
+                          if (flag==true)
+                            {
+                                red_base=src.at<Vec3b>(y, x); 
+                                red_base[2]=255;
+                                blue_img.at<Vec3b>(y, x)=red_base;
+                            }
+                            
+                          if ((base_1==0) && (base_2==255) && (base_3==0))
+                             {
+                                flag=true;                     
+                             }
+                          
+                      }
+                 flag=false;
+
+              } 
+
+} 
