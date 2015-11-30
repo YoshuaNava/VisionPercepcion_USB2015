@@ -382,36 +382,24 @@ void Slic::colour_with_cluster_means(IplImage *image) {
     }
 }
 
-void Slic::calculate_histograms(IplImage *image)
-{
-    
-    show_histograms(1,29);
-    display_number_grid(image, CV_RGB(0,255,0));
-    /*
-    cout << "Numero de clusters = " << clusters.size();
-    cout << "Numero de centros = " << centers.size();
-    
-    cout << "\n\n\n\n-----------------\n\n\n\n";
-    */
-}
-
 
 void Slic::store_superpixels(IplImage *image)
 {
     int i, x, y, k;
+    int index = 0;
     cv::Point temp_point;
     superpixels_adjacency_matrix.resize(centers.size());
     const int dx[8] = {-1, -1, -1, 0, +1, +1, +1, 0};
     const int dy[8] = {-1, 0, +1, +1, +1, 0, -1, -1};
 
-    for(i = 0 ; i < centers.size() ; ++i)
+    for(i = 0 ; i < centers.size() ;++i)
     {
         //Grow Columns by n
         superpixels_adjacency_matrix[i].resize(centers.size());
         std::fill(superpixels_adjacency_matrix[i].begin(), superpixels_adjacency_matrix[i].end(), 0);
     }
 
-    for (i = 0; i < (int) centers.size(); i++) 
+    for (i = 0; i < centers.size() ;i++) 
     {
         temp_point = cvPoint(centers[i][3], centers[i][4]);
         Superpixel sp(i, temp_point);
@@ -421,16 +409,13 @@ void Slic::store_superpixels(IplImage *image)
     {
         for (y = 0; y < image->height; y++)
         {
-            int index = clusters[x][y];
-            CvScalar colour = cvGet2D(image, y, x);
-            /*if((index==29) || (index==29))
+            if(clusters[x][y] != -1)
             {
-                //cout << "hola " << index << "\n"; 
-                cout << "ID = " << index << ".     R = " << colour.val[2] << ".    G = " << colour.val[1] << ".    B = " << colour.val[0] << ".\n";
-            }*/
-            temp_point = cvPoint(x, y);
-            //cout << "epale " << index << "\n";
-            //cout << "Superpixel # " << index << ".  Number of points = " << superpixels[index].get_points().size() << ".    Histogram length = " << superpixels[index].get_histogram().size() << "\n";
+                index = clusters[x][y];
+            }
+            //CvScalar colour = cvGet2D(image, y, x);
+            temp_point = cv::Point(x, y);
+            //cout << index << "\n";
             superpixels[index].add_point(temp_point);
             for(k=0; k<8 ;k++)
             {
@@ -438,16 +423,18 @@ void Slic::store_superpixels(IplImage *image)
                 {
                     if(clusters[x+dx[k]][y+dy[k]] == index)
                     {
-                        superpixels_adjacency_matrix[index][index] = -1;
+                         superpixels_adjacency_matrix[index][index] = -1;
                     }
                     else
                     {
                         //cout << "index = " << index << "    x+dx[k] = " << x+dx[k] << "     y+dy[k] = " << y+dy[k] << "\n";
-                        superpixels_adjacency_matrix[index][clusters[x+dx[k]][y+dy[k]]] = 1;
-                        superpixels_adjacency_matrix[clusters[x+dx[k]][y+dy[k]]][index] = 1;
+                        if(clusters[x+dx[k]][y+dy[k]] != -1)
+                        {
+                            superpixels_adjacency_matrix[index][clusters[x+dx[k]][y+dy[k]]] = 1;
+                            superpixels_adjacency_matrix[clusters[x+dx[k]][y+dy[k]]][index] = 1;
+                        }
                     }
                 }
-
             }
         }
     }
@@ -462,12 +449,12 @@ void Slic::store_superpixels(IplImage *image)
     }
     cout << "**************************************************************************************\n";
 */
-    for (i = 0; i < (int) superpixels.size(); i++) 
-    {
-        superpixels[i].calculate_bounding_rect();
-        superpixels[i].add_pixels_information(image, clusters);
-        superpixels[i].calculate_histogram();
-    }
+    // for (i = 0; i < (int) superpixels.size(); i++) 
+    // {
+    //     superpixels[i].calculate_bounding_rect();
+    //     superpixels[i].add_pixels_information(image, clusters);
+    //     superpixels[i].calculate_histogram();
+    // }
     //superpixels[0].print_everything();
 }
 

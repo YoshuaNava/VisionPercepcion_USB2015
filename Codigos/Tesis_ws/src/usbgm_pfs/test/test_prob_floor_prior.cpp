@@ -40,42 +40,38 @@ void showImages()
 
 void superpixels(cv::Mat src)
 {
-  namedWindow( "SuperPixels", 1 ); 
-  IplImage frame2 = (IplImage)src; // Reference on deallocating memory: http://stackoverflow.com/questions/12635978/memory-deallocation-of-iplimage-initialised-from-cvmat
-  
-      /* Yield the number of superpixels and weight-factors from the user. */
-  IplImage *lab_image = cvCloneImage(&frame2);
-  cvCvtColor(&frame2, lab_image, CV_BGR2Lab);
-  int w = lab_image->width, h = lab_image->height;
-  //int nr_superpixels = atoi(argv[2]);
-  int nr_superpixels = 400;
-  //int nc = atoi(argv[3]);
-  int nc = 40;
-  double step = sqrt((w * h) / (double) nr_superpixels)*3;
+	namedWindow( "SuperPixels", 1 ); 
+	IplImage frame2 = (IplImage)src; // Reference on deallocating memory: http://stackoverflow.com/questions/12635978/memory-deallocation-of-iplimage-initialised-from-cvmat
 
-  /* Perform the SLIC superpixel algorithm. */
- 
-  slic.clear_data();
-  slic.generate_superpixels(lab_image, step, nc);
-  slic.create_connectivity(lab_image);
-  	//slic.colour_with_cluster_means(&frame2);
-  slic.store_superpixels(&frame2);
-  //slic.calculate_histograms(&frame2);
-  
+	  /* Yield the number of superpixels and weight-factors from the user. */
+	IplImage *lab_image = cvCloneImage(&frame2);
+	cvCvtColor(&frame2, lab_image, CV_BGR2Lab);
+	int w = lab_image->width, h = lab_image->height;
+	//int nr_superpixels = atoi(argv[2]);
+	int nr_superpixels = 6*proc_W;
+	//int nc = atoi(argv[3]);
+	int nc = 20;
+	double step = sqrt((w * h) / (double) nr_superpixels)*3;
 
-  // slic.export_superpixels_to_files(&frame2);
-   slic.display_contours(&frame2, CV_RGB(255,0,0));
-   slic.display_number_grid(&frame2, CV_RGB(0,255,0));
-   superpixel_list = slic.get_superpixels();
-  //slic.show_histograms(1,32);
+	/* Perform the SLIC superpixel algorithm. */
+	slic.clear_data();
+	slic.generate_superpixels(lab_image, step, nc);
+	slic.create_connectivity(lab_image);
+		//slic.colour_with_cluster_means(&frame2);
+	slic.store_superpixels(&frame2);
 
-  //slic.display_center_grid(frame2, CV_RGB(0,255,0));
-  //slic.calculate_histograms(frame2);
+	//slic.export_superpixels_to_files(&frame2);
+	slic.display_contours(&frame2, CV_RGB(255,0,0));
 
-  cvShowImage("SuperPixels", &frame2);
-  //cvReleaseImage(&frame2);
-  cvReleaseImage(&lab_image);
-  cvWaitKey(10);
+	slic.display_number_grid(&frame2, CV_RGB(0,255,0));
+
+	//slic.show_histograms(1,32);
+
+	//slic.display_center_grid(frame2, CV_RGB(0,255,0));
+
+	cvShowImage("SuperPixels", &frame2);
+	cvReleaseImage(&lab_image);
+	cvWaitKey(10);
 }
 
 
@@ -83,10 +79,12 @@ void cameraSetup()
 {
 	//cap = VideoCapture(0); // Declare capture form Video: "eng_stat_obst.avi"
   
-
   //cap = VideoCapture(0);
-	cap = VideoCapture("eng_stat_obst.avi");
-	
+	//cap = VideoCapture("eng_stat_obst.avi");
+	cap = VideoCapture("Laboratorio.avi");
+	// cap = VideoCapture("LaboratorioMaleta.avi");
+	//cap = VideoCapture("PasilloLabA.avi");
+	//cap = VideoCapture("PasilloLabB.avi");	
 
 	//VideoCapture cap(1); //Otra camara, conectada a la computadora mediante USB, por ejemplo.
 	
