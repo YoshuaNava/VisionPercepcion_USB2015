@@ -84,8 +84,8 @@ void cameraSetup()
 	//cap = VideoCapture(0); // Declare capture form Video: "eng_stat_obst.avi"
   
 
-  cap = VideoCapture(0);
-	//cap = VideoCapture("eng_stat_obst.avi");
+  //cap = VideoCapture(0);
+	cap = VideoCapture("eng_stat_obst.avi");
 	
 
 	//VideoCapture cap(1); //Otra camara, conectada a la computadora mediante USB, por ejemplo.

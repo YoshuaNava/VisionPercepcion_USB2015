@@ -20,12 +20,15 @@ using namespace std;
 using namespace cv;
 
 
-cv::Mat frame, seg_image, gray, prevgray; // Mat Declarations
+cv::Mat frame, seg_image, gray, prevgray, floor_prior; // Mat Declarations
 
 cv::Mat temp_grad[3], sobel[3], borders_sobel, borders_canny, borders_combined;
 cv::Mat img_lines, contoured_img;
 vector<Vec4i> lines;
 vector<cv::Point> lines_points;
+vector<cv::Point> lines_dataset;
+int lines_history = 5;
+deque<vector<cv::Point>> acc_lines_points;
 vector<cv::Point> polynomial_fit;
 
 
@@ -33,7 +36,7 @@ double proc_W, proc_H;
 VideoCapture cap;
 
 Slic slic;
-int poly_degree = 2;
+int poly_degree = 3;
 Eigen::VectorXd poly_coeff;
 
 
@@ -89,7 +92,7 @@ void calculateCanny()
 	int const max_lowThreshold = 100;
 	int ratio = 5;
 	int kernel_size = 3;
-	GaussianBlur(gray, borders_canny, Size(3, 3), 0, 0);
+	GaussianBlur(gray, borders_canny, Size(31, 31), 0, 0);
 
 	/// Canny detector
 	Canny(borders_canny, borders_canny, lowThreshold, lowThreshold*ratio, kernel_size, true);
@@ -104,28 +107,39 @@ void findLinesHough()
 	img_lines = frame.clone();
 	lines_points.clear();
 	
-	HoughLinesP(borders_combined, lines, 1, CV_PI/180, 130, 20, 10);
+	HoughLinesP(borders_combined, lines, 1, CV_PI/180, 120, 20, 10);
 	for( size_t i = 0; i < lines.size(); i++ )
 	{
 		l = lines[i];
-		aux_point = cv::Point(l[0], l[1]);
-		// printf("x = %d  ;  y = %d\n", l[0],l[1]);
-		// printf("x = %d  ;  y = %d\n", l[2],l[3]);
-		lines_points.push_back(aux_point);
-		aux_point = cv::Point(l[2], l[3]);
-		lines_points.push_back(aux_point);
 
 		if(abs(l[0] - l[2]) != 0)
 		{
 			line_slope = (l[1] - l[3])/(l[0] - l[2]);
-			if(abs(line_slope) < 1.0)
+
+			if(abs(line_slope) < 1)
 			{
+				aux_point = cv::Point(l[0], l[1]);
+				// printf("x = %d  ;  y = %d\n", l[0],l[1]);
+				// printf("x = %d  ;  y = %d\n", l[2],l[3]);
+				lines_points.push_back(aux_point);
+				aux_point = cv::Point(l[2], l[3]);
+				lines_points.push_back(aux_point);
 				cv::line(img_lines, cv::Point(l[0], l[1]), cv::Point(l[2], l[3]), cv::Scalar(0,0,255), 3, CV_AA);
 			}
 		}
 	}
 
-	std::sort(lines_points.begin(), lines_points.end(), cvPointComparator);
+	
+	cout << "longitud de historial " << acc_lines_points.size() << "\n";
+	if(acc_lines_points.size() < lines_history)
+	{
+		acc_lines_points.push_back(lines_points);
+	}
+	else
+	{
+		acc_lines_points.pop_front();
+		acc_lines_points.push_back(lines_points);
+	}
 	// printf("Puntos ordenados:\n");
 	// for( size_t i = 0; i < lines_points.size(); i++ )
 	// {
@@ -138,16 +152,28 @@ void findLinesHough()
 void fitPolynomialFloorContour()
 {
 	cv::Point aux_point;
-	Eigen::MatrixXd vandemonde(lines_points.size(), poly_degree+1);
-	// Eigen::VectorXd x(lines_points.size());
-	Eigen::VectorXd y(lines_points.size());
-	int j,k;
-	for( size_t i = 0; i < lines_points.size(); i++ )
+	int j, k, l;
+	for(j=0; j<acc_lines_points.size() ;j++)
 	{
-		aux_point = lines_points[i];
+		for(k=0; k<acc_lines_points[j].size() ;k++)
+		{
+			//std::copy(acc_lines_points[j][k].begin(), acc_lines_points[j][k].end(), lines_dataset.begin());
+			lines_dataset.push_back(cv::Point(acc_lines_points[j][k].x, acc_lines_points[j][k].y));
+		}
+	}
+	std::sort(lines_dataset.begin(), lines_dataset.end(), cvPointComparator);
+	lines_dataset.erase( unique( lines_dataset.begin(), lines_dataset.end() ), lines_dataset.end() );
+
+
+	Eigen::MatrixXd vandemonde(lines_dataset.size(), poly_degree+1);
+	// Eigen::VectorXd x(lines_points.size());
+	Eigen::VectorXd y(lines_dataset.size());
+	for( size_t i = 0; i < lines_dataset.size(); i++ )
+	{
+		aux_point = lines_dataset[i];
 		// x(i) = aux_point.x;
 		y(i) = aux_point.y;
-		// printf("x = %d  ;  y = %d\n", aux_point.x, aux_point.y);
+		//printf("x = %d  ;  y = %d\n", aux_point.x, aux_point.y);
 		for(j=0; j<poly_degree+1 ;j++)
 		{
 			vandemonde(i,j) = pow(aux_point.x, j);
@@ -182,16 +208,17 @@ void drawPolynomialFloorBoundary()
 			contoured_img.at<cv::Vec3b>(poly_value, i)[1] = 0;
 			contoured_img.at<cv::Vec3b>(poly_value, i)[2] = 0;
 		}
-		cout << "x = " << i << "  ;  y = " << poly_value << "\n";
+		//cout << "x = " << i << "  ;  y = " << poly_value << "\n";
 	}
-	for( size_t i = 0; i < lines_points.size(); i++ )
+	for( size_t i = 0; i < lines_dataset.size(); i++ )
 	{
 		cv::Point aux_point;
-		aux_point = lines_points[i];
+		aux_point = lines_dataset[i];
 		contoured_img.at<cv::Vec3b>(aux_point.y, aux_point.x)[0] = 0;
 		contoured_img.at<cv::Vec3b>(aux_point.y, aux_point.x)[1] = 255;
 		contoured_img.at<cv::Vec3b>(aux_point.y, aux_point.x)[2] = 0;
 	}
+	lines_dataset.clear();
 }
 
 void superpixels(cv::Mat src)
@@ -240,8 +267,11 @@ void cameraSetup()
   
 
   //cap = VideoCapture(0);
-	cap = VideoCapture("eng_stat_obst.avi");
-	
+	//cap = VideoCapture("eng_stat_obst.avi");
+	//cap = VideoCapture("Laboratorio.avi");
+	// cap = VideoCapture("LaboratorioMaleta.avi");
+	cap = VideoCapture("PasilloLabA.avi");
+	//cap = VideoCapture("PasilloLabB.avi");
 
 	//VideoCapture cap(1); //Otra camara, conectada a la computadora mediante USB, por ejemplo.
 	
@@ -293,17 +323,21 @@ int main( int argc, char** argv )
 		seg_image = frame.clone();
 		superpixels(seg_image);
 		CV_TIMER_STOP(B, "Superpixels processed")
+		floor_prior = ProbFns::getFloorPrior(frame, slic.get_superpixels());
+		CV_TIMER_STOP(C, "Prior probability calculated")
 		calculateSobel();
 		calculateCanny();
-		addWeighted(borders_sobel, 0.5, borders_canny, 0.5, 0.0, borders_combined);
-		CV_TIMER_STOP(C, "Canny and Sobel edge detectors")
+		addWeighted(borders_sobel, 0.7, borders_canny, 0.3, 0.0, borders_combined);
+		CV_TIMER_STOP(D, "Canny and Sobel edge detectors")
 		findLinesHough();
-		CV_TIMER_STOP(D, "Find lines using Hough Transform")
+		CV_TIMER_STOP(E, "Find lines using Hough Transform")
 		fitPolynomialFloorContour();
-		CV_TIMER_STOP(E, "Fit a polynomial to the points given by the Hough Transform")
+		CV_TIMER_STOP(F, "Fit a polynomial to the points given by the Hough Transform")
 		drawPolynomialFloorBoundary();
-		CV_TIMER_STOP(F, "Draw polynomial floor boundary")
+		CV_TIMER_STOP(G, "Draw polynomial floor boundary")
 		showImages();
+
+
 		CV_TIMER_STOP(Z, "Loop finished")
 	 	ros::spinOnce();
 	}
