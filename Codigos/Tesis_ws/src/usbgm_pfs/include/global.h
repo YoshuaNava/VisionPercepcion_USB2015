@@ -26,6 +26,9 @@
 #include "opencv2/video/tracking.hpp"
 #include "opencv2/core/core.hpp"
 
+#include <Eigen/Core>
+#include <Eigen/Dense>
+
 //#include "img_proc_fcns.h" //various image processing/computer vision functions
 
 #include "../slic_modified/slic.h"

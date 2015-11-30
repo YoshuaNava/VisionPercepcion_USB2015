@@ -33,7 +33,15 @@ double proc_W, proc_H;
 VideoCapture cap;
 
 Slic slic;
-vector<Superpixel> superpixel_list;
+int poly_degree = 2;
+Eigen::VectorXd poly_coeff;
+
+
+//REFERENCE: http://stackoverflow.com/questions/16796732/how-to-sort-vector-of-points-based-on-a-y-axis
+struct cvPointComparator {
+    bool operator() (cv::Point pt1, cv::Point pt2) { return (pt1.x < pt2.x);}
+} cvPointComparator;
+
 
 
 void showImages()
@@ -59,7 +67,10 @@ void calculateSobel()
 	cv::convertScaleAbs(temp_grad[0], sobel[0]);
 	cv::convertScaleAbs(temp_grad[1], sobel[1]);
 	addWeighted(sobel[0], 0.5, sobel[1], 0.5, 0, borders_sobel);
+	
 
+	//REFERENCE #1: http://stackoverflow.com/questions/16665742/a-good-approach-for-detecting-lines-in-an-image
+	//REFERENCE #2: http://felix.abecassis.me/2011/09/opencv-morphological-skeleton/
 	cv::Mat element = getStructuringElement(MORPH_CROSS, Size(3, 3));
 	cv::Mat skel(borders_sobel.size(), CV_8UC1, cv::Scalar(0));
 	cv::Mat eroded, dilated;
@@ -87,6 +98,7 @@ void calculateCanny()
 
 void findLinesHough()
 {
+	Vec4i l;
 	float line_slope;
 	cv::Point aux_point;
 	img_lines = frame.clone();
@@ -95,8 +107,10 @@ void findLinesHough()
 	HoughLinesP(borders_combined, lines, 1, CV_PI/180, 130, 20, 10);
 	for( size_t i = 0; i < lines.size(); i++ )
 	{
-		Vec4i l = lines[i];
+		l = lines[i];
 		aux_point = cv::Point(l[0], l[1]);
+		// printf("x = %d  ;  y = %d\n", l[0],l[1]);
+		// printf("x = %d  ;  y = %d\n", l[2],l[3]);
 		lines_points.push_back(aux_point);
 		aux_point = cv::Point(l[2], l[3]);
 		lines_points.push_back(aux_point);
@@ -110,19 +124,75 @@ void findLinesHough()
 			}
 		}
 	}
+
+	std::sort(lines_points.begin(), lines_points.end(), cvPointComparator);
+	// printf("Puntos ordenados:\n");
+	// for( size_t i = 0; i < lines_points.size(); i++ )
+	// {
+	// 	aux_point = lines_points[i];
+	// 	printf("x = %d  ;  y = %d\n", aux_point.x, aux_point.y);
+	// }
 }
 
 
 void fitPolynomialFloorContour()
 {
-	approxPolyDP(lines_points, polynomial_fit, 3, false);
-	contoured_img = frame.clone();
-	// for( size_t i = 0; i < polynomial_fit.size(); i++ )
-	// {
-	// 	cv::line(contoured_img, cv::Point(polynomial_fit[i].x, polynomial_fit[i].y), cv::Point(polynomial_fit[i+1].x, polynomial_fit[i+1].y), cv::Scalar(0,0,255), 3, CV_AA);
-	// }
+	cv::Point aux_point;
+	Eigen::MatrixXd vandemonde(lines_points.size(), poly_degree+1);
+	// Eigen::VectorXd x(lines_points.size());
+	Eigen::VectorXd y(lines_points.size());
+	int j,k;
+	for( size_t i = 0; i < lines_points.size(); i++ )
+	{
+		aux_point = lines_points[i];
+		// x(i) = aux_point.x;
+		y(i) = aux_point.y;
+		// printf("x = %d  ;  y = %d\n", aux_point.x, aux_point.y);
+		for(j=0; j<poly_degree+1 ;j++)
+		{
+			vandemonde(i,j) = pow(aux_point.x, j);
+		}
+	}
+	poly_coeff = vandemonde.colPivHouseholderQr().solve(y);
+	// cout << "x:\n" << x << endl;
+	// cout << "y:\n" << y << endl;
+	// cout << "Vandemonde matrix:\n" << vandemonde << endl;
+	// cout << "Vandemonde " << poly_degree << "-th degree polynomial coefficients:\n" << poly_coeff << endl;
 }
 
+
+void drawPolynomialFloorBoundary()
+{
+//	contoured_img = frame.clone();
+	contoured_img = cv::Mat::zeros(frame.rows, frame.cols, CV_8UC3);;
+	int i, j;
+	float poly_value;
+
+	for(i=0; i<proc_W ;i++)
+	{
+		poly_value = 0.0;
+		for(j=0; j<poly_coeff.size() ;j++)
+		{
+			poly_value += poly_coeff(j)*pow(i, j);
+		}
+
+		if((poly_value >= 0) && (poly_value < proc_H))
+		{
+			contoured_img.at<cv::Vec3b>(poly_value, i)[0] = 255;
+			contoured_img.at<cv::Vec3b>(poly_value, i)[1] = 0;
+			contoured_img.at<cv::Vec3b>(poly_value, i)[2] = 0;
+		}
+		cout << "x = " << i << "  ;  y = " << poly_value << "\n";
+	}
+	for( size_t i = 0; i < lines_points.size(); i++ )
+	{
+		cv::Point aux_point;
+		aux_point = lines_points[i];
+		contoured_img.at<cv::Vec3b>(aux_point.y, aux_point.x)[0] = 0;
+		contoured_img.at<cv::Vec3b>(aux_point.y, aux_point.x)[1] = 255;
+		contoured_img.at<cv::Vec3b>(aux_point.y, aux_point.x)[2] = 0;
+	}
+}
 
 void superpixels(cv::Mat src)
 {
@@ -146,18 +216,17 @@ void superpixels(cv::Mat src)
   slic.create_connectivity(lab_image);
   	//slic.colour_with_cluster_means(&frame2);
   slic.store_superpixels(&frame2);
-  //slic.calculate_histograms(&frame2);
+  slic.calculate_histograms(&frame2);
   
 
   // slic.export_superpixels_to_files(&frame2);
    slic.display_contours(&frame2, CV_RGB(255,0,0));
    slic.display_number_grid(&frame2, CV_RGB(0,255,0));
-   superpixel_list = slic.get_superpixels();
+   
   //slic.show_histograms(1,32);
 
   //slic.display_center_grid(frame2, CV_RGB(0,255,0));
-  //slic.calculate_histograms(frame2);
-
+  
   cvShowImage("SuperPixels", &frame2);
   //cvReleaseImage(&frame2);
   cvReleaseImage(&lab_image);
@@ -232,6 +301,8 @@ int main( int argc, char** argv )
 		CV_TIMER_STOP(D, "Find lines using Hough Transform")
 		fitPolynomialFloorContour();
 		CV_TIMER_STOP(E, "Fit a polynomial to the points given by the Hough Transform")
+		drawPolynomialFloorBoundary();
+		CV_TIMER_STOP(F, "Draw polynomial floor boundary")
 		showImages();
 		CV_TIMER_STOP(Z, "Loop finished")
 	 	ros::spinOnce();

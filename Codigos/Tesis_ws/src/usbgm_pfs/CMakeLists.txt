@@ -5,10 +5,12 @@ PROJECT(usbgm_pfs)
 SET(CMAKE_BUILD_TYPE Release) # Release, RelWithDebInfo
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mmmx -msse -msse -msse2 -msse3 -mssse3")
+SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/CMakeModules/")
 
 
 FIND_PACKAGE(OpenCV REQUIRED)
 FIND_PACKAGE(svo REQUIRED)
+FIND_PACKAGE(Eigen REQUIRED)
 
 FIND_PACKAGE(catkin REQUIRED COMPONENTS
 	roscpp
@@ -19,7 +21,7 @@ FIND_PACKAGE(catkin REQUIRED COMPONENTS
 
 CATKIN_PACKAGE(
 	INCLUDE_DIRS include
-	DEPENDS OpenCV svo fast
+	DEPENDS OpenCV svo Eigen
 	CATKIN_DEPENDS roscpp image_transport cv_bridge
 )
 
@@ -30,11 +32,12 @@ INCLUDE_DIRECTORIES(${catkin_INCLUDE_DIRS} ${OpenCV_INCLUDE_DIRS} include)
 INCLUDE_DIRECTORIES(${catkin_INCLUDE_DIRS} ${svo_INCLUDE_DIRS} include)
 
 LIST(APPEND LINK_LIBS 
-	${OpenCV_LIBS}
+	${OpenCV_LIBRARIES}
 	${svo_LIBRARIES}
 	${roscpp_LIBRARIES}
 	${cv_bridge_LIBRARIES}
 	${image_transport_LIBRARIES}
+	${Eigen_LIBRARIES}
 )
 
 ##add_dependencies(Convert_Image ar_pose_generate_messages_cpp)
