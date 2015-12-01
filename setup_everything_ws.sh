@@ -22,3 +22,5 @@ make -j$CPU_CORES -l$CPU_CORES
 
 cd ../../../
 catkin_make
+
+sudo echo "source $(pwd)/Codigos/Tesis_ws/devel/setup.bash" >> ~/.bashrc
