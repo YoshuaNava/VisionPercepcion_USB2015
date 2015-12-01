@@ -9,4 +9,4 @@
 	url = https://github.com/uzh-rpg/rpg_vikit.git
 [submodule "Codigos/Tesis_ws/src/rpg_svo"]
 	path = Codigos/Tesis_ws/src/rpg_svo
-	url = https://github.com/uzh-rpg/rpg_svo.git
+	url = https://github.com/IreneMLC/rpg_svo.git
