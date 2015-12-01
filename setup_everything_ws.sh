@@ -4,6 +4,26 @@
 export CPU_CORES=$(grep -c ^processor /proc/cpuinfo);
 
 
+if [ -d Codigos/Tesis_ws/build ]; then
+	rm -rf Codigos/Tesis_ws/build;
+fi
+if [ -d Codigos/Tesis_ws/devel ]; then
+	rm -rf Codigos/Tesis_ws/devel;
+fi
+
+if [ -d Codigos/Tesis_ws/src/Sophus ]; then
+	rm -rf Codigos/Tesis_ws/src/Sophus;
+fi
+if [ -d Codigos/Tesis_ws/src/fast ]; then
+	rm -rf Codigos/Tesis_ws/src/fast;
+fi
+if [ -d Codigos/Tesis_ws/src/rpg_svo ]; then
+	rm -rf Codigos/Tesis_ws/src/rpg_svo;
+fi
+if [ -d Codigos/Tesis_ws/src/rpg_vikit ]; then
+	rm -rf Codigos/Tesis_ws/src/rpg_vikit;
+fi
+
 git submodule init
 git submodule update
 
