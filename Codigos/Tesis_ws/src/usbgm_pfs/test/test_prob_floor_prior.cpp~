@@ -2,6 +2,7 @@
 #include "../include/global.h"
 
 #include "../src/prob_fns.cpp"
+#include "gps_sapienza_ros/disjoint-set.h"
 //#include "slic_superpixels/slic.h"
 
 

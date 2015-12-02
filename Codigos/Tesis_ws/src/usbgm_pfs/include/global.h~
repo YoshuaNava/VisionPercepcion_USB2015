@@ -35,7 +35,7 @@
 
 #include "../slic_modified/slic.h"
 #include "svo/config.h"
-//#include "gps_sapienza_ros/disjoint-set.h"
+#include "gps_sapienza_ros/disjoint-set.h"
 
 
 

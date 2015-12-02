@@ -13,6 +13,7 @@ namespace ProbFns
 		Y1 = 1;
 		int i, j, k, row, x_coord, y_coord;
 		point2Dvec points;
+		cout << "hola" << superpixels.size() << "\n";
 		cv::Mat priorMatrix = cv::Mat::zeros(img.rows, img.cols, CV_32FC1);
 		for(i=0; i < superpixels.size() ;i++)
 		{
@@ -25,6 +26,7 @@ namespace ProbFns
 					x_coord = points[j].x;
 					y_coord = points[j].y;
 					priorMatrix.at<float>(y_coord, x_coord) = prob_floor;
+					cout << priorMatrix.at<float>(y_coord, x_coord) << "\n";
 				}
 
 		}
