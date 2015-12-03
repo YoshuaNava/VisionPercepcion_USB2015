@@ -24,18 +24,9 @@ CATKIN_PACKAGE(
 )
 
 
-#INCLUDE_DIRECTORIES(${catkin_INCLUDE_DIRS} ${OpenCV_INCLUDE_DIRS} include)
+INCLUDE_DIRECTORIES(${catkin_INCLUDE_DIRS} ${OpenCV_INCLUDE_DIRS} include)
 
-INCLUDE_DIRECTORIES(
-  include
-  ${OpenCV_INCLUDE_DIRS}
-  ${roscpp_INCLUDE_DIRS}
-  ${cv_bridge_INCLUDE_DIRS}
-  ${image_transporte_INCLUDE_DIRS}
-)
-
-
-LIST(APPEND LINK_LIBS
+LIST(APPEND LINK_LIBS 
 	${OpenCV_LIBRARIES}
 	${roscpp_LIBRARIES}
 	${cv_bridge_LIBRARIES}
@@ -54,10 +45,8 @@ LIST(APPEND SOURCEFILES
 
 ADD_EXECUTABLE(gps_sapienza src/main.cpp)
 
-ADD_LIBRARY(gps_sapienza_ros SHARED ${SOURCEFILES})
-TARGET_LINK_LIBRARIES(gps_sapienza ${LINK_LIBS})
-TARGET_LINK_LIBRARIES(gps_sapienza gps_sapienza_ros)
-
-
+ADD_LIBRARY(gps_sapienza_lib SHARED ${SOURCEFILES})
+TARGET_LINK_LIBRARIES(gps_sapienza gps_sapienza_lib)
+TARGET_LINK_LIBRARIES(gps_sapienza ${OpenCV_LIBS})
 
 
