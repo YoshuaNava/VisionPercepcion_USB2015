@@ -35,6 +35,10 @@
 
 #include "slic_modified/slic.h"
 #include "svo/config.h"
+
+
+#include "egbis/convolve.h"
+
 //#include "gps_sapienza_ros/disjoint-set.h"
 
 

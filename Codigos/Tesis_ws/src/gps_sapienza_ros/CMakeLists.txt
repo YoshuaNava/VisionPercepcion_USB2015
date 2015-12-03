@@ -45,7 +45,7 @@ LIST(APPEND SOURCEFILES
 
 ADD_EXECUTABLE(gps_sapienza src/main.cpp)
 
-ADD_LIBRARY(gps_sapienza_lib SHARED ${SOURCEFILES})
+ADD_LIBRARY(gps_sapienza_lib ${SOURCEFILES})
 TARGET_LINK_LIBRARIES(gps_sapienza gps_sapienza_lib)
 TARGET_LINK_LIBRARIES(gps_sapienza ${OpenCV_LIBS})
 

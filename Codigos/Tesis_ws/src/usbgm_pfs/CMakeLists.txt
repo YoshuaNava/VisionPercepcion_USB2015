@@ -11,7 +11,6 @@ SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/CMakeModules/"
 FIND_PACKAGE(OpenCV REQUIRED)
 FIND_PACKAGE(svo REQUIRED)
 FIND_PACKAGE(Eigen REQUIRED)
-FIND_PACKAGE(gps_sapienza_ros REQUIRED)
 
 FIND_PACKAGE(catkin REQUIRED COMPONENTS
 	roscpp
@@ -22,7 +21,7 @@ FIND_PACKAGE(catkin REQUIRED COMPONENTS
 
 CATKIN_PACKAGE(
 	INCLUDE_DIRS include
-	DEPENDS OpenCV svo Eigen gps_sapienza_ros
+	DEPENDS OpenCV svo Eigen
 	CATKIN_DEPENDS roscpp image_transport cv_bridge
 )
 
@@ -31,7 +30,6 @@ CATKIN_PACKAGE(
 
 INCLUDE_DIRECTORIES(${catkin_INCLUDE_DIRS} ${OpenCV_INCLUDE_DIRS} include)
 INCLUDE_DIRECTORIES(${catkin_INCLUDE_DIRS} ${svo_INCLUDE_DIRS} include)
-INCLUDE_DIRECTORIES(${catkin_INCLUDE_DIRS} ${gps_sapienza_ros_INCLUDE_DIRS} include)
 
 LIST(APPEND LINK_LIBS 
 	${OpenCV_LIBRARIES}
@@ -40,7 +38,6 @@ LIST(APPEND LINK_LIBS
 	${cv_bridge_LIBRARIES}
 	${image_transport_LIBRARIES}
 	${Eigen_LIBRARIES}
-	${gps_sapienza_ros_LIBRARIES}
 )
 
 ##add_dependencies(Convert_Image ar_pose_generate_messages_cpp)
