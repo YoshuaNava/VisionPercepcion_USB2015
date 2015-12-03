@@ -33,7 +33,7 @@
 
 //#include "img_proc_fcns.h" //various image processing/computer vision functions
 
-#include "../slic_modified/slic.h"
+#include "slic_modified/slic.h"
 #include "svo/config.h"
 //#include "gps_sapienza_ros/disjoint-set.h"
 

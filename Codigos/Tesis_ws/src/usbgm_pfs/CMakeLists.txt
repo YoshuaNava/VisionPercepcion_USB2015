@@ -45,23 +45,52 @@ LIST(APPEND LINK_LIBS
 
 ##add_dependencies(Convert_Image ar_pose_generate_messages_cpp)
 
+ADD_LIBRARY(slic_superpixels SHARED
+	include/slic_modified/slic.cpp
+	include/slic_modified/slic.h
+	include/slic_modified/superpixel.cpp
+	include/slic_modified/superpixel.h
+)
+
+ADD_LIBRARY(fh_egbis SHARED 
+	include/egbis/convolve.h
+	include/egbis/disjoint-set.h
+	include/egbis/filter.h
+	include/egbis/image.h
+	include/egbis/imconv.h
+	include/egbis/imutil.h
+	include/egbis/misc.h
+	include/egbis/pnmfile.h
+	include/egbis/segment.cpp
+	include/egbis/segment-graph.h
+	include/egbis/segment-image.h
+)
+
 
 ADD_EXECUTABLE(pfs src/plane_segmentation_alpha.cpp)
-ADD_EXECUTABLE(test_prob_floor_prior test/test_prob_floor_prior.cpp)
-ADD_EXECUTABLE(test_horizon_search test/test_horizon_search.cpp)
-ADD_EXECUTABLE(test_superpixel_segmentation test/test_superpixel_segmentation.cpp)
-
-ADD_LIBRARY(slic_superpixels SHARED slic_modified/slic.cpp slic_modified/superpixel.cpp)
 TARGET_LINK_LIBRARIES(pfs ${LINK_LIBS})
 TARGET_LINK_LIBRARIES(pfs slic_superpixels)
 
+
+ADD_EXECUTABLE(test_prob_floor_prior test/test_prob_floor_prior.cpp)
 TARGET_LINK_LIBRARIES(test_prob_floor_prior ${LINK_LIBS})
 TARGET_LINK_LIBRARIES(test_prob_floor_prior slic_superpixels)
 
+
+ADD_EXECUTABLE(test_horizon_search test/test_horizon_search.cpp)
 TARGET_LINK_LIBRARIES(test_horizon_search ${LINK_LIBS})
 TARGET_LINK_LIBRARIES(test_horizon_search slic_superpixels)
 
-TARGET_LINK_LIBRARIES(test_superpixel_segmentation ${LINK_LIBS})
-TARGET_LINK_LIBRARIES(test_superpixel_segmentation slic_superpixels)
+
+ADD_EXECUTABLE(test_slic_superpixel_segmentation test/test_slic_superpixel_segmentation.cpp)
+TARGET_LINK_LIBRARIES(test_slic_superpixel_segmentation ${LINK_LIBS})
+TARGET_LINK_LIBRARIES(test_slic_superpixel_segmentation slic_superpixels)
+
+
+
+
+
+
+
 
 
