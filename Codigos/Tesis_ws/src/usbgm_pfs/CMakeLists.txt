@@ -84,6 +84,9 @@ TARGET_LINK_LIBRARIES(test_slic_superpixel_segmentation ${LINK_LIBS})
 TARGET_LINK_LIBRARIES(test_slic_superpixel_segmentation slic_superpixels)
 
 
+ADD_EXECUTABLE(test_svo_depth_filter test/test_svo_depth_filter.cpp)
+TARGET_LINK_LIBRARIES(test_svo_depth_filter ${LINK_LIBS})
+
 
 
 

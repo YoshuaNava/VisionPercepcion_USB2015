@@ -111,7 +111,7 @@ void findLinesHough()
 	vector<cv::Point> lines_points;
 	img_lines = frame.clone();
 	
-	HoughLinesP(borders_combined, lines, 1, CV_PI/180, 150, 20, 5);
+	HoughLinesP(borders_combined, lines, 1, CV_PI/180, 70, 20, 5);
 	for( size_t i = 0; i < lines.size(); i++ )
 	{
 		l = lines[i];
@@ -304,7 +304,7 @@ void superpixels(cv::Mat src)
 
 	cvShowImage("SuperPixels", &frame2);
 	cvReleaseImage(&lab_image);
-//	cvWaitKey(10);
+	cvWaitKey(10);
 }
 
 
@@ -314,12 +314,12 @@ void cameraSetup()
   
 
   //cap = VideoCapture(0);
-	//cap = VideoCapture("eng_stat_obst.avi");
+	cap = VideoCapture("eng_stat_obst.avi");
 	//cap = VideoCapture("Laboratorio.avi");
 	//cap = VideoCapture("LaboratorioMaleta.avi");
 	//cap = VideoCapture("PasilloLabA.avi");
 	//cap = VideoCapture("PasilloLabB.avi");
-  cap = VideoCapture("Laboratorio4.avi");
+ // cap = VideoCapture("Laboratorio4.avi");
 //  cap = VideoCapture("Calle1.avi");
 	//VideoCapture cap(1); //Otra camara, conectada a la computadora mediante USB, por ejemplo.
 	
