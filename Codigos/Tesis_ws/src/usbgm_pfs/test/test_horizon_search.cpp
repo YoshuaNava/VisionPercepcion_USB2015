@@ -304,7 +304,7 @@ void superpixels(cv::Mat src)
 
 	cvShowImage("SuperPixels", &frame2);
 	cvReleaseImage(&lab_image);
-	cvWaitKey(10);
+//	cvWaitKey(10);
 }
 
 

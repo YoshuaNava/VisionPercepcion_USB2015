@@ -1,7 +1,5 @@
 
 #include "../include/global.h"
-
-#include "../src/prob_fns.cpp"
 //#include "slic_superpixels/slic.h"
 
 
@@ -19,77 +17,53 @@
 using namespace std;
 using namespace cv;
 
-
-cv::Mat frame, seg_image, gray, prevgray, floor_prior; // Mat Declarations
-
-cv::Mat temp_grad[3], sobel[3], borders_sobel, borders_canny, borders_combined;
-cv::Mat img_lines, contoured_img, superpixels_below_boundary;
-vector<Vec4i> lines;
-vector<cv::Point> lines_dataset;
-int lines_history = 5;
-deque<vector<cv::Point>> acc_lines_points;
-vector<cv::Point> polynomial_fit;
-vector<int> superpixel_is_floor;
-
-
 double proc_W, proc_H;
 VideoCapture cap;
 
-Slic slic;
-int poly_degree = 3;
-Eigen::VectorXd poly_coeff;
+cv::Mat frame, seg_image, gray, prevgray; // Mat Declarations
 
 
-//REFERENCE: http://stackoverflow.com/questions/16796732/how-to-sort-vector-of-points-based-on-a-y-axis
-struct cvPointComparator {
-    bool operator() (cv::Point pt1, cv::Point pt2) { return (pt1.x < pt2.x);}
-} cvPointComparator;
-
-
-
-void showImages()
-{
-	DISPLAY_IMAGE_XY(true, frame, 0, 0);
-	cv::resizeWindow("frame", proc_W, proc_H);
-}
+static int int_sigma = 5;
+static int int_k = 100;
+static int min_size = 100;
+float floatsigma;
+const char * GBS 		= "seg"; //"Graph Based Segmentation";
 
 
 
-void slicSuperpixels(cv::Mat src)
+
+void egbisSuperpixels()
 {
 	namedWindow( "SuperPixels", 1 ); 
-	IplImage frame2 = (IplImage)src; // Reference on deallocating memory: http://stackoverflow.com/questions/12635978/memory-deallocation-of-iplimage-initialised-from-cvmat
+	IplImage gray_temp = (IplImage)gray;
+	IplImage* ipl_gray = &gray_temp; // Reference on deallocating memory: http://stackoverflow.com/questions/12635978/memory-deallocation-of-iplimage-initialised-from-cvmat
+	IplImage* seg = cvCreateImage(cv::Size(proc_W, proc_H), 8, 1);;
 
-	  /* Yield the number of superpixels and weight-factors from the user. */
-	IplImage *lab_image = cvCloneImage(&frame2);
-	cvCvtColor(&frame2, lab_image, CV_BGR2Lab);
-	int w = lab_image->width, h = lab_image->height;
-	//int nr_superpixels = atoi(argv[2]);
-	int nr_superpixels = 6*proc_W;
-	//int nc = atoi(argv[3]);
-	int nc = 20;
-	double step = sqrt((w * h) / (double) nr_superpixels)*3;
+    static int num_ccs;
+    static float sigma;
+    static float k;
 
-	/* Perform the SLIC superpixel algorithm. */
-	slic.clear_data();
-	slic.generate_superpixels(lab_image, step, nc);
-	slic.create_connectivity(lab_image);
-		//slic.colour_with_cluster_means(&frame2);
-	slic.store_superpixels(&frame2);
+            //printf("processing\n");
+    floatsigma = (float)int_sigma*0.1;
+    k = (float)int_k;
+    SegmentImage(seg, ipl_gray, sigma, k, min_size, &num_ccs);
 
-	//slic.export_superpixels_to_files(&frame2);
-	slic.display_contours(&frame2, CV_RGB(255,0,0));
 
-	slic.display_number_grid(&frame2, CV_RGB(0,255,0));
 
-	//slic.show_histograms(1,32);
+    seg_image = cv::cvarrToMat(seg);
 
-	//slic.display_center_grid(frame2, CV_RGB(0,255,0));
+	cv::imshow("SuperPixels", seg_image);
 
-	cvShowImage("SuperPixels", &frame2);
-	cvReleaseImage(&lab_image);
-//	cvWaitKey(10);
+	for(int i=0; i<seg_image.rows ;i++)
+	{
+		for(int j=0; j<seg_image.cols ;j++)
+		{
+			cout << seg_image.at<uchar>(j,i) << "\n";
+		}
+	}
+	cvReleaseImage(&seg);
 }
+
 
 
 void cameraSetup()
@@ -98,8 +72,8 @@ void cameraSetup()
   
 
   //cap = VideoCapture(0);
-	//cap = VideoCapture("eng_stat_obst.avi");
-	cap = VideoCapture("Laboratorio.avi");
+	cap = VideoCapture("eng_stat_obst.avi");
+	//cap = VideoCapture("Laboratorio.avi");
 	// cap = VideoCapture("LaboratorioMaleta.avi");
 	//cap = VideoCapture("PasilloLabA.avi");
 	//cap = VideoCapture("PasilloLabB.avi");
@@ -134,7 +108,7 @@ int main( int argc, char** argv )
 	cameraSetup();
 	cap.read(frame);
 	waitKey(10);
-    
+
 	while (nh.ok()) 
 	{
 		CV_TIMER_START(X)
@@ -150,9 +124,8 @@ int main( int argc, char** argv )
 		cvtColor(frame, gray, CV_BGR2GRAY);
 		waitKey(1); // Wait Time
 
-		
 		seg_image = frame.clone();
-		slicSuperpixels(seg_image);
+		egbisSuperpixels();
 		CV_TIMER_STOP(B, "Superpixels processed")
 
 
@@ -165,8 +138,6 @@ int main( int argc, char** argv )
 	cap.release(); //Destroy the Capture from webcam
 	destroyAllWindows(); //Destroy the windows
 
-
-	//ros::spin();
 
 	return 0;
 }

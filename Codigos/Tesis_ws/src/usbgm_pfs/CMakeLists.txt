@@ -57,10 +57,9 @@ ADD_LIBRARY(fh_egbis SHARED
 	include/egbis/imconv.h
 	include/egbis/imutil.h
 	include/egbis/misc.h
-	include/egbis/pnmfile.h
-	include/egbis/segment.cpp
 	include/egbis/segment-graph.h
 	include/egbis/segment-image.h
+	include/egbis/egbis.cpp
 )
 
 
@@ -79,10 +78,13 @@ TARGET_LINK_LIBRARIES(test_horizon_search ${LINK_LIBS})
 TARGET_LINK_LIBRARIES(test_horizon_search slic_superpixels)
 
 
+ADD_EXECUTABLE(test_egbis_superpixel_segmentation test/test_egbis_superpixel_segmentation.cpp)
+TARGET_LINK_LIBRARIES(test_egbis_superpixel_segmentation ${LINK_LIBS})
+TARGET_LINK_LIBRARIES(test_egbis_superpixel_segmentation fh_egbis)
+
 ADD_EXECUTABLE(test_slic_superpixel_segmentation test/test_slic_superpixel_segmentation.cpp)
 TARGET_LINK_LIBRARIES(test_slic_superpixel_segmentation ${LINK_LIBS})
 TARGET_LINK_LIBRARIES(test_slic_superpixel_segmentation slic_superpixels)
-
 
 ADD_EXECUTABLE(test_svo_depth_filter test/test_svo_depth_filter.cpp)
 TARGET_LINK_LIBRARIES(test_svo_depth_filter ${LINK_LIBS})
