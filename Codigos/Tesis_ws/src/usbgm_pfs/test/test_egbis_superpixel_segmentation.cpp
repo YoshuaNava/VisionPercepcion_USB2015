@@ -20,7 +20,7 @@ using namespace cv;
 double proc_W, proc_H;
 VideoCapture cap;
 
-cv::Mat frame, seg_image, gray, prevgray; // Mat Declarations
+cv::Mat frame, seg_image, gray, contours_image; // Mat Declarations
 
 
 static int int_sigma = 5;
@@ -28,12 +28,75 @@ static int int_k = 100;
 static int min_size = 100;
 float floatsigma;
 const char * GBS 		= "seg"; //"Graph Based Segmentation";
+vector<vector<int>> clusters;
 
+
+void showImages()
+{
+	DISPLAY_IMAGE_XY(true, frame, 0, 0);
+	cv::resizeWindow("frame", proc_W, proc_H);
+	DISPLAY_IMAGE_XY(true, gray, 1, 0);
+	cv::resizeWindow("gray", proc_W, proc_H);
+	DISPLAY_IMAGE_XY(true, seg_image, 2, 0);
+	cv::resizeWindow("seg_image", proc_W, proc_H);
+	DISPLAY_IMAGE_XY(true, contours_image, 3, 0);
+	cv::resizeWindow("contours_image", proc_W, proc_H);
+}
+
+
+void display_contours(CvScalar colour) {
+    const int dx8[8] = {-1, -1,  0,  1, 1, 1, 0, -1};
+	const int dy8[8] = { 0, -1, -1, -1, 0, 1, 1,  1};
+	
+	/* Initialize the contour vector and the matrix detailing whether a pixel
+	 * is already taken to be a contour. */
+	vector<CvPoint> contours;
+	vec2db istaken;
+	for (int i = 0; i < seg_image.cols; i++) { 
+        vector<bool> nb;
+        for (int j = 0; j < seg_image.rows; j++) {
+            nb.push_back(false);
+        }
+        istaken.push_back(nb);
+    }
+    
+    /* Go through all the pixels. */
+    for (int i = 0; i < seg_image.cols; i++) {
+        for (int j = 0; j < seg_image.rows; j++) {
+            int nr_p = 0;
+            
+            /* Compare the pixel to its 8 neighbours. */
+            for (int k = 0; k < 8; k++) {
+                int x = i + dx8[k], y = j + dy8[k];
+                
+                if (x >= 0 && x < seg_image.cols && y >= 0 && y < seg_image.rows) {
+                    if (istaken[x][y] == false && clusters[i][j] != clusters[x][y]) {
+                        nr_p += 1;
+                    }
+                }
+            }
+            
+            /* Add the pixel to the contour list if desired. */
+            if (nr_p >= 2) {
+                contours.push_back(cvPoint(i,j));
+                istaken[i][j] = true;
+            }
+        }
+    }
+    
+    /* Draw the contour pixels. */
+    for (int i = 0; i < (int)contours.size(); i++) {
+		contours_image.at<cv::Vec3b>(contours[i].y, contours[i].x).val[0] = colour.val[0];
+		contours_image.at<cv::Vec3b>(contours[i].y, contours[i].x).val[1] = colour.val[1];
+		contours_image.at<cv::Vec3b>(contours[i].y, contours[i].x).val[2] = colour.val[2];
+    }
+}
 
 
 
 void egbisSuperpixels()
 {
+	clusters.clear();
 	namedWindow( "SuperPixels", 1 ); 
 	IplImage gray_temp = (IplImage)gray;
 	IplImage* ipl_gray = &gray_temp; // Reference on deallocating memory: http://stackoverflow.com/questions/12635978/memory-deallocation-of-iplimage-initialised-from-cvmat
@@ -50,16 +113,19 @@ void egbisSuperpixels()
 
 
 
-    seg_image = cv::cvarrToMat(seg);
+    seg_image = cv::cvarrToMat(seg, true, true, 0);
 
-	cv::imshow("SuperPixels", seg_image);
+//	cv::imshow("SuperPixels", seg_image);
 
-	for(int i=0; i<seg_image.rows ;i++)
+	for(int i=0; i<seg_image.cols ;i++)
 	{
-		for(int j=0; j<seg_image.cols ;j++)
+		vector<int> seg_row;
+		for(int j=0; j<seg_image.rows ;j++)
 		{
-			cout << seg_image.at<uchar>(j,i) << "\n";
+//			cout << "u = " << j << "  ;  v = " << i << "	;	Superpixel = " << seg_image.at<uchar>(i,j) << "\n";
+			seg_row.push_back((int)seg_image.at<uchar>(j,i));
 		}
+		clusters.push_back(seg_row);
 	}
 	cvReleaseImage(&seg);
 }
@@ -124,10 +190,14 @@ int main( int argc, char** argv )
 		cvtColor(frame, gray, CV_BGR2GRAY);
 		waitKey(1); // Wait Time
 
-		seg_image = frame.clone();
 		egbisSuperpixels();
 		CV_TIMER_STOP(B, "Superpixels processed")
 
+		contours_image = frame.clone();
+		display_contours(cv::Scalar(255,0,0));
+		CV_TIMER_STOP(C, "Superpixels contours defined")		
+
+		showImages();
 
 		CV_TIMER_STOP(Z, "Loop finished")
 	 	ros::spinOnce();
