@@ -271,7 +271,7 @@ void findSuperpixelsBelowBoundary()
 	}
 }
 
-void superpixels(cv::Mat src)
+void slicSuperpixels(cv::Mat src)
 {
 	namedWindow( "SuperPixels", 1 ); 
 	IplImage frame2 = (IplImage)src; // Reference on deallocating memory: http://stackoverflow.com/questions/12635978/memory-deallocation-of-iplimage-initialised-from-cvmat
@@ -370,7 +370,7 @@ int main( int argc, char** argv )
 
 		
 		seg_image = frame.clone();
-		superpixels(seg_image);
+		slicSuperpixels(seg_image);
 		CV_TIMER_STOP(B, "Superpixels processed")
 		floor_prior = ProbFns::getFloorPrior(frame, slic.get_superpixels());
 		CV_TIMER_STOP(C, "Prior probability calculated")

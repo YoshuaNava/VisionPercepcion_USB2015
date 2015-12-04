@@ -19,7 +19,7 @@
 #include <math.h>
 #include <vector>
 #include <float.h>
-#include "superpixel.h"
+#include <libsuperpixel/superpixel.h>
 using namespace std;
 
 /* 2d matrices are handled by 2d vectors. */

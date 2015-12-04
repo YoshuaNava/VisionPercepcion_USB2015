@@ -1,6 +1,6 @@
 
 #include "../include/global.h"
-//#include "slic_superpixels/slic.h"
+#include <libsuperpixel/superpixel.h>
 
 
 
@@ -29,7 +29,12 @@ static int min_size = 100;
 float floatsigma;
 const char * GBS 		= "seg"; //"Graph Based Segmentation";
 vector<vector<int>> clusters;
-
+int num_superpixels = -1;
+vector<int> superpixels_centers_count;
+vector<cv::Point> superpixels_centers;
+vector<Superpixel> superpixels_list;
+vector<vector<int>> superpixels_adjacency_matrix;
+vector<vector<int>> superpixels_Gsimilarity_matrix;
 
 void showImages()
 {
@@ -43,8 +48,130 @@ void showImages()
 	cv::resizeWindow("contours_image", proc_W, proc_H);
 }
 
+void displayCenterGrid(cv::Mat image, CvScalar colour) 
+{
+    for (int i=0; i<num_superpixels ;i++) 
+    {
+        cv::circle(image, cvPoint(superpixels_centers[i].x, superpixels_centers[i].y), 2, colour, 2);
+    }
+}
 
-void display_contours(CvScalar colour) {
+
+void storeSuperpixels()
+{
+    int i, x, y, k;
+    int index = 0;
+    cv::Point temp_point;
+    superpixels_adjacency_matrix.resize(num_superpixels);
+    const int dx[8] = {-1, -1, -1, 0, +1, +1, +1, 0};
+    const int dy[8] = {-1, 0, +1, +1, +1, 0, -1, -1};
+
+    for(i = 0 ; i < num_superpixels ;++i)
+    {
+        //Grow Columns by n
+        superpixels_adjacency_matrix[i].resize(num_superpixels);
+        std::fill(superpixels_adjacency_matrix[i].begin(), superpixels_adjacency_matrix[i].end(), 0);
+    }
+    for (i = 0; i < num_superpixels ;i++) 
+    {
+        temp_point = cvPoint(superpixels_centers[i].x, superpixels_centers[i].y);
+        Superpixel sp(i, temp_point);
+        superpixels_list.push_back(sp);
+    }
+
+    for (x = 0; x < frame.cols; x++)
+    {
+        for (y = 0; y < frame.rows; y++)
+        {
+    		// cout << "num SuperPixels  " << superpixels_list.size() << "\n";
+      //       cout << "hola " << clusters[x][y] << "\n";
+            if(clusters[x][y] != -1)
+            {
+                index = clusters[x][y];
+            }
+            //CvScalar colour = cvGet2D(image, y, x);
+            temp_point = cv::Point(x, y);
+
+            //cout << index << "\n";
+            superpixels_list[index].add_point(temp_point);
+            for(k=0; k<8 ;k++)
+            {
+                if(((x+dx[k]>=0) && (x+dx[k]<frame.cols)) && ((y+dy[k]>=0) && (y+dy[k]<frame.rows)))
+                {
+                    if(clusters[x+dx[k]][y+dy[k]] == index)
+                    {
+                         superpixels_adjacency_matrix[index][index] = -1;
+                    }
+                    else
+                    {
+                        //cout << "index = " << index << "    x+dx[k] = " << x+dx[k] << "     y+dy[k] = " << y+dy[k] << "\n";
+                        if(clusters[x+dx[k]][y+dy[k]] != -1)
+                        {
+                            superpixels_adjacency_matrix[index][clusters[x+dx[k]][y+dy[k]]] = 1;
+                            superpixels_adjacency_matrix[clusters[x+dx[k]][y+dy[k]]][index] = 1;
+                        }
+                    }
+                }
+            }
+        }
+    }
+    // cout << "bye\n";
+
+
+    // for(i=0; i<num_superpixels ;++i)
+    // {
+    //     for(k=0; k<num_superpixels ;k++)    //Grow Columns by n
+    //     {
+    //         cout << (int) superpixels_adjacency_matrix[i][k] << "   ";
+    //     }
+    //     cout << "\n";
+    // }
+    // cout << "**************************************************************************************\n";
+
+    for (i = 0; i < (int) superpixels_list.size(); i++) 
+    {
+  //   	vector<cv::Point> points = superpixels_list[i].get_points();
+		// cout << "superpixel  " << superpixels_list[i].get_id() << "	points count  " << points.size() << "\n";
+        //superpixels_list[i].calculate_bounding_rect();
+        superpixels_list[i].add_pixels_information(frame, clusters);
+        superpixels_list[i].calculate_histogram();
+    }
+    //superpixels_list[0].print_everything();
+}
+
+
+
+void calculateSuperpixelCenters()
+{
+	int j, k, c_id;
+    /* Compute the new cluster centers. */
+    for (j=0; j<frame.cols ;j++) 
+    {
+        for (k = 0; k<frame.rows ;k++) 
+        {
+            c_id = clusters[j][k];
+            
+            if (c_id != -1) 
+            {
+            	superpixels_centers[c_id].x += j;
+            	superpixels_centers[c_id].y += k;    
+                superpixels_centers_count[c_id] += 1;
+            }
+        }
+    }
+
+    /* Normalize the clusters. */
+    for (j=0; j<num_superpixels ;j++) {
+    	//cout << "superpixel  " << j << "	centers count  " << superpixels_centers_count[j] << "\n";
+        superpixels_centers[j].x /= superpixels_centers_count[j];
+        superpixels_centers[j].y /= superpixels_centers_count[j];
+    }
+
+}
+
+
+
+void outlineSuperpixelsContours(CvScalar colour) {
     const int dx8[8] = {-1, -1,  0,  1, 1, 1, 0, -1};
 	const int dy8[8] = { 0, -1, -1, -1, 0, 1, 1,  1};
 	
@@ -96,8 +223,11 @@ void display_contours(CvScalar colour) {
 
 void egbisSuperpixels()
 {
+	superpixels_centers_count.clear();
+	superpixels_centers.clear();
+	superpixels_list.clear();
 	clusters.clear();
-	namedWindow( "SuperPixels", 1 ); 
+
 	IplImage gray_temp = (IplImage)gray;
 	IplImage* ipl_gray = &gray_temp; // Reference on deallocating memory: http://stackoverflow.com/questions/12635978/memory-deallocation-of-iplimage-initialised-from-cvmat
 	IplImage* seg = cvCreateImage(cv::Size(proc_W, proc_H), 8, 1);;
@@ -111,23 +241,39 @@ void egbisSuperpixels()
     k = (float)int_k;
     SegmentImage(seg, ipl_gray, sigma, k, min_size, &num_ccs);
 
-
-
     seg_image = cv::cvarrToMat(seg, true, true, 0);
-
-//	cv::imshow("SuperPixels", seg_image);
-
-	for(int i=0; i<seg_image.cols ;i++)
+    cvReleaseImage(&seg);
+	num_superpixels = -1;
+	int i, j;
+	for(i=0; i<seg_image.cols ;i++)
 	{
 		vector<int> seg_row;
-		for(int j=0; j<seg_image.rows ;j++)
+		for(j=0; j<seg_image.rows ;j++)
 		{
 //			cout << "u = " << j << "  ;  v = " << i << "	;	Superpixel = " << seg_image.at<uchar>(i,j) << "\n";
 			seg_row.push_back((int)seg_image.at<uchar>(j,i));
+			if((int)seg_image.at<uchar>(j,i) > num_superpixels)
+			{
+				num_superpixels = seg_image.at<uchar>(j,i);
+			}
 		}
 		clusters.push_back(seg_row);
 	}
-	cvReleaseImage(&seg);
+	num_superpixels = num_superpixels + 1;
+
+	for(i=0; i<num_superpixels ;i++)
+	{
+		superpixels_centers.push_back(cv::Point(0.0, 0.0));
+		superpixels_centers_count.push_back(1);
+	}
+
+
+
+	contours_image = frame.clone();
+	outlineSuperpixelsContours(cv::Scalar(255,0,0));
+	calculateSuperpixelCenters();
+	storeSuperpixels();
+	displayCenterGrid(contours_image, cv::Scalar(0,255,0));
 }
 
 
@@ -184,7 +330,6 @@ int main( int argc, char** argv )
 			std::cout << "Unable to retrieve frame from video stream." << std::endl;
 			continue;
 		}
-
 		CV_TIMER_STOP(A, "Received image from camera")
 		cv:resize(frame, frame, Size(proc_W, proc_H), 0, 0, INTER_AREA);
 		cvtColor(frame, gray, CV_BGR2GRAY);
@@ -192,10 +337,6 @@ int main( int argc, char** argv )
 
 		egbisSuperpixels();
 		CV_TIMER_STOP(B, "Superpixels processed")
-
-		contours_image = frame.clone();
-		display_contours(cv::Scalar(255,0,0));
-		CV_TIMER_STOP(C, "Superpixels contours defined")		
 
 		showImages();
 

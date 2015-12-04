@@ -42,11 +42,14 @@ LIST(APPEND LINK_LIBS
 
 ##add_dependencies(Convert_Image ar_pose_generate_messages_cpp)
 
-ADD_LIBRARY(slic_superpixels SHARED
+ADD_LIBRARY(slic SHARED
 	include/slic_modified/slic.cpp
 	include/slic_modified/slic.h
-	include/slic_modified/superpixel.cpp
-	include/slic_modified/superpixel.h
+)
+
+ADD_LIBRARY(libsuperpixel SHARED
+	include/libsuperpixel/superpixel.cpp
+	include/libsuperpixel/superpixel.h
 )
 
 ADD_LIBRARY(fh_egbis SHARED 
@@ -65,26 +68,31 @@ ADD_LIBRARY(fh_egbis SHARED
 
 ADD_EXECUTABLE(pfs src/plane_segmentation_alpha.cpp)
 TARGET_LINK_LIBRARIES(pfs ${LINK_LIBS})
-TARGET_LINK_LIBRARIES(pfs slic_superpixels)
+TARGET_LINK_LIBRARIES(pfs slic)
+TARGET_LINK_LIBRARIES(pfs libsuperpixel)
 
 
 ADD_EXECUTABLE(test_prob_floor_prior test/test_prob_floor_prior.cpp)
 TARGET_LINK_LIBRARIES(test_prob_floor_prior ${LINK_LIBS})
-TARGET_LINK_LIBRARIES(test_prob_floor_prior slic_superpixels)
+TARGET_LINK_LIBRARIES(test_prob_floor_prior slic)
+TARGET_LINK_LIBRARIES(test_prob_floor_prior libsuperpixel)
 
 
 ADD_EXECUTABLE(test_horizon_search test/test_horizon_search.cpp)
 TARGET_LINK_LIBRARIES(test_horizon_search ${LINK_LIBS})
-TARGET_LINK_LIBRARIES(test_horizon_search slic_superpixels)
+TARGET_LINK_LIBRARIES(test_horizon_search slic)
+TARGET_LINK_LIBRARIES(test_horizon_search libsuperpixel)
 
 
 ADD_EXECUTABLE(test_egbis_superpixel_segmentation test/test_egbis_superpixel_segmentation.cpp)
 TARGET_LINK_LIBRARIES(test_egbis_superpixel_segmentation ${LINK_LIBS})
 TARGET_LINK_LIBRARIES(test_egbis_superpixel_segmentation fh_egbis)
+TARGET_LINK_LIBRARIES(test_egbis_superpixel_segmentation libsuperpixel)
 
 ADD_EXECUTABLE(test_slic_superpixel_segmentation test/test_slic_superpixel_segmentation.cpp)
 TARGET_LINK_LIBRARIES(test_slic_superpixel_segmentation ${LINK_LIBS})
-TARGET_LINK_LIBRARIES(test_slic_superpixel_segmentation slic_superpixels)
+TARGET_LINK_LIBRARIES(test_slic_superpixel_segmentation slic)
+TARGET_LINK_LIBRARIES(test_slic_superpixel_segmentation libsuperpixel)
 
 ADD_EXECUTABLE(test_svo_depth_filter test/test_svo_depth_filter.cpp)
 TARGET_LINK_LIBRARIES(test_svo_depth_filter ${LINK_LIBS})

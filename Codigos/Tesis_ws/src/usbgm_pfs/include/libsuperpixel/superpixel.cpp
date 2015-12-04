@@ -34,6 +34,12 @@ Superpixel::Superpixel(int id, cv::Point center)
 	this->center = center;
 }
 
+
+int Superpixel::get_id()
+{
+	return this->id;
+}
+
 cv::Point Superpixel::get_center()
 {
 	return this->center;
@@ -59,12 +65,18 @@ void Superpixel::add_point(cv::Point point)
 
 void Superpixel::calculate_histogram()
 {
+
 	/// Separate the image in 3 places ( B, G and R )
 	vector<cv::Mat> bgr_planes;
 	split(this->pixels, bgr_planes);
 
 	/// Establish the number of bins
 	int histSize = 256;
+	int hist_w = this->pixels.cols;
+	int hist_h = this->pixels.rows;
+	int bin_w = cvRound( (double) hist_w/histSize );
+
+	this->histogram = cv::Mat(hist_h, hist_w, CV_8UC3, cvScalar(0,0,0));
 
 	/// Set the ranges ( for B,G,R) )
 	float range[] = { 0, 256 } ;
@@ -75,22 +87,18 @@ void Superpixel::calculate_histogram()
 
 	cv::Mat b_hist, g_hist, r_hist;
 
-	/// Compute the histograms:
-	calcHist( &bgr_planes[0], 1, 0, this->pixels_mask, b_hist, 1, &histSize, &histRange, uniform, accumulate );
-	calcHist( &bgr_planes[1], 1, 0, this->pixels_mask, g_hist, 1, &histSize, &histRange, uniform, accumulate );
-	calcHist( &bgr_planes[2], 1, 0, this->pixels_mask, r_hist, 1, &histSize, &histRange, uniform, accumulate );
+	if(this->pixels.rows>0 && this->pixels.cols>0)
+	{
+		/// Compute the histograms:
+		calcHist( &bgr_planes[0], 1, 0, this->pixels_mask, b_hist, 1, &histSize, &histRange, uniform, accumulate );
+		calcHist( &bgr_planes[1], 1, 0, this->pixels_mask, g_hist, 1, &histSize, &histRange, uniform, accumulate );
+		calcHist( &bgr_planes[2], 1, 0, this->pixels_mask, r_hist, 1, &histSize, &histRange, uniform, accumulate );
 
-	// Draw the histograms for B, G and R
-	int hist_w = this->pixels.cols;
-	int hist_h = this->pixels.rows;
-	int bin_w = cvRound( (double) hist_w/histSize );
-
-	this->histogram = cv::Mat(hist_h, hist_w, CV_8UC3, cvScalar( 0,0,0));
-
-	/// Normalize the result to [ 0, histImage.rows ]
-	normalize(b_hist, b_hist, 0, this->histogram.rows, cv::NORM_MINMAX, -1, cv::Mat() );
-	normalize(g_hist, g_hist, 0, this->histogram.rows, cv::NORM_MINMAX, -1, cv::Mat() );
-	normalize(r_hist, r_hist, 0, this->histogram.rows, cv::NORM_MINMAX, -1, cv::Mat() );
+		/// Normalize the result to [ 0, histImage.rows ]
+		normalize(b_hist, b_hist, 0, this->histogram.rows, cv::NORM_MINMAX, -1, cv::Mat() );
+		normalize(g_hist, g_hist, 0, this->histogram.rows, cv::NORM_MINMAX, -1, cv::Mat() );
+		normalize(r_hist, r_hist, 0, this->histogram.rows, cv::NORM_MINMAX, -1, cv::Mat() );
+	}
 }
 
 
@@ -124,6 +132,59 @@ void Superpixel::add_pixels_information(IplImage *img, vector<vector<int>> clust
 	}
 }
 
+
+void Superpixel::add_pixels_information(cv::Mat img, vector<vector<int>> clusters)
+{
+	int i, j;
+	int min_x, max_x, min_y, max_y, sp_height, sp_width;
+	min_x = img.cols;
+	min_y = img.rows;
+	max_x = 0;
+	max_y = 0;
+	for(i=0; i<points.size() ;i++)
+	{
+		if(points[i].x < min_x)
+		{
+			min_x = points[i].x;
+		}
+		if(points[i].y < min_y)
+		{
+			min_y = points[i].y;
+		}
+		if(points[i].x > max_x)
+		{
+			max_x = points[i].x;
+		}
+		if(points[i].y > max_y)
+		{
+			max_y = points[i].y;
+		}
+	}
+//	cout << "min_x " << min_x << "  max_x " << max_x << "   min_y " << min_y << "  max_y " << max_y << "\n";
+	sp_height = max_y - min_y;
+	sp_width = max_x - min_x;
+	CvScalar colour;
+	this->pixels = cv::Mat::zeros(sp_height, sp_width, CV_8UC3);
+	this->pixels_mask = cv::Mat::zeros(sp_height, sp_width, CV_8UC1);
+
+	int x_coord, y_coord;
+	for (int j = min_y; j < max_y ;j++)
+	{
+		y_coord = j - min_y;
+		for (int i = min_x; i < max_x ;i++)	
+		{
+			if(this->id == clusters[i][j])
+			{
+				x_coord = i - min_x;
+
+				(this->pixels.at<cv::Vec3b>(y_coord, x_coord)).val[0] = img.at<cv::Vec3b>(j,i).val[0];
+				(this->pixels.at<cv::Vec3b>(y_coord, x_coord)).val[1] = img.at<cv::Vec3b>(j,i).val[1];
+				(this->pixels.at<cv::Vec3b>(y_coord, x_coord)).val[2] = img.at<cv::Vec3b>(j,i).val[2];
+				this->pixels_mask.at<uchar>(y_coord, x_coord) = 255;
+			}
+		}
+	}
+}
 
 void Superpixel::init_structures(int num_points)
 {
