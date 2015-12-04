@@ -34,8 +34,10 @@ vector<int> superpixel_is_floor;
 
 double proc_W, proc_H;
 VideoCapture cap;
+vector<Superpixel> superpixels_list;
 
 Slic slic;
+Egbis egbis;
 int poly_degree = 3;
 Eigen::VectorXd poly_coeff;
 
@@ -236,14 +238,13 @@ void findSuperpixelsBelowBoundary()
 	superpixel_is_floor.clear();
 	if(acc_lines_points[lines_history-1].size() > 0)
 	{
-		vector<Superpixel> superpixel_list = slic.get_superpixels();
 		int i, j;
 		point2Dvec points;
 		float poly_value;
 		int x_coord, y_coord;
-		for(i=0; i<superpixel_list.size() ;i++)
+		for(i=0; i<superpixels_list.size() ;i++)
 		{
-			cv::Point center = superpixel_list[i].get_center();
+			cv::Point center = superpixels_list[i].get_center();
 			poly_value = 0;
 			for(j=0; j<poly_coeff.size() ;j++)
 			{
@@ -253,7 +254,7 @@ void findSuperpixelsBelowBoundary()
 			if(poly_value < center.y)
 			{
 				superpixel_is_floor.push_back(1);
-				points = superpixel_list[i].get_points();
+				points = superpixels_list[i].get_points();
 				for(j=0; j < points.size() ;j++)
 				{
 					x_coord = points[j].x;
@@ -271,10 +272,10 @@ void findSuperpixelsBelowBoundary()
 	}
 }
 
-void slicSuperpixels(cv::Mat src)
+void slicSuperpixels()
 {
 	namedWindow( "SuperPixels", 1 ); 
-	IplImage frame2 = (IplImage)src; // Reference on deallocating memory: http://stackoverflow.com/questions/12635978/memory-deallocation-of-iplimage-initialised-from-cvmat
+	IplImage frame2 = (IplImage)seg_image; // Reference on deallocating memory: http://stackoverflow.com/questions/12635978/memory-deallocation-of-iplimage-initialised-from-cvmat
 
 	  /* Yield the number of superpixels and weight-factors from the user. */
 	IplImage *lab_image = cvCloneImage(&frame2);
@@ -292,6 +293,7 @@ void slicSuperpixels(cv::Mat src)
 	slic.create_connectivity(lab_image);
 		//slic.colour_with_cluster_means(&frame2);
 	slic.store_superpixels(&frame2);
+	superpixels_list = slic.get_superpixels();
 
 	//slic.export_superpixels_to_files(&frame2);
 	slic.display_contours(&frame2, CV_RGB(255,0,0));
@@ -307,6 +309,15 @@ void slicSuperpixels(cv::Mat src)
 //	cvWaitKey(10);
 }
 
+
+void egbisSuperpixels()
+{
+	seg_image = egbis.generateSuperpixels(frame, gray);
+    //egbis.outlineSuperpixelsContours(cv::Scalar(255,0,0));
+    egbis.calculateSuperpixelCenters();
+    superpixels_list = egbis.storeSuperpixelsMemory();
+    //egbis.displayCenterGrid(contours_image, cv::Scalar(0,255,0));
+}
 
 void cameraSetup()
 {
@@ -370,7 +381,8 @@ int main( int argc, char** argv )
 
 		
 		seg_image = frame.clone();
-		slicSuperpixels(seg_image);
+		//slicSuperpixels();
+		egbisSuperpixels();
 		CV_TIMER_STOP(B, "Superpixels processed")
 		floor_prior = ProbFns::getFloorPrior(frame, slic.get_superpixels());
 		CV_TIMER_STOP(C, "Prior probability calculated")

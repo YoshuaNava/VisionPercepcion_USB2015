@@ -62,6 +62,7 @@ ADD_LIBRARY(fh_egbis SHARED
 	include/egbis/misc.h
 	include/egbis/segment-graph.h
 	include/egbis/segment-image.h
+	include/egbis/egbis.h
 	include/egbis/egbis.cpp
 )
 
@@ -75,12 +76,14 @@ TARGET_LINK_LIBRARIES(pfs libsuperpixel)
 ADD_EXECUTABLE(test_prob_floor_prior test/test_prob_floor_prior.cpp)
 TARGET_LINK_LIBRARIES(test_prob_floor_prior ${LINK_LIBS})
 TARGET_LINK_LIBRARIES(test_prob_floor_prior slic)
+TARGET_LINK_LIBRARIES(test_prob_floor_prior fh_egbis)
 TARGET_LINK_LIBRARIES(test_prob_floor_prior libsuperpixel)
 
 
 ADD_EXECUTABLE(test_horizon_search test/test_horizon_search.cpp)
 TARGET_LINK_LIBRARIES(test_horizon_search ${LINK_LIBS})
 TARGET_LINK_LIBRARIES(test_horizon_search slic)
+TARGET_LINK_LIBRARIES(test_horizon_search fh_egbis)
 TARGET_LINK_LIBRARIES(test_horizon_search libsuperpixel)
 
 

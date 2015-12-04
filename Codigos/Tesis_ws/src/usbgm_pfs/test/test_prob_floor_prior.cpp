@@ -25,7 +25,8 @@ double proc_W, proc_H;
 VideoCapture cap;
 
 Slic slic;
-vector<Superpixel> superpixel_list;
+Egbis egbis;
+vector<Superpixel> superpixels_list;
 
 
 void showImages()
@@ -38,10 +39,10 @@ void showImages()
 
 
 
-void superpixels(cv::Mat src)
+void slicSuperpixels()
 {
 	namedWindow( "SuperPixels", 1 ); 
-	IplImage frame2 = (IplImage)src; // Reference on deallocating memory: http://stackoverflow.com/questions/12635978/memory-deallocation-of-iplimage-initialised-from-cvmat
+	IplImage frame2 = (IplImage)seg_image; // Reference on deallocating memory: http://stackoverflow.com/questions/12635978/memory-deallocation-of-iplimage-initialised-from-cvmat
 
 	  /* Yield the number of superpixels and weight-factors from the user. */
 	IplImage *lab_image = cvCloneImage(&frame2);
@@ -59,6 +60,7 @@ void superpixels(cv::Mat src)
 	slic.create_connectivity(lab_image);
 		//slic.colour_with_cluster_means(&frame2);
 	slic.store_superpixels(&frame2);
+	superpixels_list = slic.get_superpixels();
 
 	//slic.export_superpixels_to_files(&frame2);
 	slic.display_contours(&frame2, CV_RGB(255,0,0));
@@ -72,6 +74,16 @@ void superpixels(cv::Mat src)
 	cvShowImage("SuperPixels", &frame2);
 	cvReleaseImage(&lab_image);
 //	cvWaitKey(10);
+}
+
+
+void egbisSuperpixels()
+{
+	seg_image = egbis.generateSuperpixels(frame, gray);
+    //egbis.outlineSuperpixelsContours(cv::Scalar(255,0,0));
+    egbis.calculateSuperpixelCenters();
+    superpixels_list = egbis.storeSuperpixelsMemory();
+    //egbis.displayCenterGrid(contours_image, cv::Scalar(0,255,0));
 }
 
 
@@ -130,15 +142,17 @@ int main( int argc, char** argv )
 		CV_TIMER_STOP(A, "Received image from camera")
 
 		cv:resize(frame, frame, Size(proc_W, proc_H), 0, 0, INTER_AREA);
+		cvtColor(frame, gray, CV_BGR2GRAY);
 		waitKey(1); // Wait Time
 
 		
 		waitKey(1);
 		seg_image = frame.clone();
-		superpixels(seg_image);
+		//slicSuperpixels();
+		egbisSuperpixels();
 		CV_TIMER_STOP(B, "Superpixels processed")
 
-		floor_prior = ProbFns::getFloorPrior(frame, slic.get_superpixels());
+		floor_prior = ProbFns::getFloorPrior(frame, superpixels_list);
 		CV_TIMER_STOP(C, "Prior probability calculated")
 		showImages();
 

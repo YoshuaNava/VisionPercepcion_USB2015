@@ -47,9 +47,7 @@
 #include <egbis/pnmfile.h>
 #include <egbis/segment-graph.h>
 #include <egbis/segment-image.h>
-
-
-
+#include <egbis/egbis.h>
 
 //#include "gps_sapienza_ros/disjoint-set.h"
 
