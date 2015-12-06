@@ -119,7 +119,7 @@ void findLinesHough()
 	vector<cv::Point> lines_points;
 	img_lines = frame.clone();
 	
-	HoughLinesP(borders_combined, lines, 1, CV_PI/180, 130, 20, 5);
+	HoughLinesP(borders_combined, lines, 1, CV_PI/180, 70, 20, 5);
 	// Threshold for Sapienza dataset = 70
 	// Threshold for ps3eye camera = 120
 	for( size_t i = 0; i < lines.size(); i++ )
@@ -222,9 +222,10 @@ void drawPolynomialFloorBoundary()
 
 			if((poly_value >= 0) && (poly_value < proc_H))
 			{
-				floor_boundary_img.at<cv::Vec3b>(poly_value, i)[0] = 255;
-				floor_boundary_img.at<cv::Vec3b>(poly_value, i)[1] = 0;
-				floor_boundary_img.at<cv::Vec3b>(poly_value, i)[2] = 0;
+				// floor_boundary_img.at<cv::Vec3b>(poly_value, i)[0] = 255;
+				// floor_boundary_img.at<cv::Vec3b>(poly_value, i)[1] = 0;
+				// floor_boundary_img.at<cv::Vec3b>(poly_value, i)[2] = 0;
+				cv::circle(floor_boundary_img, cv::Point(i, poly_value), 1, CV_RGB(0,0,255), 3);
 			}
 			//cout << "x = " << i << "  ;  y = " << poly_value << "\n";
 		}
@@ -232,9 +233,10 @@ void drawPolynomialFloorBoundary()
 		{
 			cv::Point aux_point;
 			aux_point = lines_dataset[i];
-			floor_boundary_img.at<cv::Vec3b>(aux_point.y, aux_point.x)[0] = 0;
-			floor_boundary_img.at<cv::Vec3b>(aux_point.y, aux_point.x)[1] = 255;
-			floor_boundary_img.at<cv::Vec3b>(aux_point.y, aux_point.x)[2] = 0;
+			// floor_boundary_img.at<cv::Vec3b>(aux_point.y, aux_point.x)[0] = 0;
+			// floor_boundary_img.at<cv::Vec3b>(aux_point.y, aux_point.x)[1] = 255;
+			// floor_boundary_img.at<cv::Vec3b>(aux_point.y, aux_point.x)[2] = 0;
+			cv::circle(floor_boundary_img, cv::Point(aux_point.x, aux_point.y), 1, CV_RGB(0,255,0), 3);
 		}
 	}
 	lines_dataset.clear();
@@ -370,7 +372,6 @@ void drawProbabilisticFloor()
 
 void slicSuperpixels()
 {
-	namedWindow( "SuperPixels", 1 ); 
 	IplImage frame2 = (IplImage)seg_image; // Reference on deallocating memory: http://stackoverflow.com/questions/12635978/memory-deallocation-of-iplimage-initialised-from-cvmat
 
 	  /* Yield the number of superpixels and weight-factors from the user. */
@@ -424,10 +425,10 @@ void cameraSetup()
   
 
   //cap = VideoCapture(0);
-	//cap = VideoCapture("eng_stat_obst.avi");
+	cap = VideoCapture("eng_stat_obst.avi");
 	//cap = VideoCapture("Laboratorio.avi");
 	//cap = VideoCapture("LaboratorioMaleta.avi");
-	cap = VideoCapture("PasilloLabA.avi");
+	//cap = VideoCapture("PasilloLabA.avi");
 	//cap = VideoCapture("PasilloLabB.avi");
  // cap = VideoCapture("Laboratorio4.avi");
 //  cap = VideoCapture("Calle1.avi");
@@ -487,8 +488,8 @@ int main( int argc, char** argv )
 
 		
 		seg_image = frame.clone();
-		//slicSuperpixels();
-		egbisSuperpixels();
+		slicSuperpixels();
+		//egbisSuperpixels();
 		CV_TIMER_STOP(B, "Superpixels processed")
 		floor_prior = ProbFns::getFloorPrior(frame, slic.get_superpixels());
 		CV_TIMER_STOP(C, "Prior probability calculated")
