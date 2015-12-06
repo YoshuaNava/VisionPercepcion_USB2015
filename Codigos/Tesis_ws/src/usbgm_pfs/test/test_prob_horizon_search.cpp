@@ -41,6 +41,10 @@ Egbis egbis;
 int poly_degree = 3;
 Eigen::VectorXd poly_coeff;
 
+int superpixels_history = 10;
+deque<vector<int>> superpixels_isfloor_samples;
+vector<double> superpixels_floor_prob;
+
 
 //REFERENCE: http://stackoverflow.com/questions/16796732/how-to-sort-vector-of-points-based-on-a-y-axis
 struct cvPointComparator {
@@ -115,7 +119,9 @@ void findLinesHough()
 	vector<cv::Point> lines_points;
 	img_lines = frame.clone();
 	
-	HoughLinesP(borders_combined, lines, 1, CV_PI/180, 70, 20, 5);
+	HoughLinesP(borders_combined, lines, 1, CV_PI/180, 130, 20, 5);
+	// Threshold for Sapienza dataset = 70
+	// Threshold for ps3eye camera = 120
 	for( size_t i = 0; i < lines.size(); i++ )
 	{
 		l = lines[i];
@@ -156,6 +162,7 @@ void findLinesHough()
 		acc_lines_points.push_back(lines_points);
 	}
 }
+
 
 
 void fitPolynomialFloorContour()
@@ -236,14 +243,11 @@ void drawPolynomialFloorBoundary()
 
 void findSuperpixelsBelowBoundary()
 {
-	superpixels_below_boundary = floor_boundary_img.clone();
 	superpixel_is_floor.clear();
 	if(acc_lines_points[lines_history-1].size() > 0)
 	{
 		int i, j;
-		point2Dvec points;
 		float poly_value;
-		int x_coord, y_coord;
 		for(i=0; i<superpixels_list.size() ;i++)
 		{
 			cv::Point center = superpixels_list[i].get_center();
@@ -256,22 +260,112 @@ void findSuperpixelsBelowBoundary()
 			if(poly_value < center.y)
 			{
 				superpixel_is_floor.push_back(1);
-				points = superpixels_list[i].get_points();
-				for(j=0; j < points.size() ;j++)
-				{
-					x_coord = points[j].x;
-					y_coord = points[j].y;
-					superpixels_below_boundary.at<cv::Vec3b>(y_coord, x_coord)[2] = 255;
-				}
 			}
 			else
 			{
 				superpixel_is_floor.push_back(0);
 			}
 		}
-		cvtColor(gray, gray, CV_GRAY2RGB);
-		addWeighted(superpixels_below_boundary, 0.5, gray, 0.5, 0.0, superpixels_below_boundary);
+
+
+		if(superpixels_isfloor_samples.size() < lines_history)
+		{
+			superpixels_isfloor_samples.push_back(superpixel_is_floor);
+		}
+		else
+		{
+			superpixels_isfloor_samples.pop_front();
+			superpixels_isfloor_samples.push_back(superpixel_is_floor);
+		}
+//		cvtColor(gray, gray, CV_GRAY2RGB);
+//		addWeighted(superpixels_below_boundary, 0.5, gray, 0.5, 0.0, superpixels_below_boundary);
 	}
+}
+
+
+void calculateFloorProbability()
+{
+	int i, j;
+	superpixels_floor_prob.clear();
+	vector<int> samples_count;
+	for(i=0; i<superpixels_isfloor_samples.size() ;i++)
+	{
+		//cout << "hola  " << i <<"\n";
+		//cout << "epale  " << superpixels_isfloor_samples[i].size() <<"\n";
+		for(j=0; j<superpixels_isfloor_samples[i].size() ;j++)
+		{
+		// 	cout << "epale   " << j <<"\n";
+			if(superpixels_isfloor_samples[i][j] == 1)
+			{
+				if (superpixels_floor_prob.size() < j+1)
+				{
+					superpixels_floor_prob.push_back(1);	
+				}
+				else
+				{
+					superpixels_floor_prob[j]++;
+				}
+			}
+			else
+			{
+				if (superpixels_floor_prob.size() < j+1)
+				{
+					superpixels_floor_prob.push_back(0);
+				}
+		 	}
+
+			if(samples_count.size() < j+1)
+			{
+				samples_count.push_back(1);
+			}
+			else
+			{
+				samples_count[j]++;
+			}
+		}
+	}
+
+	for(i=0; i<samples_count.size() ;i++)
+	{
+		//cout << "Superpixel " << i << "  positive samples  " << superpixels_floor_prob[i] << "   number of samples  " << samples_count[i] << "\n";
+		superpixels_floor_prob[i] = superpixels_floor_prob[i]/samples_count[i];
+		//cout << "   probability of being floor  " << superpixels_floor_prob[i] << "\n";
+	}
+}
+
+
+void drawProbabilisticFloor()
+{
+	superpixels_below_boundary = floor_boundary_img.clone();
+	int i, j;
+	point2Dvec points;
+	float poly_value;
+	int x_coord, y_coord;
+	uchar blue_tonality, red_tonality;
+	for(i=0; i<superpixels_list.size() ;i++)
+	{
+		if(superpixels_floor_prob[i] > 0)
+		{
+			blue_tonality = superpixels_floor_prob[i]*255;
+			red_tonality = 255-superpixels_floor_prob[i]*255;
+		}
+		else
+		{
+			blue_tonality = 0;
+			red_tonality = 0;
+		}
+		points = superpixels_list[i].get_points();
+		for(j=0; j < points.size() ;j++)
+		{
+			x_coord = points[j].x;
+			y_coord = points[j].y;
+			superpixels_below_boundary.at<cv::Vec3b>(y_coord, x_coord)[0] = blue_tonality;
+			superpixels_below_boundary.at<cv::Vec3b>(y_coord, x_coord)[2] = red_tonality;
+		}
+	}
+
+	cvtColor(gray, gray, CV_GRAY2RGB);
+	addWeighted(superpixels_below_boundary, 0.7, gray, 0.3, 0.0, superpixels_below_boundary);
 }
 
 void slicSuperpixels()
@@ -299,6 +393,7 @@ void slicSuperpixels()
 
 	//slic.export_superpixels_to_files(&frame2);
 	slic.display_contours(&frame2, CV_RGB(255,0,0));
+	superpixels_contours_img = cv::cvarrToMat(&frame2, true, true, 0);
 
 	slic.display_number_grid(&frame2, CV_RGB(0,255,0));
 
@@ -306,7 +401,7 @@ void slicSuperpixels()
 
 	//slic.display_center_grid(frame2, CV_RGB(0,255,0));
 
-	cvShowImage("SuperPixels", &frame2);
+//	cvShowImage("SuperPixels", &frame2);
 	cvReleaseImage(&lab_image);
 //	cvWaitKey(10);
 }
@@ -329,10 +424,10 @@ void cameraSetup()
   
 
   //cap = VideoCapture(0);
-	cap = VideoCapture("eng_stat_obst.avi");
+	//cap = VideoCapture("eng_stat_obst.avi");
 	//cap = VideoCapture("Laboratorio.avi");
 	//cap = VideoCapture("LaboratorioMaleta.avi");
-	//cap = VideoCapture("PasilloLabA.avi");
+	cap = VideoCapture("PasilloLabA.avi");
 	//cap = VideoCapture("PasilloLabB.avi");
  // cap = VideoCapture("Laboratorio4.avi");
 //  cap = VideoCapture("Calle1.avi");
@@ -408,7 +503,11 @@ int main( int argc, char** argv )
 		drawPolynomialFloorBoundary();
 		CV_TIMER_STOP(G, "Drawn polynomial floor boundary")
 		findSuperpixelsBelowBoundary();
-		CV_TIMER_STOP(H, "Tagged superpixels below boundary")
+		CV_TIMER_STOP(H, "Found superpixels below boundary for present iteration")
+		calculateFloorProbability();
+		CV_TIMER_STOP(I, "Calculated probability of a superpixel being floor")
+		drawProbabilisticFloor();
+		CV_TIMER_STOP(J, "Tagged superpixels below boundary")
 		showImages();
 
 

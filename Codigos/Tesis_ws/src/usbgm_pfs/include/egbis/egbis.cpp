@@ -47,6 +47,21 @@ cv::Mat Egbis::displayCenterGrid(cv::Mat image, CvScalar colour)
     return image;
 }
 
+cv::Mat Egbis::displayNumberGrid(cv::Mat image, CvScalar colour)
+{
+    for (int i = 0; i < (int) superpixels_list.size(); i++) {
+        //cvCircle(image, cvPoint(superpixels[i][0], superpixels[i][0]), 2, colour, 2);
+        char buffer[25];
+        sprintf(buffer, "%i", i);
+        //CvFont font;
+        //cvInitFont(&font, CV_FONT_HERSHEY_SIMPLEX, 0.3, 0.3);
+        cv::putText(image, buffer, cvPoint(superpixels_centers[i].x, superpixels_centers[i].y), CV_FONT_HERSHEY_SIMPLEX, 0.3, colour, 1, CV_AA);
+        //cout << "Superpixel # " << i << ".  Number of points = " << superpixels[i].get_points().size() << ".    Histogram length = " << superpixels[i].get_histogram().size() << "\n";
+    }
+
+    return image;
+}
+
 
 
 vector<Superpixel> Egbis::storeSuperpixelsMemory()
