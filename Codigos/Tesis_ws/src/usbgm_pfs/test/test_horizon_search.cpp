@@ -299,6 +299,7 @@ void slicSuperpixels()
 
 	//slic.export_superpixels_to_files(&frame2);
 	slic.display_contours(&frame2, CV_RGB(255,0,0));
+	superpixels_contours_img = cv::cvarrToMat(&frame2, true, true, 0);
 
 	slic.display_number_grid(&frame2, CV_RGB(0,255,0));
 
@@ -392,8 +393,8 @@ int main( int argc, char** argv )
 
 		
 		seg_image = frame.clone();
-		//slicSuperpixels();
-		egbisSuperpixels();
+		slicSuperpixels();
+		//egbisSuperpixels();
 		CV_TIMER_STOP(B, "Superpixels processed")
 		floor_prior = ProbFns::getFloorPrior(frame, slic.get_superpixels());
 		CV_TIMER_STOP(C, "Prior probability calculated")

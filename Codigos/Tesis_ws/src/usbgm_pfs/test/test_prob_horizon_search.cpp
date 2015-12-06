@@ -23,7 +23,7 @@ using namespace cv;
 cv::Mat frame, seg_image, gray, prevgray, floor_prior; // Mat Declarations
 
 cv::Mat temp_grad[3], sobel[3], borders_sobel, borders_canny, borders_combined;
-cv::Mat img_lines, floor_boundary_img, superpixels_contours_img, superpixels_below_boundary;
+cv::Mat img_lines, floor_boundary_img, superpixels_contours_img, superpixels_below_boundary, floor_prob_map;
 vector<Vec4i> lines;
 vector<cv::Point> lines_dataset;
 int lines_history = 5;
@@ -67,7 +67,9 @@ void showImages()
 	cv::resizeWindow("floor_boundary_img", proc_W, proc_H);
 	DISPLAY_IMAGE_XY(true, superpixels_contours_img, 0, 1);
 	cv::resizeWindow("superpixels_contours_img", proc_W, proc_H);
-	DISPLAY_IMAGE_XY(true, superpixels_below_boundary, 1, 1);
+	DISPLAY_IMAGE_XY(true, floor_prob_map, 1, 1);
+	cv::resizeWindow("floor_prob_map", proc_W, proc_H);
+	DISPLAY_IMAGE_XY(true, superpixels_below_boundary, 2, 1);
 	cv::resizeWindow("superpixels_below_boundary", proc_W, proc_H);
 
 }
@@ -339,6 +341,7 @@ void calculateFloorProbability()
 void drawProbabilisticFloor()
 {
 	superpixels_below_boundary = floor_boundary_img.clone();
+	floor_prob_map = cv::Mat::zeros(proc_H, proc_W, CV_32FC1);
 	int i, j;
 	point2Dvec points;
 	float poly_value;
@@ -363,6 +366,7 @@ void drawProbabilisticFloor()
 			y_coord = points[j].y;
 			superpixels_below_boundary.at<cv::Vec3b>(y_coord, x_coord)[0] = blue_tonality;
 			superpixels_below_boundary.at<cv::Vec3b>(y_coord, x_coord)[2] = red_tonality;
+			floor_prob_map.at<float>(y_coord, x_coord) = superpixels_floor_prob[i];
 		}
 	}
 
