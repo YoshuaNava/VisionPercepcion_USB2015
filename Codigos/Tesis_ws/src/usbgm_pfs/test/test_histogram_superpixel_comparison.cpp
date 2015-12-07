@@ -29,6 +29,20 @@ VideoCapture cap;
 Slic slic;
 
 
+void compareHistograms(int base_sp_id, int test1_sp_id, int test2_sp_id)
+{
+	for( int i = 0; i < 4; i++ )
+    {
+	    int compare_method = i;
+		vector<Superpixel> superpixels_list = slic.get_superpixels();
+		double base_base = compareHist( superpixels_list[base_sp_id].get_histogram(), superpixels_list[base_sp_id].get_histogram(), compare_method );
+	    double base_test1 = compareHist( superpixels_list[base_sp_id].get_histogram(), superpixels_list[test1_sp_id].get_histogram(), compare_method );
+	    double base_test2 = compareHist( superpixels_list[base_sp_id].get_histogram(), superpixels_list[test2_sp_id].get_histogram(), compare_method );
+	    printf( " Method [%d]: Superpixel %i against itself, Superpixels %i and %i, Superpixels %i and %i : %f,   %f,   %f \n", i, base_sp_id, base_sp_id, test1_sp_id, base_sp_id, test2_sp_id, base_base, base_test1, base_test2 );
+	}
+
+}
+
 
 void showImages()
 {
@@ -115,7 +129,12 @@ int main( int argc, char** argv )
 
 	cameraSetup();
 	cap.read(frame);
-	waitKey(10);
+	printf("******************************************\n");
+	printf("Probabilistic Ground Plane Segmentation\n");
+	printf("Authors: Rafael Colmenares and Yoshua Nava\n");
+	printf("******************************************\n");
+
+	waitKey(0);
     
 	while (nh.ok()) 
 	{
@@ -127,6 +146,7 @@ int main( int argc, char** argv )
 			continue;
 		}
 
+		printf("#######################################\n");
 		CV_TIMER_STOP(A, "Received image from camera")
 		cv:resize(frame, frame, Size(proc_W, proc_H), 0, 0, INTER_AREA);
 		cvtColor(frame, gray, CV_BGR2GRAY);
@@ -135,9 +155,14 @@ int main( int argc, char** argv )
 		slicSuperpixels(seg_image);
 		CV_TIMER_STOP(B, "Superpixels processed")
 
+
+		compareHistograms(11, 23, 104);
+		CV_TIMER_STOP(C, "Three superpixel histograms compared")
 		showImages();
 
+
 		CV_TIMER_STOP(Z, "Loop finished")
+		printf("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n");
 	 	ros::spinOnce();
 	}
 

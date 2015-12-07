@@ -61,7 +61,6 @@ class Superpixel
 		void add_pixels_information(IplImage *img, vector<vector<int>> clusters);
 		void add_pixels_information(cv::Mat img, vector<vector<int>> clusters);
 		void calculate_histogram();
-		void calculate_bounding_rect();
 		void export_to_jpeg(IplImage *img);
 };
 

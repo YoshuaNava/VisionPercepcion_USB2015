@@ -449,13 +449,11 @@ void Slic::store_superpixels(IplImage *image)
     }
     cout << "**************************************************************************************\n";
 */
-    // for (i = 0; i < (int) superpixels.size(); i++) 
-    // {
-    //     superpixels[i].calculate_bounding_rect();
-    //     superpixels[i].add_pixels_information(image, clusters);
-    //     superpixels[i].calculate_histogram();
-    // }
-    //superpixels[0].print_everything();
+    for (i = 0; i < (int) superpixels.size(); i++) 
+    {
+        superpixels[i].add_pixels_information(image, clusters);
+        superpixels[i].calculate_histogram();
+    }
 }
 
 

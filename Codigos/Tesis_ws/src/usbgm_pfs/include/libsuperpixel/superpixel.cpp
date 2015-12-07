@@ -66,9 +66,9 @@ void Superpixel::add_point(cv::Point point)
 void Superpixel::calculate_histogram()
 {
 
-	/// Separate the image in 3 places ( B, G and R )
-	vector<cv::Mat> bgr_planes;
-	split(this->pixels, bgr_planes);
+	// /// Separate the image in 3 places ( B, G and R )
+	// vector<cv::Mat> bgr_planes;
+	// split(this->pixels, bgr_planes);
 
 	/// Establish the number of bins
 	int histSize = 256;
@@ -76,28 +76,24 @@ void Superpixel::calculate_histogram()
 	int hist_h = this->pixels.rows;
 	int bin_w = cvRound( (double) hist_w/histSize );
 
-	this->histogram = cv::Mat(hist_h, hist_w, CV_8UC3, cvScalar(0,0,0));
+	this->histogram = cv::Mat(hist_h, hist_w, CV_32FC3, cvScalar(0.0,0.0,0.0));
 
 	/// Set the ranges ( for B,G,R) )
 	float range[] = { 0, 256 } ;
 	const float* histRange = { range };
+	int channels[] = {0,1,2};
 
 	bool uniform = true; 
 	bool accumulate = false;
 
-	cv::Mat b_hist, g_hist, r_hist;
-
 	if(this->pixels.rows>0 && this->pixels.cols>0)
 	{
 		/// Compute the histograms:
-		calcHist( &bgr_planes[0], 1, 0, this->pixels_mask, b_hist, 1, &histSize, &histRange, uniform, accumulate );
-		calcHist( &bgr_planes[1], 1, 0, this->pixels_mask, g_hist, 1, &histSize, &histRange, uniform, accumulate );
-		calcHist( &bgr_planes[2], 1, 0, this->pixels_mask, r_hist, 1, &histSize, &histRange, uniform, accumulate );
-
-		/// Normalize the result to [ 0, histImage.rows ]
-		normalize(b_hist, b_hist, 0, this->histogram.rows, cv::NORM_MINMAX, -1, cv::Mat() );
-		normalize(g_hist, g_hist, 0, this->histogram.rows, cv::NORM_MINMAX, -1, cv::Mat() );
-		normalize(r_hist, r_hist, 0, this->histogram.rows, cv::NORM_MINMAX, -1, cv::Mat() );
+		// cout << "EPALE\n";
+		calcHist( &this->pixels, 1, channels, this->pixels_mask, this->histogram, 1, &histSize, &histRange, uniform, accumulate );
+		// cout << "hola\n";
+		// /// Normalize the result to [ 0, histImage.rows ]
+		normalize(this->histogram, this->histogram, 0, this->histogram.rows, cv::NORM_MINMAX, -1, cv::Mat() );
 	}
 }
 
@@ -105,23 +101,48 @@ void Superpixel::calculate_histogram()
 
 void Superpixel::add_pixels_information(IplImage *img, vector<vector<int>> clusters)
 {
+	int i, j;
+	int min_x, max_x, min_y, max_y, sp_height, sp_width;
+	min_x = img->width;
+	min_y = img->height;
+	max_x = 0;
+	max_y = 0;
+	for(i=0; i<points.size() ;i++)
+	{
+		if(points[i].x < min_x)
+		{
+			min_x = points[i].x;
+		}
+		if(points[i].y < min_y)
+		{
+			min_y = points[i].y;
+		}
+		if(points[i].x > max_x)
+		{
+			max_x = points[i].x;
+		}
+		if(points[i].y > max_y)
+		{
+			max_y = points[i].y;
+		}
+	}
+//	cout << "min_x " << min_x << "  max_x " << max_x << "   min_y " << min_y << "  max_y " << max_y << "\n";
+	sp_height = max_y - min_y;
+	sp_width = max_x - min_x;
 	CvScalar colour;
-	this->pixels = cv::Mat::zeros(this->bounding_rect.height, this->bounding_rect.width, CV_8UC3);
-	this->pixels_mask = cv::Mat::zeros(this->bounding_rect.height, this->bounding_rect.width, CV_8UC1);
+	this->pixels = cv::Mat::zeros(sp_height, sp_width, CV_8UC3);
+	this->pixels_mask = cv::Mat::zeros(sp_height, sp_width, CV_8UC1);
 
 	int x_coord, y_coord;
-	for (int j = bounding_rect.y; j < bounding_rect.y+bounding_rect.height ;j++)
+	for (int j = min_y; j < max_y ;j++)
 	{
-		y_coord = j - bounding_rect.y;
-		for (int i = bounding_rect.x; i < bounding_rect.x+bounding_rect.width ;i++)	
+		y_coord = j - min_y;
+		for (int i = min_x; i < max_x ;i++)	
 		{
 			if(this->id == clusters[i][j])
 			{
-				x_coord = i - bounding_rect.x;
-				/*
-				cout << i << "   "	<< j << "\n";
-				cout << bounding_rect.x << "   "	<< bounding_rect.y << "\n\n\n";
-				*/
+				x_coord = i - min_x;
+
 				colour = cvGet2D(img, j, i);
 				(this->pixels.at<cv::Vec3b>(y_coord, x_coord)).val[0] = colour.val[0];
 				(this->pixels.at<cv::Vec3b>(y_coord, x_coord)).val[1] = colour.val[1];
@@ -212,41 +233,13 @@ void Superpixel::print_everything()
 	{
 		cout << "(" << points[i].x << ", " << points[i].y << ")" << "\n";
 	}
-
-/*
-	cout << "Histogram:\n";
-	for(int i=0; i<256 ;i++)
-	{
-		cout << "Valor = " << i << ".	R = " << histogram[i][0] << ".	G = " << histogram[i][1] << ".	B = " << histogram[i][2] << ".\n";
-	}
-*/
 }
 
 
-void Superpixel::calculate_bounding_rect()
-{
-	this->bounding_rect = cv::boundingRect(this->points);
-//	cout << "numero de pixels = " << this->pixels.size() << "	numero de puntos = " << this->points.size()  << "		rectangulo, ancho = " << bounding_rect.width << "   largo =" << bounding_rect.height << "\n";
-
-	/*cv::Point pt1, pt2;
-	pt1.x = rect.x;
-	pt1.y = rect.y;
-	pt2.x = rect.x + rect.width;
-	pt2.y = rect.y + rect.height;
-	rectangle(pixel_mask, pt1, pt2, CV_RGB(255,0,0), 1);
-	cv::imshow("pixel_mask", pixel_mask);
-	*/
-}
 
 
 void Superpixel::export_to_jpeg(IplImage *img)
 {
-	/*
-	if(this->id == 1)
-	{
-		cv::imshow("superpixel", this->pixels);
-	}
-	*/
 	//string path = "/home/mecatronica/Github_Yoshua/VisionPercepcion_USB2015/Codigos/Tesis_ws/src/Plane_Segmentation_3/superpixel_images/";
 	string path = "/home/alfredoso/GitHub/VisionPercepcion_USB2015/Codigos/Tesis_ws/src/usbgm_pfs/superpixel_images/";
 	string pixels_file_name = to_string(this->id) + ".jpg";

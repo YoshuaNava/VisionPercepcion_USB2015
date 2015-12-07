@@ -104,6 +104,11 @@ TARGET_LINK_LIBRARIES(test_slic_superpixel_segmentation ${LINK_LIBS})
 TARGET_LINK_LIBRARIES(test_slic_superpixel_segmentation slic)
 TARGET_LINK_LIBRARIES(test_slic_superpixel_segmentation libsuperpixel)
 
+ADD_EXECUTABLE(test_histogram_superpixel_comparison test/test_histogram_superpixel_comparison.cpp)
+TARGET_LINK_LIBRARIES(test_histogram_superpixel_comparison ${LINK_LIBS})
+TARGET_LINK_LIBRARIES(test_histogram_superpixel_comparison slic)
+TARGET_LINK_LIBRARIES(test_histogram_superpixel_comparison libsuperpixel)
+
 ADD_EXECUTABLE(test_svo_depth_filter test/test_svo_depth_filter.cpp)
 TARGET_LINK_LIBRARIES(test_svo_depth_filter ${LINK_LIBS})
 
