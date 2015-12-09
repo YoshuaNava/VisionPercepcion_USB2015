@@ -36,7 +36,7 @@
 		vector<cv::Point> superpixels_centers;
 		vector<Superpixel> superpixels_list;
 		vector<vector<int>> superpixels_adjacency_matrix;
-		vector<vector<int>> superpixels_Gsimilarity_matrix;
+		vector<vector<int>> superpixels_similarity_matrix;
 		cv::Mat frame, seg_image, gray, contours_image;
 
 	public:
@@ -51,6 +51,7 @@
 		vector<Superpixel> storeSuperpixelsMemory();
 		cv::Mat displayCenterGrid(cv::Mat image, CvScalar colour);
 		cv::Mat displayNumberGrid(cv::Mat image, CvScalar colour);
+		vector<Superpixel> get_superpixels();
  };
 
 

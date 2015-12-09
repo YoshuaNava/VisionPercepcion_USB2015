@@ -25,11 +25,10 @@ CATKIN_PACKAGE(
 	CATKIN_DEPENDS roscpp image_transport cv_bridge
 )
 
-
-
-
 INCLUDE_DIRECTORIES(${catkin_INCLUDE_DIRS} ${OpenCV_INCLUDE_DIRS} include)
 INCLUDE_DIRECTORIES(${catkin_INCLUDE_DIRS} ${svo_INCLUDE_DIRS} include)
+INCLUDE_DIRECTORIES(include test)
+
 
 LIST(APPEND LINK_LIBS 
 	${OpenCV_LIBRARIES}
@@ -40,19 +39,18 @@ LIST(APPEND LINK_LIBS
 	${Eigen_LIBRARIES}
 )
 
-##add_dependencies(Convert_Image ar_pose_generate_messages_cpp)
-
-ADD_LIBRARY(slic SHARED
-	include/slic_modified/slic.cpp
-	include/slic_modified/slic.h
-)
-
 ADD_LIBRARY(libsuperpixel SHARED
 	include/libsuperpixel/superpixel.cpp
 	include/libsuperpixel/superpixel.h
 )
 
-ADD_LIBRARY(fh_egbis SHARED 
+ADD_LIBRARY(slic SHARED
+	include/slic_modified/slic.cpp
+	include/slic_modified/slic.h
+)
+TARGET_LINK_LIBRARIES(slic libsuperpixel)
+
+ADD_LIBRARY(egbis SHARED 
 	include/egbis/convolve.h
 	include/egbis/disjoint-set.h
 	include/egbis/filter.h
@@ -65,49 +63,44 @@ ADD_LIBRARY(fh_egbis SHARED
 	include/egbis/egbis.h
 	include/egbis/egbis.cpp
 )
+TARGET_LINK_LIBRARIES(egbis libsuperpixel)
 
 
 ADD_EXECUTABLE(pfs src/plane_segmentation_alpha.cpp)
 TARGET_LINK_LIBRARIES(pfs ${LINK_LIBS})
 TARGET_LINK_LIBRARIES(pfs slic)
-TARGET_LINK_LIBRARIES(pfs libsuperpixel)
 
 
 ADD_EXECUTABLE(test_prob_floor_prior test/test_prob_floor_prior.cpp)
 TARGET_LINK_LIBRARIES(test_prob_floor_prior ${LINK_LIBS})
 TARGET_LINK_LIBRARIES(test_prob_floor_prior slic)
-TARGET_LINK_LIBRARIES(test_prob_floor_prior fh_egbis)
-TARGET_LINK_LIBRARIES(test_prob_floor_prior libsuperpixel)
+TARGET_LINK_LIBRARIES(test_prob_floor_prior egbis)
 
 
 ADD_EXECUTABLE(test_horizon_search test/test_horizon_search.cpp)
 TARGET_LINK_LIBRARIES(test_horizon_search ${LINK_LIBS})
 TARGET_LINK_LIBRARIES(test_horizon_search slic)
-TARGET_LINK_LIBRARIES(test_horizon_search fh_egbis)
-TARGET_LINK_LIBRARIES(test_horizon_search libsuperpixel)
+TARGET_LINK_LIBRARIES(test_horizon_search egbis)
 
 
 ADD_EXECUTABLE(test_prob_horizon_search test/test_prob_horizon_search.cpp)
 TARGET_LINK_LIBRARIES(test_prob_horizon_search ${LINK_LIBS})
 TARGET_LINK_LIBRARIES(test_prob_horizon_search slic)
-TARGET_LINK_LIBRARIES(test_prob_horizon_search fh_egbis)
-TARGET_LINK_LIBRARIES(test_prob_horizon_search libsuperpixel)
+TARGET_LINK_LIBRARIES(test_prob_horizon_search egbis)
 
 
 ADD_EXECUTABLE(test_egbis_superpixel_segmentation test/test_egbis_superpixel_segmentation.cpp)
 TARGET_LINK_LIBRARIES(test_egbis_superpixel_segmentation ${LINK_LIBS})
-TARGET_LINK_LIBRARIES(test_egbis_superpixel_segmentation fh_egbis)
-TARGET_LINK_LIBRARIES(test_egbis_superpixel_segmentation libsuperpixel)
+TARGET_LINK_LIBRARIES(test_egbis_superpixel_segmentation egbis)
 
 ADD_EXECUTABLE(test_slic_superpixel_segmentation test/test_slic_superpixel_segmentation.cpp)
 TARGET_LINK_LIBRARIES(test_slic_superpixel_segmentation ${LINK_LIBS})
 TARGET_LINK_LIBRARIES(test_slic_superpixel_segmentation slic)
-TARGET_LINK_LIBRARIES(test_slic_superpixel_segmentation libsuperpixel)
 
 ADD_EXECUTABLE(test_histogram_superpixel_comparison test/test_histogram_superpixel_comparison.cpp)
 TARGET_LINK_LIBRARIES(test_histogram_superpixel_comparison ${LINK_LIBS})
 TARGET_LINK_LIBRARIES(test_histogram_superpixel_comparison slic)
-TARGET_LINK_LIBRARIES(test_histogram_superpixel_comparison libsuperpixel)
+TARGET_LINK_LIBRARIES(test_histogram_superpixel_comparison egbis)
 
 ADD_EXECUTABLE(test_svo_depth_filter test/test_svo_depth_filter.cpp)
 TARGET_LINK_LIBRARIES(test_svo_depth_filter ${LINK_LIBS})
