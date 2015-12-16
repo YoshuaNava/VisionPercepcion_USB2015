@@ -36,7 +36,7 @@ void compareHistograms(int base_sp_id, int test1_sp_id, int test2_sp_id)
 	vector<Superpixel> superpixels_list;
 	if(SUPERPIXEL_ALGORITHM == "EGBIS")
 	{
-		superpixels_list = egbis.get_superpixels();
+		superpixels_list = egbis.getSuperpixels();
 	}
 	else
 	{

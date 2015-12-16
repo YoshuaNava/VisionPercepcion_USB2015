@@ -415,6 +415,7 @@ int main( int argc, char** argv )
 
 		CV_TIMER_STOP(Z, "Loop finished")
 		printf("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n");
+
 	 	ros::spinOnce();
 	}
 

@@ -88,6 +88,11 @@ TARGET_LINK_LIBRARIES(test_prob_horizon_search ${LINK_LIBS})
 TARGET_LINK_LIBRARIES(test_prob_horizon_search slic)
 TARGET_LINK_LIBRARIES(test_prob_horizon_search egbis)
 
+ADD_EXECUTABLE(test_bayesian_horizon_search test/test_bayesian_horizon_search.cpp)
+TARGET_LINK_LIBRARIES(test_bayesian_horizon_search ${LINK_LIBS})
+TARGET_LINK_LIBRARIES(test_bayesian_horizon_search slic)
+TARGET_LINK_LIBRARIES(test_bayesian_horizon_search egbis)
+
 
 ADD_EXECUTABLE(test_egbis_superpixel_segmentation test/test_egbis_superpixel_segmentation.cpp)
 TARGET_LINK_LIBRARIES(test_egbis_superpixel_segmentation ${LINK_LIBS})

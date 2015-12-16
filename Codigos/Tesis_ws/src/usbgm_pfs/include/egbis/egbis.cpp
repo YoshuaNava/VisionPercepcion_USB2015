@@ -288,7 +288,7 @@ cv::Mat Egbis::generateSuperpixels(cv::Mat image, cv::Mat gray_image)
 
 
 
-vector<Superpixel> Egbis::get_superpixels()
+vector<Superpixel> Egbis::getSuperpixels()
 {
     return this->superpixels_list;
 }
