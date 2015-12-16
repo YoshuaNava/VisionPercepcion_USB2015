@@ -1,6 +1,5 @@
 
-#include "../include/global.h"
-#include <libsuperpixel/superpixel.h>
+#include <global.h>
 
 
 

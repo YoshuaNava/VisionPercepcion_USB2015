@@ -1,10 +1,15 @@
+#ifndef PROBABILISTIC_FUNCTIONS_H
+#define PROBABILISTIC_FUNCTIONS_H
 
-#include "../include/global.h"
+#include <global.h>
 
-
-
-cv::Mat GetFloorPrior(cv::Mat img, vector<Superpixel> superpixels)
+namespace ProbFloorSearch
 {
-	cv::Mat
-
+	class ProbFns
+	{
+		public: 
+			static cv::Mat getFloorPrior(cv::Mat img, vector<Superpixel> superpixels);
+	};
 }
+
+#endif

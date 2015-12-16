@@ -1,8 +1,5 @@
 
-#include "../include/global.h"
-
-#include "../src/prob_fns.cpp"
-//#include "slic_superpixels/slic.h"
+#include <global.h>
 
 
 

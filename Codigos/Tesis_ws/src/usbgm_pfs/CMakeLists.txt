@@ -66,49 +66,54 @@ ADD_LIBRARY(egbis SHARED
 TARGET_LINK_LIBRARIES(egbis libsuperpixel)
 
 
-ADD_EXECUTABLE(pfs src/plane_segmentation_alpha.cpp)
-TARGET_LINK_LIBRARIES(pfs ${LINK_LIBS})
-TARGET_LINK_LIBRARIES(pfs slic)
+ADD_LIBRARY(fps SHARED 
+	include/probabilistic_functions.h
+	src/probabilistic_functions.cpp
+	include/hough_horizon_search.h
+	src/hough_horizon_search.cpp
+	include/global.h
+)
+TARGET_LINK_LIBRARIES(fps egbis)
+TARGET_LINK_LIBRARIES(fps slic)
+TARGET_LINK_LIBRARIES(fps ${LINK_LIBS})
+
+# ADD_EXECUTABLE(pfs src/plane_segmentation_alpha.cpp)
+# TARGET_LINK_LIBRARIES(pfs ${LINK_LIBS})
+# TARGET_LINK_LIBRARIES(pfs slic)
 
 
 ADD_EXECUTABLE(test_prob_floor_prior test/test_prob_floor_prior.cpp)
-TARGET_LINK_LIBRARIES(test_prob_floor_prior ${LINK_LIBS})
-TARGET_LINK_LIBRARIES(test_prob_floor_prior slic)
-TARGET_LINK_LIBRARIES(test_prob_floor_prior egbis)
+TARGET_LINK_LIBRARIES(test_prob_floor_prior fps)
 
 
 ADD_EXECUTABLE(test_horizon_search test/test_horizon_search.cpp)
-TARGET_LINK_LIBRARIES(test_horizon_search ${LINK_LIBS})
-TARGET_LINK_LIBRARIES(test_horizon_search slic)
-TARGET_LINK_LIBRARIES(test_horizon_search egbis)
+TARGET_LINK_LIBRARIES(test_horizon_search fps)
 
 
 ADD_EXECUTABLE(test_prob_horizon_search test/test_prob_horizon_search.cpp)
-TARGET_LINK_LIBRARIES(test_prob_horizon_search ${LINK_LIBS})
-TARGET_LINK_LIBRARIES(test_prob_horizon_search slic)
-TARGET_LINK_LIBRARIES(test_prob_horizon_search egbis)
+TARGET_LINK_LIBRARIES(test_prob_horizon_search fps)
+
 
 ADD_EXECUTABLE(test_bayesian_horizon_search test/test_bayesian_horizon_search.cpp)
-TARGET_LINK_LIBRARIES(test_bayesian_horizon_search ${LINK_LIBS})
-TARGET_LINK_LIBRARIES(test_bayesian_horizon_search slic)
-TARGET_LINK_LIBRARIES(test_bayesian_horizon_search egbis)
+TARGET_LINK_LIBRARIES(test_bayesian_horizon_search fps)
 
 
 ADD_EXECUTABLE(test_egbis_superpixel_segmentation test/test_egbis_superpixel_segmentation.cpp)
 TARGET_LINK_LIBRARIES(test_egbis_superpixel_segmentation ${LINK_LIBS})
 TARGET_LINK_LIBRARIES(test_egbis_superpixel_segmentation egbis)
 
+
 ADD_EXECUTABLE(test_slic_superpixel_segmentation test/test_slic_superpixel_segmentation.cpp)
 TARGET_LINK_LIBRARIES(test_slic_superpixel_segmentation ${LINK_LIBS})
 TARGET_LINK_LIBRARIES(test_slic_superpixel_segmentation slic)
 
-ADD_EXECUTABLE(test_histogram_superpixel_comparison test/test_histogram_superpixel_comparison.cpp)
-TARGET_LINK_LIBRARIES(test_histogram_superpixel_comparison ${LINK_LIBS})
-TARGET_LINK_LIBRARIES(test_histogram_superpixel_comparison slic)
-TARGET_LINK_LIBRARIES(test_histogram_superpixel_comparison egbis)
 
-ADD_EXECUTABLE(test_svo_depth_filter test/test_svo_depth_filter.cpp)
-TARGET_LINK_LIBRARIES(test_svo_depth_filter ${LINK_LIBS})
+ADD_EXECUTABLE(test_histogram_superpixel_comparison test/test_histogram_superpixel_comparison.cpp)
+TARGET_LINK_LIBRARIES(test_histogram_superpixel_comparison fps)
+
+
+# ADD_EXECUTABLE(test_svo_depth_filter test/test_svo_depth_filter.cpp)
+# TARGET_LINK_LIBRARIES(test_svo_depth_filter ${LINK_LIBS})
 
 
 

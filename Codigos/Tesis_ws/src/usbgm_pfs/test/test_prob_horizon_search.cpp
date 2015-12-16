@@ -1,8 +1,5 @@
 
-#include "../include/global.h"
-
-#include "../src/prob_fns.cpp"
-//#include "slic_superpixels/slic.h"
+#include <global.h>
 
 
 
@@ -18,6 +15,7 @@
 #define DISPLAY_IMAGE_XY(R,img,X,Y)		if(R){cvNamedWindow(#img); cvMoveWindow(#img, int(round(X*Window_W)), int(round(Y*Window_H))) ;} cv::imshow(#img, img);
 using namespace std;
 using namespace cv;
+//using namespace ProbFloorSearch;
 
 
 cv::Mat frame, seg_image, gray, prevgray, floor_prior; // Mat Declarations
@@ -475,7 +473,7 @@ int main( int argc, char** argv )
 		slicSuperpixels();
 		//egbisSuperpixels();
 		CV_TIMER_STOP(B, "Superpixels processed")
-		floor_prior = ProbFns::getFloorPrior(frame, superpixels_list);
+		floor_prior = ProbFloorSearch::ProbFns::getFloorPrior(frame, superpixels_list);
 		CV_TIMER_STOP(C, "Prior probability calculated")
 		calculateCanny();
 		calculateSobel();

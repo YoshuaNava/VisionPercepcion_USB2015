@@ -1,8 +1,5 @@
 
-#include "../include/global.h"
-
-#include "../src/prob_fns.cpp"
-//#include "slic_superpixels/slic.h"
+#include <global.h>
 
 
 
@@ -19,7 +16,7 @@
 #define SUPERPIXEL_ALGORITHM 	"SLIC"
 using namespace std;
 using namespace cv;
-
+using namespace ProbFloorSearch;
 
 cv::Mat frame, seg_image, gray, superpixels_contours_img; // Mat Declarations
 
@@ -108,8 +105,8 @@ void egbisSuperpixels()
 
 void cameraSetup()
 {
-  	//cap = VideoCapture(0);
-	cap = VideoCapture("../eng_stat_obst.avi");
+  	cap = VideoCapture(0);
+	//cap = VideoCapture("../eng_stat_obst.avi");
 	
 //	proc_W = 160;//160
 //	proc_H = 120;//120
