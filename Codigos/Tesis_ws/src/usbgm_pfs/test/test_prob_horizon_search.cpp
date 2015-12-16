@@ -281,7 +281,6 @@ void calculateFloorProbability()
 	int i, j;
 	superpixels_floor_prob.clear();
 	vector<int> samples_count;
-	cout << superpixels_isfloor_samples.size() << "\n";
 	for(i=0; i<superpixels_isfloor_samples.size() ;i++)
 	{
 		for(j=0; j<superpixels_isfloor_samples[i].size() ;j++)
@@ -331,7 +330,6 @@ void drawProbabilisticFloor()
 	floor_prob_map = cv::Mat::zeros(proc_H, proc_W, CV_32FC1);
 	int i, j;
 	point2Dvec points;
-	float poly_value;
 	int x_coord, y_coord;
 	uchar blue_tonality, red_tonality;
 	for(i=0; i<superpixels_list.size() ;i++)
@@ -477,7 +475,7 @@ int main( int argc, char** argv )
 		slicSuperpixels();
 		//egbisSuperpixels();
 		CV_TIMER_STOP(B, "Superpixels processed")
-		floor_prior = ProbFns::getFloorPrior(frame, slic.get_superpixels());
+		floor_prior = ProbFns::getFloorPrior(frame, superpixels_list);
 		CV_TIMER_STOP(C, "Prior probability calculated")
 		calculateCanny();
 		calculateSobel();

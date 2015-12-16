@@ -24,6 +24,7 @@ cv::Mat frame, seg_image, gray, prevgray, floor_prior; // Mat Declarations
 
 cv::Mat temp_grad[3], sobel[3], borders_sobel, borders_canny, borders_combined;
 cv::Mat img_lines, floor_boundary_img, superpixels_contours_img, superpixels_below_boundary, floor_prob_map;
+cv::Mat bayes_prob_floor, coloured_bayes_floor;
 vector<Vec4i> lines;
 vector<cv::Point> lines_dataset;
 int lines_history = 5;
@@ -71,7 +72,10 @@ void showImages()
 	cv::resizeWindow("floor_prob_map", proc_W, proc_H);
 	DISPLAY_IMAGE_XY(true, superpixels_below_boundary, 2, 1);
 	cv::resizeWindow("superpixels_below_boundary", proc_W, proc_H);
-
+	DISPLAY_IMAGE_XY(true, bayes_prob_floor, 3, 1);
+	cv::resizeWindow("bayes_prob_floor", proc_W, proc_H);
+	DISPLAY_IMAGE_XY(true, coloured_bayes_floor, 4, 1);
+	cv::resizeWindow("coloured_bayes_floor", proc_W, proc_H);
 }
 
 
@@ -281,7 +285,6 @@ void calculateFloorProbability()
 	int i, j;
 	superpixels_floor_prob.clear();
 	vector<int> samples_count;
-	cout << superpixels_isfloor_samples.size() << "\n";
 	for(i=0; i<superpixels_isfloor_samples.size() ;i++)
 	{
 		for(j=0; j<superpixels_isfloor_samples[i].size() ;j++)
@@ -331,7 +334,6 @@ void drawProbabilisticFloor()
 	floor_prob_map = cv::Mat::zeros(proc_H, proc_W, CV_32FC1);
 	int i, j;
 	point2Dvec points;
-	float poly_value;
 	int x_coord, y_coord;
 	uchar blue_tonality, red_tonality;
 	for(i=0; i<superpixels_list.size() ;i++)
@@ -363,6 +365,49 @@ void drawProbabilisticFloor()
 	cvtColor(gray, gray, CV_GRAY2RGB);
 	addWeighted(superpixels_below_boundary, 0.7, gray, 0.3, 0.0, superpixels_below_boundary);
 }
+
+
+void calculateBayesianEstimateFloor()
+{
+	coloured_bayes_floor = floor_boundary_img.clone();
+	bayes_prob_floor = cv::Mat::zeros(proc_H, proc_W, CV_32FC1);
+	int i, j;
+	point2Dvec points;
+	int x_coord, y_coord;
+	uchar green_tonality;
+	double prob_bayes_floor = 0;
+	double prob_prior = 0;
+	for(i=0; i<superpixels_list.size() ;i++)
+	{
+		if(i<superpixels_floor_prob.size())
+		{
+			prob_prior = floor_prior.at<float>(superpixels_list[i].get_center().y, superpixels_list[i].get_center().x);
+			prob_bayes_floor = (superpixels_floor_prob[i] * prob_prior) / (superpixels_floor_prob[i] * prob_prior + 0.7 * (1-prob_prior));
+			cout << "prior floor =  " << prob_prior << "\n";
+			cout << "horizon floor =  " << superpixels_floor_prob[i] << "\n";
+			cout << "bayes floor =  " << prob_bayes_floor << "\n";
+			if(superpixels_floor_prob[i] > 0)
+			{
+				green_tonality = prob_bayes_floor * 255;
+			}
+			else
+			{
+				green_tonality = 0;
+			}
+			
+			points = superpixels_list[i].get_points();
+			for(j=0; j < points.size() ;j++)
+			{
+				x_coord = points[j].x;
+				y_coord = points[j].y;
+				bayes_prob_floor.at<float>(y_coord, x_coord) = prob_bayes_floor; 
+				coloured_bayes_floor.at<cv::Vec3b>(y_coord, x_coord)[1] = green_tonality;
+			}
+		}
+	}				
+	addWeighted(superpixels_below_boundary, 0.7, coloured_bayes_floor, 0.3, 0.0, coloured_bayes_floor);
+}
+
 
 
 void slicSuperpixels()
@@ -410,8 +455,8 @@ void cameraSetup()
 	//cap = VideoCapture(0); // Declare capture form Video: "eng_stat_obst.avi"
   
 
-  //cap = VideoCapture(0);
-	cap = VideoCapture("eng_stat_obst.avi");
+  cap = VideoCapture(0);
+	//cap = VideoCapture("eng_stat_obst.avi");
 	//cap = VideoCapture("Laboratorio.avi");
 	//cap = VideoCapture("LaboratorioMaleta.avi");
 	//cap = VideoCapture("PasilloLabA.avi");
@@ -454,7 +499,7 @@ int main( int argc, char** argv )
 	printf("Authors: Rafael Colmenares and Yoshua Nava\n");
 	printf("******************************************\n");
 	waitKey(0);
-
+	
     
 	while (nh.ok()) 
 	{
@@ -477,7 +522,7 @@ int main( int argc, char** argv )
 		slicSuperpixels();
 		//egbisSuperpixels();
 		CV_TIMER_STOP(B, "Superpixels processed")
-		floor_prior = ProbFns::getFloorPrior(frame, slic.get_superpixels());
+		floor_prior = ProbFns::getFloorPrior(frame, superpixels_list);
 		CV_TIMER_STOP(C, "Prior probability calculated")
 		calculateCanny();
 		calculateSobel();
@@ -494,7 +539,9 @@ int main( int argc, char** argv )
 		calculateFloorProbability();
 		CV_TIMER_STOP(I, "Calculated probability of a superpixel being floor")
 		drawProbabilisticFloor();
-		CV_TIMER_STOP(J, "Tagged superpixels below boundary")
+		CV_TIMER_STOP(J, "Tagged superpixels below probabilistic boundary")
+		calculateBayesianEstimateFloor();
+		CV_TIMER_STOP(K, "Tagged superpixels below bayesian boundary")
 		showImages();
 
 
