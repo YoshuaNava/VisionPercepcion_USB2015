@@ -3,17 +3,6 @@
 
 #include <segmentation_handler.h>
 
-
-//macros for stopwatch
-//REFERENCE: https://sites.google.com/site/mikesapi/downloads/ground-plane-segmentation-and-autonomous-guidance
-#define CV_TIMER_START(X)       	double X = (double)cvGetTickCount();
-#define CV_TIMER_STOP(Y, STRING) 	double Y = (double)cvGetTickCount() - X; \
-                                            printf("Time @ [%s] = %gms\n", \
-                                            STRING, Y/((double)cvGetTickFrequency()*1000.) );
-
-#define Window_W 1.02*proc_W //appriximate wht window width and hight as a function of the frame size
-#define Window_H 1.3*(proc_H)+20
-#define DISPLAY_IMAGE_XY(R,img,X,Y)		if(R){cvNamedWindow(#img); cvMoveWindow(#img, int(round(X*Window_W)), int(round(Y*Window_H))) ;} cv::imshow(#img, img);
 using namespace std;
 using namespace cv;
 using namespace ProbFloorSearch;
@@ -21,7 +10,6 @@ using namespace ProbFloorSearch;
 cv::Mat frame, seg_image, gray, superpixels_contours_img; // Mat Declarations
 vector<Superpixel> superpixels_list;
 
-double proc_W, proc_H;
 VideoCapture cap;
 
 SegmentationHandler segHandler("EGBIS");
@@ -62,10 +50,6 @@ void cameraSetup()
   	cap = VideoCapture(0);
 	//cap = VideoCapture("../eng_stat_obst.avi");
 	
-//	proc_W = 160;//160
-//	proc_H = 120;//120
-	proc_W = 320;//160
-	proc_H = 240;//120
 	cap.set(CV_CAP_PROP_FRAME_WIDTH, 640);
 	cap.set(CV_CAP_PROP_FRAME_HEIGHT, 480);
 	// Good reference: http://superuser.com/questions/897420/how-to-know-which-framerate-should-i-use-to-capture-webcam-with-ffmpeg
@@ -114,7 +98,6 @@ int main( int argc, char** argv )
 		superpixels_contours_img = frame.clone();
 		segHandler.segmentImage(frame, gray);
 		superpixels_list = segHandler.getSuperpixels();
-		cout << superpixels_list.size() << "\n";
 		superpixels_contours_img = segHandler.getContoursImage();
 		CV_TIMER_STOP(B, "Superpixels processed")
 

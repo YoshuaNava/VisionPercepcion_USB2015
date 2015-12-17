@@ -274,7 +274,6 @@ cv::Mat Egbis::generateSuperpixels(cv::Mat image, cv::Mat gray_image)
 		clusters.push_back(seg_row);
 	}
 	num_superpixels = num_superpixels + 1;
-    cout << " num of superpixels    " << num_superpixels << "\n";
 
 	for(i=0; i<num_superpixels ;i++)
 	{

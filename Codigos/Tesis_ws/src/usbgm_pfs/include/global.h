@@ -34,7 +34,22 @@
 #include <Eigen/Core>
 #include <Eigen/Dense>
 
-
 #include <svo/config.h>
+
+// #define proc_H	120
+// #define proc_W	160
+#define proc_H	240
+#define proc_W	320
+#define Window_W 1.02*proc_W //appriximate wht window width and hight as a function of the frame size
+#define Window_H 1.3*(proc_H)+20
+#define DISPLAY_IMAGE_XY(R,img,X,Y)		if(R){cvNamedWindow(#img); cvMoveWindow(#img, int(round(X*Window_W)), int(round(Y*Window_H))) ;} cv::imshow(#img, img);
+
+//macros for stopwatch
+//REFERENCE: https://sites.google.com/site/mikesapi/downloads/ground-plane-segmentation-and-autonomous-guidance
+#define CV_TIMER_START(X)       	double X = (double)cvGetTickCount();
+#define CV_TIMER_STOP(Y, STRING) 	double Y = (double)cvGetTickCount() - X; \
+                                            printf("Time @ [%s] = %gms\n", \
+                                            STRING, Y/((double)cvGetTickFrequency()*1000.) );
+
 
 #endif

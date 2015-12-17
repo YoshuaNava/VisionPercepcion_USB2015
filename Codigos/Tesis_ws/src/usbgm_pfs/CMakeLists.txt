@@ -69,8 +69,8 @@ TARGET_LINK_LIBRARIES(egbis libsuperpixel)
 ADD_LIBRARY(fps SHARED 
 	include/probabilistic_functions.h
 	src/probabilistic_functions.cpp
-	# include/hough_horizon_search.h
-	# src/hough_horizon_search.cpp
+	include/hough_horizon_search.h
+	src/hough_horizon_search.cpp
 	include/segmentation_handler.h
 	src/segmentation_handler.cpp
 	include/global.h
@@ -98,6 +98,10 @@ TARGET_LINK_LIBRARIES(test_prob_horizon_search fps)
 
 ADD_EXECUTABLE(test_bayesian_horizon_search test/test_bayesian_horizon_search.cpp)
 TARGET_LINK_LIBRARIES(test_bayesian_horizon_search fps)
+
+
+ADD_EXECUTABLE(test_encapsulated_horizon_search test/test_encapsulated_horizon_search.cpp)
+TARGET_LINK_LIBRARIES(test_encapsulated_horizon_search fps)
 
 
 ADD_EXECUTABLE(test_egbis_superpixel_segmentation test/test_egbis_superpixel_segmentation.cpp)

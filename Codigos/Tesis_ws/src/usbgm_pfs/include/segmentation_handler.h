@@ -6,7 +6,6 @@
 
 
 
-
 namespace ProbFloorSearch
 {
 	class SegmentationHandler

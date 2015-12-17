@@ -5,17 +5,6 @@
 #include <segmentation_handler.h>
 
 
-
-//macros for stopwatch
-//REFERENCE: https://sites.google.com/site/mikesapi/downloads/ground-plane-segmentation-and-autonomous-guidance
-#define CV_TIMER_START(X)       	double X = (double)cvGetTickCount();
-#define CV_TIMER_STOP(Y, STRING) 	double Y = (double)cvGetTickCount() - X; \
-                                            printf("Time @ [%s] = %gms\n", \
-                                            STRING, Y/((double)cvGetTickFrequency()*1000.) );
-
-#define Window_W 1.02*proc_W //appriximate wht window width and hight as a function of the frame size
-#define Window_H 1.3*(proc_H)+20
-#define DISPLAY_IMAGE_XY(R,img,X,Y)		if(R){cvNamedWindow(#img); cvMoveWindow(#img, int(round(X*Window_W)), int(round(Y*Window_H))) ;} cv::imshow(#img, img);
 using namespace std;
 using namespace cv;
 using namespace ProbFloorSearch;
@@ -31,7 +20,6 @@ vector<cv::Point> polynomial_fit;
 vector<int> superpixel_is_floor;
 
 
-double proc_W, proc_H;
 VideoCapture cap;
 vector<Superpixel> superpixels_list;
 
@@ -380,9 +368,9 @@ void calculateBayesianEstimateFloor()
 		{
 			prob_prior = floor_prior.at<float>(superpixels_list[i].get_center().y, superpixels_list[i].get_center().x);
 			prob_bayes_floor = (superpixels_floor_prob[i] * prob_prior) / (superpixels_floor_prob[i] * prob_prior + 0.7 * (1-prob_prior));
-			cout << "prior floor =  " << prob_prior << "\n";
-			cout << "horizon floor =  " << superpixels_floor_prob[i] << "\n";
-			cout << "bayes floor =  " << prob_bayes_floor << "\n";
+			// cout << "prior floor =  " << prob_prior << "\n";
+			// cout << "horizon floor =  " << superpixels_floor_prob[i] << "\n";
+			// cout << "bayes floor =  " << prob_bayes_floor << "\n";
 			if(superpixels_floor_prob[i] > 0)
 			{
 				green_tonality = prob_bayes_floor * 255;
@@ -424,10 +412,6 @@ void cameraSetup()
 	//VideoCapture cap(1); //Otra camara, conectada a la computadora mediante USB, por ejemplo.
 	
 	
-//	proc_W = 160;//160
-//	proc_H = 120;//120
-	proc_W = 320;//160
-	proc_H = 240;//120
 	cap.set(CV_CAP_PROP_FRAME_WIDTH, 640);
 	cap.set(CV_CAP_PROP_FRAME_HEIGHT, 480);
 	// Good reference: http://superuser.com/questions/897420/how-to-know-which-framerate-should-i-use-to-capture-webcam-with-ffmpeg
@@ -479,7 +463,6 @@ int main( int argc, char** argv )
 		superpixels_contours_img = frame.clone();
 		segHandler.segmentImage(frame, gray);
 		superpixels_list = segHandler.getSuperpixels();
-		cout << superpixels_list.size() << "\n";
 		superpixels_contours_img = segHandler.getContoursImage();
 		CV_TIMER_STOP(B, "Superpixels processed")
 		floor_prior = ProbFns::getFloorPrior(frame, superpixels_list);
