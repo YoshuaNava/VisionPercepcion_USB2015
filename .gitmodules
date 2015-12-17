@@ -10,3 +10,6 @@
 [submodule "Codigos/Tesis_ws/src/rpg_svo"]
 	path = Codigos/Tesis_ws/src/rpg_svo
 	url = https://github.com/IreneMLC/rpg_svo.git
+[submodule "Codigos/Tesis_ws/src/ORB_SLAM"]
+	path = Codigos/Tesis_ws/src/ORB_SLAM
+	url = https://github.com/YoshuaNava/ORB_SLAM.git

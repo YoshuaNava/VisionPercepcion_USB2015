@@ -23,9 +23,12 @@ fi
 if [ -d Codigos/Tesis_ws/src/rpg_vikit ]; then
 	rm -rf Codigos/Tesis_ws/src/rpg_vikit;
 fi
+if [ -d Codigos/Tesis_ws/src/ORB_SLAM ]; then
+	rm -rf Codigos/Tesis_ws/src/ORB_SLAM;
+fi
 
 git submodule init
-git submodule update
+git submodule update --depth=1
 
 cd Codigos/Tesis_ws/src/Sophus
 git checkout a621ff
