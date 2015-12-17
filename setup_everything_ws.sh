@@ -28,45 +28,45 @@ if [ -d Codigos/Tesis_ws/src/ORB_SLAM ]; then
 fi
 
 git submodule init
-git submodule update --depth=1
+git submodule update
 
-cd Codigos/Tesis_ws/src/Sophus
-git checkout a621ff
-mkdir build
-cd build
-cmake ..
-make -j$CPU_CORES -l$CPU_CORES
+# cd Codigos/Tesis_ws/src/Sophus
+# git checkout a621ff
+# mkdir build
+# cd build
+# cmake ..
+# make -j$CPU_CORES -l$CPU_CORES
 
-cd ../../fast
-mkdir build
-cd build
-cmake ..
-make -j$CPU_CORES -l$CPU_CORES
-
-
-cd ../../ORB_SLAM/Thirdparty/g2o/
-mkdir build
-cd build
-cmake .. -DCMAKE_BUILD_TYPE=Release
-make -j$CPU_CORES -l$CPU_CORES
+# cd ../../fast
+# mkdir build
+# cd build
+# cmake ..
+# make -j$CPU_CORES -l$CPU_CORES
 
 
-cd ../../DBoW2/
-mkdir build
-cd build
-cmake .. -DCMAKE_BUILD_TYPE=Release
-make -j$CPU_CORES -l$CPU_CORES
+# cd ../../ORB_SLAM/Thirdparty/g2o/
+# mkdir build
+# cd build
+# cmake .. -DCMAKE_BUILD_TYPE=Release
+# make -j$CPU_CORES -l$CPU_CORES
 
-cd ../../../
-mkdir build
-cd build
-cmake .. -DCMAKE_BUILD_TYPE=Release
-make -j$CPU_CORES -l$CPU_CORES
 
-cd ../../../
-catkin_make
+# cd ../../DBoW2/
+# mkdir build
+# cd build
+# cmake .. -DCMAKE_BUILD_TYPE=Release
+# make -j$CPU_CORES -l$CPU_CORES
 
-sudo echo "source $(pwd)/devel/setup.bash" >> ~/.bashrc
+# cd ../../../
+# mkdir build
+# cd build
+# cmake .. -DCMAKE_BUILD_TYPE=Release
+# make -j$CPU_CORES -l$CPU_CORES
 
-# REFERENCE: http://answers.ros.org/question/53353/autocomplete-not-working-anymore/
-sudo echo 'export LC_ALL="C"' >> ~/.bashrc
+# cd ../../../
+# catkin_make
+
+# sudo echo "source $(pwd)/devel/setup.bash" >> ~/.bashrc
+
+# # REFERENCE: http://answers.ros.org/question/53353/autocomplete-not-working-anymore/
+# sudo echo 'export LC_ALL="C"' >> ~/.bashrc
