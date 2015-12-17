@@ -69,8 +69,10 @@ TARGET_LINK_LIBRARIES(egbis libsuperpixel)
 ADD_LIBRARY(fps SHARED 
 	include/probabilistic_functions.h
 	src/probabilistic_functions.cpp
-	include/hough_horizon_search.h
-	src/hough_horizon_search.cpp
+	# include/hough_horizon_search.h
+	# src/hough_horizon_search.cpp
+	include/segmentation_handler.h
+	src/segmentation_handler.cpp
 	include/global.h
 )
 TARGET_LINK_LIBRARIES(fps egbis)
@@ -90,26 +92,26 @@ ADD_EXECUTABLE(test_horizon_search test/test_horizon_search.cpp)
 TARGET_LINK_LIBRARIES(test_horizon_search fps)
 
 
-ADD_EXECUTABLE(test_prob_horizon_search test/test_prob_horizon_search.cpp)
-TARGET_LINK_LIBRARIES(test_prob_horizon_search fps)
+# ADD_EXECUTABLE(test_prob_horizon_search test/test_prob_horizon_search.cpp)
+# TARGET_LINK_LIBRARIES(test_prob_horizon_search fps)
 
 
-ADD_EXECUTABLE(test_bayesian_horizon_search test/test_bayesian_horizon_search.cpp)
-TARGET_LINK_LIBRARIES(test_bayesian_horizon_search fps)
+# ADD_EXECUTABLE(test_bayesian_horizon_search test/test_bayesian_horizon_search.cpp)
+# TARGET_LINK_LIBRARIES(test_bayesian_horizon_search fps)
 
 
-ADD_EXECUTABLE(test_egbis_superpixel_segmentation test/test_egbis_superpixel_segmentation.cpp)
-TARGET_LINK_LIBRARIES(test_egbis_superpixel_segmentation ${LINK_LIBS})
-TARGET_LINK_LIBRARIES(test_egbis_superpixel_segmentation egbis)
+# ADD_EXECUTABLE(test_egbis_superpixel_segmentation test/test_egbis_superpixel_segmentation.cpp)
+# TARGET_LINK_LIBRARIES(test_egbis_superpixel_segmentation ${LINK_LIBS})
+# TARGET_LINK_LIBRARIES(test_egbis_superpixel_segmentation egbis)
 
 
-ADD_EXECUTABLE(test_slic_superpixel_segmentation test/test_slic_superpixel_segmentation.cpp)
-TARGET_LINK_LIBRARIES(test_slic_superpixel_segmentation ${LINK_LIBS})
-TARGET_LINK_LIBRARIES(test_slic_superpixel_segmentation slic)
+# ADD_EXECUTABLE(test_slic_superpixel_segmentation test/test_slic_superpixel_segmentation.cpp)
+# TARGET_LINK_LIBRARIES(test_slic_superpixel_segmentation ${LINK_LIBS})
+# TARGET_LINK_LIBRARIES(test_slic_superpixel_segmentation slic)
 
 
-ADD_EXECUTABLE(test_histogram_superpixel_comparison test/test_histogram_superpixel_comparison.cpp)
-TARGET_LINK_LIBRARIES(test_histogram_superpixel_comparison fps)
+# ADD_EXECUTABLE(test_histogram_superpixel_comparison test/test_histogram_superpixel_comparison.cpp)
+# TARGET_LINK_LIBRARIES(test_histogram_superpixel_comparison fps)
 
 
 # ADD_EXECUTABLE(test_svo_depth_filter test/test_svo_depth_filter.cpp)

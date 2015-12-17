@@ -1,9 +1,10 @@
 
 #include <probabilistic_functions.h>
 
-//#include <global.h>
+using namespace ProbFloorSearch;
 
-cv::Mat ProbFloorSearch::ProbFns::getFloorPrior(cv::Mat img, vector<Superpixel> superpixels)
+
+cv::Mat ProbFns::getFloorPrior(cv::Mat img, vector<Superpixel> superpixels)
 {
 	//REFERENCE: https://sites.google.com/site/mikesapi/downloads/ground-plane-segmentation-and-autonomous-guidance
 	float lambda, Y1, Y0, prob_floor;

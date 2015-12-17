@@ -1,3 +1,6 @@
+#ifndef GLOBAL_H
+#define GLOBAL_H
+
 //opencv header files
 #include "ros/ros.h"
 #include "std_msgs/String.h"
@@ -32,10 +35,6 @@
 #include <Eigen/Dense>
 
 
-#include <slic_modified/slic.h>
-#include <egbis/egbis.h>
-#include <probabilistic_functions.h>
-
-
-
 #include <svo/config.h>
+
+#endif

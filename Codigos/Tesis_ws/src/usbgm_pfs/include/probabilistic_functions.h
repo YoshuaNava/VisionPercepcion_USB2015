@@ -2,6 +2,8 @@
 #define PROBABILISTIC_FUNCTIONS_H
 
 #include <global.h>
+#include <libsuperpixel/superpixel.h>
+
 
 namespace ProbFloorSearch
 {

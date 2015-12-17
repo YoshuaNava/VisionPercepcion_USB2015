@@ -1,6 +1,9 @@
 
 #include <global.h>
 
+#include <probabilistic_functions.h>
+#include <slic_modified/slic.h>
+#include <egbis/egbis.h>
 
 
 //macros for stopwatch
@@ -390,8 +393,8 @@ int main( int argc, char** argv )
 
 		
 		seg_image = frame.clone();
-		slicSuperpixels();
-		//egbisSuperpixels();
+		//slicSuperpixels();
+		egbisSuperpixels();
 		CV_TIMER_STOP(B, "Superpixels processed")
 		floor_prior = ProbFns::getFloorPrior(frame, slic.get_superpixels());
 		CV_TIMER_STOP(C, "Prior probability calculated")
