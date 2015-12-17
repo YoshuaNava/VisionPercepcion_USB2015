@@ -28,7 +28,7 @@ if [ -d Codigos/Tesis_ws/src/ORB_SLAM ]; then
 fi
 
 git submodule init
-git submodule update
+git submodule update --depth=1
 
 # cd Codigos/Tesis_ws/src/Sophus
 # git checkout a621ff
