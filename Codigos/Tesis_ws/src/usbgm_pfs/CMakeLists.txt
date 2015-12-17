@@ -88,18 +88,6 @@ ADD_EXECUTABLE(test_prob_floor_prior test/test_prob_floor_prior.cpp)
 TARGET_LINK_LIBRARIES(test_prob_floor_prior fps)
 
 
-ADD_EXECUTABLE(test_horizon_search test/test_horizon_search.cpp)
-TARGET_LINK_LIBRARIES(test_horizon_search fps)
-
-
-ADD_EXECUTABLE(test_prob_horizon_search test/test_prob_horizon_search.cpp)
-TARGET_LINK_LIBRARIES(test_prob_horizon_search fps)
-
-
-ADD_EXECUTABLE(test_bayesian_horizon_search test/test_bayesian_horizon_search.cpp)
-TARGET_LINK_LIBRARIES(test_bayesian_horizon_search fps)
-
-
 ADD_EXECUTABLE(test_encapsulated_horizon_search test/test_encapsulated_horizon_search.cpp)
 TARGET_LINK_LIBRARIES(test_encapsulated_horizon_search fps)
 
