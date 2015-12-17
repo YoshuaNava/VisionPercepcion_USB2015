@@ -1,6 +1,9 @@
 
 #include <global.h>
 
+#include <slic_modified/slic.h>
+#include <egbis/egbis.h>
+
 
 
 //macros for stopwatch
@@ -48,8 +51,8 @@ void egbisSuperpixels()
 
 void cameraSetup()
 {
-  	//cap = VideoCapture(0);
-	cap = VideoCapture("../eng_stat_obst.avi");
+  	cap = VideoCapture(0);
+//	cap = VideoCapture("../eng_stat_obst.avi");
 	
 //	proc_W = 160;//160
 //	proc_H = 120;//120

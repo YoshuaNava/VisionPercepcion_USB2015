@@ -18,7 +18,7 @@ using namespace std;
 using namespace cv;
 using namespace ProbFloorSearch;
 
-cv::Mat frame, seg_image, gray, prevgray, floor_prior; // Mat Declarations
+cv::Mat frame, seg_image, gray, floor_prior; // Mat Declarations
 
 double proc_W, proc_H;
 VideoCapture cap;

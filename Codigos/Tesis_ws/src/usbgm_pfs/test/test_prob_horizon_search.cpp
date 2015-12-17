@@ -1,6 +1,8 @@
 
 #include <global.h>
 
+#include <probabilistic_functions.h>
+#include <segmentation_handler.h>
 
 
 //macros for stopwatch
@@ -18,10 +20,9 @@ using namespace cv;
 using namespace ProbFloorSearch;
 
 
-cv::Mat frame, seg_image, gray, prevgray, floor_prior; // Mat Declarations
-
+cv::Mat frame, gray, superpixels_contours_img, floor_prior; // Mat Declarations
 cv::Mat temp_grad[3], sobel[3], borders_sobel, borders_canny, borders_combined;
-cv::Mat img_lines, floor_boundary_img, superpixels_contours_img, superpixels_below_boundary, floor_prob_map;
+cv::Mat img_lines, floor_boundary_img, superpixels_below_boundary, floor_prob_map;
 vector<Vec4i> lines;
 vector<cv::Point> lines_dataset;
 int lines_history = 5;
@@ -34,8 +35,7 @@ double proc_W, proc_H;
 VideoCapture cap;
 vector<Superpixel> superpixels_list;
 
-Slic slic;
-Egbis egbis;
+SegmentationHandler segHandler("SLIC");
 int poly_degree = 3;
 Eigen::VectorXd poly_coeff;
 
@@ -361,46 +361,6 @@ void drawProbabilisticFloor()
 }
 
 
-void slicSuperpixels()
-{
-
-	seg_image = frame.clone();
-	IplImage frame2 = (IplImage)seg_image; // Reference on deallocating memory: http://stackoverflow.com/questions/12635978/memory-deallocation-of-iplimage-initialised-from-cvmat
-
-	/* Yield the number of superpixels and weight-factors from the user. */
-	IplImage *lab_image = cvCloneImage(&frame2);
-	cvCvtColor(&frame2, lab_image, CV_BGR2Lab);
-	int w = lab_image->width, h = lab_image->height;
-	int nr_superpixels = 6*proc_W;
-	int nc = 20;
-	double step = sqrt((w * h) / (double) nr_superpixels)*3;
-
-	/* Perform the SLIC superpixel algorithm. */
-	slic.clear_data();
-	slic.generate_superpixels(lab_image, step, nc);
-	slic.create_connectivity(lab_image);
-	slic.store_superpixels(&frame2);
-	superpixels_list = slic.get_superpixels();
-
-	slic.display_contours(&frame2, CV_RGB(255,0,0));
-	//slic.display_center_grid(&frame2, CV_RGB(0,255,0));
-	slic.display_number_grid(&frame2, CV_RGB(0,255,0));
-	superpixels_contours_img = cv::cvarrToMat(&frame2, true, true, 0);
-
-	cvReleaseImage(&lab_image);
-}
-
-
-void egbisSuperpixels()
-{
-	seg_image = egbis.generateSuperpixels(frame, gray);
-    superpixels_contours_img = egbis.outlineSuperpixelsContours(cv::Scalar(255,0,0));
-    egbis.calculateSuperpixelCenters();
-    egbis.storeSuperpixelsMemory();
-	superpixels_list = egbis.getSuperpixels();
-    superpixels_contours_img = egbis.displayCenterGrid(superpixels_contours_img, cv::Scalar(0,255,0));
-}
-
 void cameraSetup()
 {
 	//cap = VideoCapture(0); // Declare capture form Video: "eng_stat_obst.avi"
@@ -469,9 +429,11 @@ int main( int argc, char** argv )
 		waitKey(1); // Wait Time
 
 		
-		seg_image = frame.clone();
-		slicSuperpixels();
-		//egbisSuperpixels();
+		superpixels_contours_img = frame.clone();
+		segHandler.segmentImage(frame, gray);
+		superpixels_list = segHandler.getSuperpixels();
+		cout << superpixels_list.size() << "\n";
+		superpixels_contours_img = segHandler.getContoursImage();
 		CV_TIMER_STOP(B, "Superpixels processed")
 		floor_prior = ProbFns::getFloorPrior(frame, superpixels_list);
 		CV_TIMER_STOP(C, "Prior probability calculated")

@@ -1,6 +1,8 @@
 
 #include <global.h>
 
+#include <probabilistic_functions.h>
+#include <segmentation_handler.h>
 
 
 
@@ -18,11 +20,9 @@ using namespace std;
 using namespace cv;
 using namespace ProbFloorSearch;
 
-cv::Mat frame, seg_image, gray, prevgray, floor_prior; // Mat Declarations
-
+cv::Mat frame, gray, superpixels_contours_img, floor_prior; // Mat Declarations
 cv::Mat temp_grad[3], sobel[3], borders_sobel, borders_canny, borders_combined;
-cv::Mat img_lines, floor_boundary_img, superpixels_contours_img, superpixels_below_boundary, floor_prob_map;
-cv::Mat bayes_prob_floor, coloured_bayes_floor;
+cv::Mat img_lines, floor_boundary_img, superpixels_below_boundary, floor_prob_map;cv::Mat bayes_prob_floor, coloured_bayes_floor;
 vector<Vec4i> lines;
 vector<cv::Point> lines_dataset;
 int lines_history = 5;
@@ -35,8 +35,7 @@ double proc_W, proc_H;
 VideoCapture cap;
 vector<Superpixel> superpixels_list;
 
-Slic slic;
-Egbis egbis;
+SegmentationHandler segHandler("SLIC");
 int poly_degree = 3;
 Eigen::VectorXd poly_coeff;
 
@@ -477,9 +476,11 @@ int main( int argc, char** argv )
 		waitKey(1); // Wait Time
 
 		
-		seg_image = frame.clone();
-		slicSuperpixels();
-		//egbisSuperpixels();
+		superpixels_contours_img = frame.clone();
+		segHandler.segmentImage(frame, gray);
+		superpixels_list = segHandler.getSuperpixels();
+		cout << superpixels_list.size() << "\n";
+		superpixels_contours_img = segHandler.getContoursImage();
 		CV_TIMER_STOP(B, "Superpixels processed")
 		floor_prior = ProbFns::getFloorPrior(frame, superpixels_list);
 		CV_TIMER_STOP(C, "Prior probability calculated")
