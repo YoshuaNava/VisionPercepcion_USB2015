@@ -43,6 +43,26 @@ cd build
 cmake ..
 make -j$CPU_CORES -l$CPU_CORES
 
+
+cd ../../ORB_SLAM/Thirdparty/g2o/
+mkdir build
+cd build
+cmake .. -DCMAKE_BUILD_TYPE=Release
+make -j$CPU_CORES -l$CPU_CORES
+
+
+cd ../../DBoW2/
+mkdir build
+cd build
+cmake .. -DCMAKE_BUILD_TYPE=Release
+make -j$CPU_CORES -l$CPU_CORES
+
+cd ../../../
+mkdir build
+cd build
+cmake .. -DCMAKE_BUILD_TYPE=Release
+make -j$CPU_CORES -l$CPU_CORES
+
 cd ../../../
 catkin_make
 
