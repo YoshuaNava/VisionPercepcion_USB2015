@@ -20,16 +20,13 @@ namespace ProbFloorSearch
 		private:
 			double img_W, img_H;
 			cv::Mat frame, gray, superpixels_contours_img, floor_prior; // Mat Declarations
-			cv::Mat temp_grad[3], sobel[3], borders_sobel, borders_canny, borders_combined;
-			cv::Mat img_lines, poly_boundary_img, superpixels_below_boundary, floor_prob_map;
+			cv::Mat borders_combined, img_lines, poly_boundary_img, superpixels_below_boundary, floor_prob_map;
 			cv::Mat bayes_prob_floor, coloured_bayes_floor;
 			
-			vector<cv::Vec4i> lines;
 			vector<cv::Point> lines_dataset;
 			int lines_history = 5;
 			deque<vector<cv::Point>> acc_lines_points;
 			
-			vector<cv::Point> polynomial_fit;
 			int poly_degree = 3;
 			Eigen::VectorXd poly_coeff;
 			
@@ -44,8 +41,17 @@ namespace ProbFloorSearch
 		public: 
 			HoughHorizon(double img_W, double img_H);
 			~HoughHorizon();
-			void calculateSobel();
-			void calculateCanny();
+			
+			cv::Mat getBordersImage();
+			cv::Mat getLinesImage();
+			cv::Mat getPolyBoundaryImage();
+			cv::Mat getTaggedSuperpixelsImage();
+			cv::Mat getColouredBayesImage();
+			cv::Mat getProbabilisticFloorEstimate();
+			cv::Mat getBayesianFloorEstimate();
+			
+			void showImages();
+			void calculateSobelCannyBorders();
 			void findLinesHough();
 			void fitPolynomialFloorContour();
 			void drawPolynomialFloorBoundary();
@@ -58,15 +64,6 @@ namespace ProbFloorSearch
 			void doSimpleEstimation(cv::Mat frame, cv::Mat gray, cv::Mat superpixels_contours_img, cv::Mat floor_prior, vector<Superpixel> superpixels_list);
 			void doProbabilisticEstimation(cv::Mat frame, cv::Mat gray, cv::Mat superpixels_contours_img, cv::Mat floor_prior, vector<Superpixel> superpixels_list);
 			void doBayesianEstimation(cv::Mat frame, cv::Mat gray, cv::Mat superpixels_contours_img, cv::Mat floor_prior, vector<Superpixel> superpixels_list);
-			
-			cv::Mat getBordersImage();
-			cv::Mat getLinesImage();
-			cv::Mat getPolyBoundaryImage();
-			cv::Mat getTaggedSuperpixelsImage();
-			cv::Mat getColouredBayesImage();
-			cv::Mat getProbabilisticFloorEstimate();
-			cv::Mat getBayesianFloorEstimate();
-			void showImages();			
 	};
 }
 

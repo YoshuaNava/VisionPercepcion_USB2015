@@ -17,10 +17,8 @@ HoughHorizon::~HoughHorizon()
 
 void HoughHorizon::clearData()
 {
-	lines.clear();
 	lines_dataset.clear();
 	acc_lines_points.clear();
-	polynomial_fit.clear();
 	superpixels_list.clear();
 	superpixel_is_floor.clear();
 	superpixels_isfloor_samples.clear();
@@ -28,8 +26,121 @@ void HoughHorizon::clearData()
 }
 
 
-void HoughHorizon::calculateSobel()
+
+cv::Mat HoughHorizon::getBordersImage()
 {
+	return this->borders_combined;	
+}
+
+
+cv::Mat HoughHorizon::getLinesImage()
+{
+	return this->img_lines;
+}
+
+
+cv::Mat HoughHorizon::getPolyBoundaryImage()
+{
+	return this->poly_boundary_img;
+}
+
+
+cv::Mat HoughHorizon::getTaggedSuperpixelsImage()
+{
+	return this->superpixels_below_boundary;
+}
+
+
+cv::Mat HoughHorizon::getColouredBayesImage()
+{
+	return coloured_bayes_floor;
+}
+
+
+cv::Mat HoughHorizon::getProbabilisticFloorEstimate()
+{
+	return this->floor_prob_map;
+}
+
+
+cv::Mat HoughHorizon::getBayesianFloorEstimate()
+{
+	return this->bayes_prob_floor;
+}
+
+
+void HoughHorizon::showImages()
+{
+	if(algorithmType == 's')
+	{
+		DISPLAY_IMAGE_XY(true, frame, 0, 0);
+		cv::resizeWindow("frame", proc_W, proc_H);
+		DISPLAY_IMAGE_XY(true, gray, 1, 0);
+		cv::resizeWindow("gray", proc_W, proc_H);
+		DISPLAY_IMAGE_XY(true, borders_combined, 2, 0);
+		cv::resizeWindow("borders_combined", proc_W, proc_H);
+		DISPLAY_IMAGE_XY(true, img_lines, 3, 0);
+		cv::resizeWindow("img_lines", proc_W, proc_H);
+		DISPLAY_IMAGE_XY(true, poly_boundary_img, 4, 0);
+		cv::resizeWindow("poly_boundary_img", proc_W, proc_H);
+		DISPLAY_IMAGE_XY(true, superpixels_contours_img, 0, 1);
+		cv::resizeWindow("superpixels_contours_img", proc_W, proc_H);
+		DISPLAY_IMAGE_XY(true, superpixels_below_boundary, 1, 1);
+		cv::resizeWindow("superpixels_below_boundary", proc_W, proc_H);
+	}
+	if(algorithmType == 'p')
+	{
+		DISPLAY_IMAGE_XY(true, frame, 0, 0);
+		cv::resizeWindow("frame", proc_W, proc_H);
+		DISPLAY_IMAGE_XY(true, gray, 1, 0);
+		cv::resizeWindow("gray", proc_W, proc_H);
+		DISPLAY_IMAGE_XY(true, borders_combined, 2, 0);
+		cv::resizeWindow("borders_combined", proc_W, proc_H);
+		DISPLAY_IMAGE_XY(true, img_lines, 3, 0);
+		cv::resizeWindow("img_lines", proc_W, proc_H);
+		DISPLAY_IMAGE_XY(true, poly_boundary_img, 4, 0);
+		cv::resizeWindow("poly_boundary_img", proc_W, proc_H);
+		DISPLAY_IMAGE_XY(true, superpixels_contours_img, 0, 1);
+		cv::resizeWindow("superpixels_contours_img", proc_W, proc_H);
+		DISPLAY_IMAGE_XY(true, floor_prob_map, 1, 1);
+		cv::resizeWindow("floor_prob_map", proc_W, proc_H);
+		DISPLAY_IMAGE_XY(true, superpixels_below_boundary, 2, 1);
+		cv::resizeWindow("superpixels_below_boundary", proc_W, proc_H);
+	}
+	if(algorithmType == 'b')
+	{
+		DISPLAY_IMAGE_XY(true, frame, 0, 0);
+		cv::resizeWindow("frame", proc_W, proc_H);
+		DISPLAY_IMAGE_XY(true, gray, 1, 0);
+		cv::resizeWindow("gray", proc_W, proc_H);
+		DISPLAY_IMAGE_XY(true, borders_combined, 2, 0);
+		cv::resizeWindow("borders_combined", proc_W, proc_H);
+		DISPLAY_IMAGE_XY(true, img_lines, 3, 0);
+		cv::resizeWindow("img_lines", proc_W, proc_H);
+		DISPLAY_IMAGE_XY(true, poly_boundary_img, 4, 0);
+		cv::resizeWindow("poly_boundary_img", proc_W, proc_H);
+		DISPLAY_IMAGE_XY(true, superpixels_contours_img, 0, 1);
+		cv::resizeWindow("superpixels_contours_img", proc_W, proc_H);
+		DISPLAY_IMAGE_XY(true, floor_prob_map, 1, 1);
+		cv::resizeWindow("floor_prob_map", proc_W, proc_H);
+		DISPLAY_IMAGE_XY(true, superpixels_below_boundary, 2, 1);
+		cv::resizeWindow("superpixels_below_boundary", proc_W, proc_H);
+		DISPLAY_IMAGE_XY(true, bayes_prob_floor, 3, 1);
+		cv::resizeWindow("bayes_prob_floor", proc_W, proc_H);
+		DISPLAY_IMAGE_XY(true, coloured_bayes_floor, 4, 1);
+		cv::resizeWindow("coloured_bayes_floor", proc_W, proc_H);
+	}
+}
+
+
+void HoughHorizon::calculateSobelCannyBorders()
+{
+	cv::Mat temp_grad[3], sobel[3], borders_sobel, borders_canny;
+	int edgeThresh = 1;
+	int lowThreshold = 3;
+	int const max_lowThreshold = 100;
+	int ratio = 5;
+	int kernel_size = 3;
 	//cv::equalizeHist(gray,gray);
 	GaussianBlur(gray, gray, cv::Size(5, 5), 0, 0 );
 	cv::Sobel(gray, temp_grad[0], gray.depth(), 2, 0, 3, 15, 0, cv::BORDER_DEFAULT);
@@ -49,25 +160,17 @@ void HoughHorizon::calculateSobel()
 	cv::subtract(borders_sobel, dilated, dilated);
 	cv::bitwise_or(skel, dilated, skel);
 	eroded.copyTo(borders_sobel);
-}
 
-
-void HoughHorizon::calculateCanny()
-{
-	int edgeThresh = 1;
-	int lowThreshold = 3;
-	int const max_lowThreshold = 100;
-	int ratio = 5;
-	int kernel_size = 3;
 	GaussianBlur(gray, borders_canny, cv::Size(img_W/8+1-((int)img_W%8), (int)img_W/8+1-((int)img_W%8)), 0, 0);
 	Canny(borders_canny, borders_canny, lowThreshold, lowThreshold*ratio, kernel_size, true);
+	addWeighted(borders_sobel, 0.7, borders_canny, 0.3, 0.0, borders_combined);
 }
 
 
 void HoughHorizon::findLinesHough()
 {
-	addWeighted(borders_sobel, 0.7, borders_canny, 0.3, 0.0, borders_combined);
 	cv::Vec4i line;
+	vector<cv::Vec4i> lines;
 	float line_slope;
 	cv::Point aux_point;
 	vector<cv::Point> lines_points;
@@ -344,7 +447,7 @@ void HoughHorizon::calculateBayesianEstimateFloor()
 	int i, j;
 	point2Dvec points;
 	int x_coord, y_coord;
-	uchar green_tonality;
+	uchar red_tonality;
 	double prob_bayes_floor = 0;
 	double prob_prior = 0;
 	for(i=0; i<superpixels_list.size() ;i++)
@@ -352,18 +455,11 @@ void HoughHorizon::calculateBayesianEstimateFloor()
 		if(i<superpixels_floor_prob.size())
 		{
 			prob_prior = floor_prior.at<float>(superpixels_list[i].get_center().y, superpixels_list[i].get_center().x);
-			prob_bayes_floor = (superpixels_floor_prob[i] * prob_prior) / (superpixels_floor_prob[i] * prob_prior + 0.7 * (1-prob_prior));
+			prob_bayes_floor = (superpixels_floor_prob[i] * prob_prior) / (superpixels_floor_prob[i] * prob_prior + 0.5 * (1-prob_prior));
 			// cout << "prior floor =  " << prob_prior << "\n";
 			// cout << "horizon floor =  " << superpixels_floor_prob[i] << "\n";
 			// cout << "bayes floor =  " << prob_bayes_floor << "\n";
-			if(superpixels_floor_prob[i] > 0)
-			{
-				green_tonality = prob_bayes_floor * 255;
-			}
-			else
-			{
-				green_tonality = 0;
-			}
+			red_tonality = prob_bayes_floor * 255;
 			
 			points = superpixels_list[i].get_points();
 			for(j=0; j < points.size() ;j++)
@@ -371,11 +467,11 @@ void HoughHorizon::calculateBayesianEstimateFloor()
 				x_coord = points[j].x;
 				y_coord = points[j].y;
 				bayes_prob_floor.at<float>(y_coord, x_coord) = prob_bayes_floor; 
-				coloured_bayes_floor.at<cv::Vec3b>(y_coord, x_coord)[1] = green_tonality;
+				coloured_bayes_floor.at<cv::Vec3b>(y_coord, x_coord)[2] = red_tonality;
 			}
 		}
 	}				
-	addWeighted(superpixels_below_boundary, 0.7, coloured_bayes_floor, 0.3, 0.0, coloured_bayes_floor);
+	addWeighted(coloured_bayes_floor, 0.7, gray, 0.3, 0.0, coloured_bayes_floor);
 }
 
 
@@ -388,8 +484,7 @@ void HoughHorizon::doSimpleEstimation(cv::Mat frame, cv::Mat gray, cv::Mat super
 	this->floor_prior = floor_prior.clone();
 	this->superpixels_list = superpixels_list;
 	this->algorithmType = 's';
-	calculateCanny();
-	calculateSobel();
+	calculateSobelCannyBorders();
 	findLinesHough();
 	fitPolynomialFloorContour();
 	drawPolynomialFloorBoundary();
@@ -406,8 +501,7 @@ void HoughHorizon::doProbabilisticEstimation(cv::Mat frame, cv::Mat gray, cv::Ma
 	this->floor_prior = floor_prior.clone();
 	this->superpixels_list = superpixels_list;
 	this->algorithmType = 'p';
-	calculateCanny();
-	calculateSobel();
+	calculateSobelCannyBorders();
 	findLinesHough();
 	fitPolynomialFloorContour();
 	drawPolynomialFloorBoundary();
@@ -426,8 +520,7 @@ void HoughHorizon::doBayesianEstimation(cv::Mat frame, cv::Mat gray, cv::Mat sup
 	this->floor_prior = floor_prior.clone();
 	this->superpixels_list = superpixels_list;
 	this->algorithmType = 'b';
-	calculateCanny();
-	calculateSobel();
+	calculateSobelCannyBorders();
 	findLinesHough();
 	fitPolynomialFloorContour();
 	drawPolynomialFloorBoundary();
@@ -438,108 +531,3 @@ void HoughHorizon::doBayesianEstimation(cv::Mat frame, cv::Mat gray, cv::Mat sup
 	showImages();
 }
 
-
-cv::Mat HoughHorizon::getBordersImage()
-{
-	return this->borders_combined;	
-}
-
-
-cv::Mat HoughHorizon::getLinesImage()
-{
-	return this->img_lines;
-}
-
-
-cv::Mat HoughHorizon::getPolyBoundaryImage()
-{
-	return this->poly_boundary_img;
-}
-
-
-cv::Mat HoughHorizon::getTaggedSuperpixelsImage()
-{
-	return this->superpixels_below_boundary;
-}
-
-
-cv::Mat HoughHorizon::getColouredBayesImage()
-{
-	return coloured_bayes_floor;
-}
-
-
-cv::Mat HoughHorizon::getProbabilisticFloorEstimate()
-{
-	return this->floor_prob_map;
-}
-
-
-cv::Mat HoughHorizon::getBayesianFloorEstimate()
-{
-	return this->bayes_prob_floor;
-}
-
-
-void HoughHorizon::showImages()
-{
-	if(algorithmType == 's')
-	{
-		DISPLAY_IMAGE_XY(true, frame, 0, 0);
-		cv::resizeWindow("frame", proc_W, proc_H);
-		DISPLAY_IMAGE_XY(true, gray, 1, 0);
-		cv::resizeWindow("gray", proc_W, proc_H);
-		DISPLAY_IMAGE_XY(true, borders_combined, 2, 0);
-		cv::resizeWindow("borders_combined", proc_W, proc_H);
-		DISPLAY_IMAGE_XY(true, img_lines, 3, 0);
-		cv::resizeWindow("img_lines", proc_W, proc_H);
-		DISPLAY_IMAGE_XY(true, poly_boundary_img, 4, 0);
-		cv::resizeWindow("poly_boundary_img", proc_W, proc_H);
-		DISPLAY_IMAGE_XY(true, superpixels_contours_img, 0, 1);
-		cv::resizeWindow("superpixels_contours_img", proc_W, proc_H);
-		DISPLAY_IMAGE_XY(true, superpixels_below_boundary, 1, 1);
-		cv::resizeWindow("superpixels_below_boundary", proc_W, proc_H);
-	}
-	if(algorithmType == 'p')
-	{
-		DISPLAY_IMAGE_XY(true, frame, 0, 0);
-		cv::resizeWindow("frame", proc_W, proc_H);
-		DISPLAY_IMAGE_XY(true, gray, 1, 0);
-		cv::resizeWindow("gray", proc_W, proc_H);
-		DISPLAY_IMAGE_XY(true, borders_combined, 2, 0);
-		cv::resizeWindow("borders_combined", proc_W, proc_H);
-		DISPLAY_IMAGE_XY(true, img_lines, 3, 0);
-		cv::resizeWindow("img_lines", proc_W, proc_H);
-		DISPLAY_IMAGE_XY(true, poly_boundary_img, 4, 0);
-		cv::resizeWindow("poly_boundary_img", proc_W, proc_H);
-		DISPLAY_IMAGE_XY(true, superpixels_contours_img, 0, 1);
-		cv::resizeWindow("superpixels_contours_img", proc_W, proc_H);
-		DISPLAY_IMAGE_XY(true, floor_prob_map, 1, 1);
-		cv::resizeWindow("floor_prob_map", proc_W, proc_H);
-		DISPLAY_IMAGE_XY(true, superpixels_below_boundary, 2, 1);
-		cv::resizeWindow("superpixels_below_boundary", proc_W, proc_H);
-	}
-	if(algorithmType == 'b')
-	{
-		DISPLAY_IMAGE_XY(true, frame, 0, 0);
-		cv::resizeWindow("frame", proc_W, proc_H);
-		DISPLAY_IMAGE_XY(true, gray, 1, 0);
-		cv::resizeWindow("gray", proc_W, proc_H);
-		DISPLAY_IMAGE_XY(true, borders_combined, 2, 0);
-		cv::resizeWindow("borders_combined", proc_W, proc_H);
-		DISPLAY_IMAGE_XY(true, img_lines, 3, 0);
-		cv::resizeWindow("img_lines", proc_W, proc_H);
-		DISPLAY_IMAGE_XY(true, poly_boundary_img, 4, 0);
-		cv::resizeWindow("poly_boundary_img", proc_W, proc_H);
-		DISPLAY_IMAGE_XY(true, superpixels_contours_img, 0, 1);
-		cv::resizeWindow("superpixels_contours_img", proc_W, proc_H);
-		DISPLAY_IMAGE_XY(true, floor_prob_map, 1, 1);
-		cv::resizeWindow("floor_prob_map", proc_W, proc_H);
-		DISPLAY_IMAGE_XY(true, superpixels_below_boundary, 2, 1);
-		cv::resizeWindow("superpixels_below_boundary", proc_W, proc_H);
-		DISPLAY_IMAGE_XY(true, bayes_prob_floor, 3, 1);
-		cv::resizeWindow("bayes_prob_floor", proc_W, proc_H);
-		DISPLAY_IMAGE_XY(true, coloured_bayes_floor, 4, 1);
-		cv::resizeWindow("coloured_bayes_floor", proc_W, proc_H);
-	}
-}
