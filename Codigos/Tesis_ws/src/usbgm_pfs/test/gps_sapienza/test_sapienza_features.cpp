@@ -17,10 +17,16 @@ cv::Mat bayes_prob_floor, coloured_bayes_floor;
 VideoCapture cap;
 vector<Superpixel> superpixels_list;
 
-SegmentationHandler seg_handler("SLIC");
+SegmentationHandler seg_handler("EGBIS");
 HoughHorizon hough_searcher(proc_H, proc_W);
+
 GPSSapienza::Features features;
 GPSSapienza::Features* featuresPtr = &features;
+GPSSapienza::Statistics statistics;
+GPSSapienza::Statistics* statisticsPtr = &statistics;
+GPSSapienza::Model stat_model;
+GPSSapienza::Model* stat_modelPtr = &stat_model;
+GPSSapienza::Algorithm_parameters alg_params;
 
 
 
@@ -93,6 +99,11 @@ int main( int argc, char** argv )
 	printf("******************************************\n");
 	waitKey(0);
 	
+	alg_params.img_size = cv::Size(proc_W, proc_H);
+	GPSSapienza::init_stats(alg_params.img_size, statisticsPtr, 1);
+	GPSSapienza::init_model(alg_params.img_size, cv::Rect(), stat_modelPtr);
+	GPSSapienza::init_features(alg_params.img_size, featuresPtr);
+	
     
 	while (nh.ok()) 
 	{
@@ -133,5 +144,5 @@ int main( int argc, char** argv )
 
 	//ros::spin();
 
-	return 0;
+	return EXIT_SUCCESS;
 }

@@ -82,16 +82,8 @@ namespace GPSSapienza
         
         //Basic Stats
         cv::Scalar* mean;
-        CvScalar* stdDev;
+        cv::Scalar* stdDev;
     
-        //Edge Stats
-        //CvHistogram *HegoM, *HegmM;
-        
-        //Colour Stats
-        //CvHistogram *HhueM, *HsatM;
-        
-        //LBP Stats
-        //CvHistogram *HlbpM;
         CvHistogram* H_M[NUM_FEATURES],*H_M_DISP[NUM_FEATURES];
         int* dim;
     
@@ -130,7 +122,9 @@ namespace GPSSapienza
     typedef struct algorithm_parameters Algorithm_parameters;
 
 
-    void init_stats(cv::Size img_size, Statistics* S, bool init);
+	void init_stats(cv::Size img_size, Statistics* S, bool init);
+    void init_model(cv::Size img_size, cv::Rect SafeRegion, Model* M);
+    void init_features(cv::Size img_size, Features * F);
     
 }
 

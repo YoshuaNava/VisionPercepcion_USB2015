@@ -1,5 +1,6 @@
 
 #include "init_structures.h"
+using namespace std;
 
 namespace GPSSapienza
 {
@@ -174,13 +175,15 @@ namespace GPSSapienza
 		//cvSet(M->mask,cv::ScalarAll(ONE),0);
 		//cvResetImageROI( M->mask );
 	
-		//M->mean = new cv::Scalar[n];
+		M->mean = new cv::Scalar[n];
 		for (int i=0; i<n; i++){
+			cout << "hola\n\n";
 			M->mean[i] = cv::Scalar(0,0,0,0);
 		}
 	
-		//M->stdDev = new cv::Scalar[n];
+		M->stdDev = new cv::Scalar[n];
 		for (int i=0; i<n; i++){
+			cout << "epale\n\n";
 			M->stdDev[i] = cv::Scalar(0,0,0,0);
 		}
 	
@@ -211,7 +214,7 @@ namespace GPSSapienza
 		for (int i=2; i<NUM_FEATURES; i++){
 			M->dim[i] = 32;
 		}
-	
+			
 		M->H_M[0] = cvCreateHist( 1, &dim_32, CV_HIST_ARRAY, &range_256_ptr, 1 );
 		M->H_M[1] = cvCreateHist( 1, &dim_9, CV_HIST_ARRAY, &range_2pi_ptr, 1 );
 		M->H_M[2] = cvCreateHist( 1, &dim_32, CV_HIST_ARRAY, &range_181_ptr, 1 );
@@ -268,15 +271,5 @@ namespace GPSSapienza
 	}
 
 
-
-
-
-
-
 	
 }
-
-
-
-
-
