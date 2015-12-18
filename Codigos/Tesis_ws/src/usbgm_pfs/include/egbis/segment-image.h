@@ -89,7 +89,7 @@ int* comp_arr;
 int* segments;
 uchar* graycolors;
 
-void SegmentImage(IplImage* numbered_output, IplImage *im, float sigma, float c, int min_size,
+void SegmentImage(IplImage* output, IplImage *im, float sigma, float c, int min_size,
 			  int *num_ccs) {
   static int width = im->width;
   static int height = im->height;
@@ -167,8 +167,7 @@ void SegmentImage(IplImage* numbered_output, IplImage *im, float sigma, float c,
   *num_ccs = u->num_sets();
 	int length = u->num_sets();
 
-  char * num_outputPixelData = (char *)(numbered_output->imageData);
-  char * cluster_outputPixelData = (char *)(numbered_output->imageData);
+  char * outputPixelData = (char *)(output->imageData);
   int comp1=0;
   comp_arr = new int[width*height];
   //int comp_arr[width*height];
@@ -188,7 +187,7 @@ void SegmentImage(IplImage* numbered_output, IplImage *im, float sigma, float c,
 
 
 
-  cvNormalize(numbered_output,numbered_output,0,255,CV_MINMAX,0);
+  cvNormalize(output,output,0,255,CV_MINMAX,0);
 
 
   vector<int> myvector (comp_arr, comp_arr+i);
@@ -225,19 +224,17 @@ i=0;
     for (int x = 0; x < width; x++) {
       int comp = u->find(y * width + x);
 
-			int index = (y*numbered_output->width+x)*numbered_output->nChannels;
+			int index = (y*output->width+x)*output->nChannels;
 
-			num_outputPixelData[index+0] = graycolors[comp]/(floor(255/myvector.size()));
-      cluster_outputPixelData[index+0] = graycolors[comp];
+			outputPixelData[index+0] = graycolors[comp]/(floor(255/myvector.size()));
+      //outputPixelData[index+0] = graycolors[comp];
 			//printf("col= %d ", graycolors[comp]);
 
 
     }
   }
 
-//  delete [] colors;
 delete u;
-	//cvReleaseImage(&output);
 delete [] comp_arr;
 comp_arr = NULL;
 
@@ -247,7 +244,6 @@ segments = NULL;
 delete [] graycolors;
 graycolors = NULL;
 
-//~myvector();
 }
 
 #endif
