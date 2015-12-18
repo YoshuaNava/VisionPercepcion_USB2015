@@ -79,6 +79,14 @@ TARGET_LINK_LIBRARIES(fps egbis)
 TARGET_LINK_LIBRARIES(fps slic)
 TARGET_LINK_LIBRARIES(fps ${LINK_LIBS})
 
+
+ADD_LIBRARY(gps_sapienza_mod SHARED 
+	include/gps_sapienza/img_proc_functions.h
+	include/gps_sapienza/img_proc_functions.cpp
+	include/gps_sapienza/init_structures.h
+	include/gps_sapienza/init_structures.cpp
+)
+TARGET_LINK_LIBRARIES(gps_sapienza_mod ${LINK_LIBS})
 # ADD_EXECUTABLE(pfs src/plane_segmentation_alpha.cpp)
 # TARGET_LINK_LIBRARIES(pfs ${LINK_LIBS})
 # TARGET_LINK_LIBRARIES(pfs slic)
@@ -86,6 +94,10 @@ TARGET_LINK_LIBRARIES(fps ${LINK_LIBS})
 
 ADD_EXECUTABLE(test_prob_floor_prior test/test_prob_floor_prior.cpp)
 TARGET_LINK_LIBRARIES(test_prob_floor_prior fps)
+
+ADD_EXECUTABLE(test_sapienza_features test/test_sapienza_features.cpp)
+TARGET_LINK_LIBRARIES(test_sapienza_features fps)
+TARGET_LINK_LIBRARIES(test_sapienza_features gps_sapienza_mod)
 
 
 ADD_EXECUTABLE(test_encapsulated_horizon_search test/test_encapsulated_horizon_search.cpp)

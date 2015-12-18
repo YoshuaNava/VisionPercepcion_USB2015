@@ -489,7 +489,7 @@ void HoughHorizon::doSimpleEstimation(cv::Mat frame, cv::Mat gray, cv::Mat super
 	fitPolynomialFloorContour();
 	drawPolynomialFloorBoundary();
 	findSimpleSuperpixelsBelowBoundary();
-	showImages();
+//	showImages();
 }
 
 
@@ -508,7 +508,7 @@ void HoughHorizon::doProbabilisticEstimation(cv::Mat frame, cv::Mat gray, cv::Ma
 	findProbSuperpixelsBelowBoundary();
 	calculateFloorProbability();
 	drawProbabilisticFloor();
-	showImages();	
+//	showImages();	
 }
 
 
@@ -528,6 +528,6 @@ void HoughHorizon::doBayesianEstimation(cv::Mat frame, cv::Mat gray, cv::Mat sup
 	calculateFloorProbability();
 	drawProbabilisticFloor();
 	calculateBayesianEstimateFloor();
-	showImages();
+//	showImages();
 }
 

@@ -17,12 +17,12 @@
 #include <vector>
 
 #include "opencv/cv.h"
-#include "opencv/highgui.h"
 #include "opencv/cxcore.h"
 #include "opencv2/highgui/highgui.hpp"
 #include "opencv2/imgproc/imgproc.hpp"
 #include "opencv2/video/tracking.hpp"
 #include "opencv2/core/core.hpp"
+
 #define point2Dvec vector<cv::Point>
 
 using namespace std;
