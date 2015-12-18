@@ -13,3 +13,6 @@
 [submodule "Codigos/Tesis_ws/src/ORB_SLAM"]
 	path = Codigos/Tesis_ws/src/ORB_SLAM
 	url = https://github.com/YoshuaNava/ORB_SLAM.git
+[submodule "Codigos/Tesis_ws/src/usb_cam"]
+	path = Codigos/Tesis_ws/src/usb_cam
+	url = https://github.com/bosch-ros-pkg/usb_cam.git
