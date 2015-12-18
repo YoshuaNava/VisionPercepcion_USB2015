@@ -9,7 +9,6 @@ SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/CMakeModules/"
 
 
 FIND_PACKAGE(OpenCV REQUIRED)
-FIND_PACKAGE(svo REQUIRED)
 FIND_PACKAGE(Eigen REQUIRED)
 
 FIND_PACKAGE(catkin REQUIRED COMPONENTS
@@ -21,18 +20,17 @@ FIND_PACKAGE(catkin REQUIRED COMPONENTS
 
 CATKIN_PACKAGE(
 	INCLUDE_DIRS include
-	DEPENDS OpenCV svo Eigen
+	DEPENDS OpenCV Eigen
 	CATKIN_DEPENDS roscpp image_transport cv_bridge
 )
 
 INCLUDE_DIRECTORIES(${catkin_INCLUDE_DIRS} ${OpenCV_INCLUDE_DIRS} include)
-INCLUDE_DIRECTORIES(${catkin_INCLUDE_DIRS} ${svo_INCLUDE_DIRS} include)
+INCLUDE_DIRECTORIES(${catkin_INCLUDE_DIRS} ${Eigen_INCLUDE_DIRS} include)
 INCLUDE_DIRECTORIES(include test)
 
 
 LIST(APPEND LINK_LIBS 
 	${OpenCV_LIBRARIES}
-	${svo_LIBRARIES}
 	${roscpp_LIBRARIES}
 	${cv_bridge_LIBRARIES}
 	${image_transport_LIBRARIES}
@@ -87,41 +85,36 @@ ADD_LIBRARY(gps_sapienza_mod SHARED
 	include/gps_sapienza/init_structures.cpp
 )
 TARGET_LINK_LIBRARIES(gps_sapienza_mod ${LINK_LIBS})
-# ADD_EXECUTABLE(pfs src/plane_segmentation_alpha.cpp)
-# TARGET_LINK_LIBRARIES(pfs ${LINK_LIBS})
-# TARGET_LINK_LIBRARIES(pfs slic)
 
 
-ADD_EXECUTABLE(test_prob_floor_prior test/test_prob_floor_prior.cpp)
+
+
+ADD_EXECUTABLE(test_prob_floor_prior test/horizon_search/test_prob_floor_prior.cpp)
 TARGET_LINK_LIBRARIES(test_prob_floor_prior fps)
 
-ADD_EXECUTABLE(test_sapienza_features test/test_sapienza_features.cpp)
-TARGET_LINK_LIBRARIES(test_sapienza_features fps)
-TARGET_LINK_LIBRARIES(test_sapienza_features gps_sapienza_mod)
-
-
-ADD_EXECUTABLE(test_encapsulated_horizon_search test/test_encapsulated_horizon_search.cpp)
+ADD_EXECUTABLE(test_encapsulated_horizon_search test/horizon_search/test_encapsulated_horizon_search.cpp)
 TARGET_LINK_LIBRARIES(test_encapsulated_horizon_search fps)
 
 
-ADD_EXECUTABLE(test_egbis_superpixel_segmentation test/test_egbis_superpixel_segmentation.cpp)
+ADD_EXECUTABLE(test_egbis_superpixel_segmentation test/segmentation/test_egbis_superpixel_segmentation.cpp)
 TARGET_LINK_LIBRARIES(test_egbis_superpixel_segmentation ${LINK_LIBS})
 TARGET_LINK_LIBRARIES(test_egbis_superpixel_segmentation egbis)
 
-
-ADD_EXECUTABLE(test_slic_superpixel_segmentation test/test_slic_superpixel_segmentation.cpp)
+ADD_EXECUTABLE(test_slic_superpixel_segmentation test/segmentation/test_slic_superpixel_segmentation.cpp)
 TARGET_LINK_LIBRARIES(test_slic_superpixel_segmentation ${LINK_LIBS})
 TARGET_LINK_LIBRARIES(test_slic_superpixel_segmentation slic)
 
-
-ADD_EXECUTABLE(test_histogram_superpixel_comparison test/test_histogram_superpixel_comparison.cpp)
+ADD_EXECUTABLE(test_histogram_superpixel_comparison test/segmentation/test_histogram_superpixel_comparison.cpp)
 TARGET_LINK_LIBRARIES(test_histogram_superpixel_comparison fps)
 
 
-# ADD_EXECUTABLE(test_svo_depth_filter test/test_svo_depth_filter.cpp)
-# TARGET_LINK_LIBRARIES(test_svo_depth_filter ${LINK_LIBS})
+ADD_EXECUTABLE(test_sapienza_features test/gps_sapienza/test_sapienza_features.cpp)
+TARGET_LINK_LIBRARIES(test_sapienza_features fps)
+TARGET_LINK_LIBRARIES(test_sapienza_features gps_sapienza_mod)
 
-
+# ADD_EXECUTABLE(test_sapienza_features test/gps_sapienza/test_sapienza_features.cpp)
+# TARGET_LINK_LIBRARIES(test_sapienza_features fps)
+# TARGET_LINK_LIBRARIES(test_sapienza_features gps_sapienza_mod)
 
 
 

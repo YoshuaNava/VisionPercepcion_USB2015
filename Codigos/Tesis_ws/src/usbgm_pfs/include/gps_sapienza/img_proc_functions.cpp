@@ -85,6 +85,7 @@ namespace GPSSapienza{
 		cv::split(featuresPtr->hsv, hsv_channels); //cvsplit Divides a multi-channel array into separate single-channel arrays
 		featuresPtr->hue = hsv_channels[0];
 		featuresPtr->sat = hsv_channels[1];
+		featuresPtr->val = hsv_channels[2];
 		cv::split(featuresPtr->YCrCb, ycrcb_channels);
 		featuresPtr->Cr = ycrcb_channels[1];
 		featuresPtr->Cb = ycrcb_channels[2];

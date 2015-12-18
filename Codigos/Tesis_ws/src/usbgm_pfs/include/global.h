@@ -34,8 +34,6 @@
 #include <Eigen/Core>
 #include <Eigen/Dense>
 
-#include <svo/config.h>
-
 // #define proc_H	120
 // #define proc_W	160
 #define proc_H	240

@@ -32,32 +32,33 @@
 #include "opencv2/core/core.hpp"
 
 #define NUM_FEATURES    6
+#define ZERO	0 //Binary image zero=0 & one=255
+#define ONE	255
 
 
 namespace GPSSapienza
 {
-
     struct statistics {
     
-        int *id;
-        int *size;
-        int *gray_id;
+        int* id;
+        int* size;
+        int* gray_id;
         cv::Scalar* mean;
         cv::Scalar* stdDev;
-        CvRect* box; 
+        cv::Rect* box; 
         int no_features;
     
     
-        double *P_Gt;
-        double *P_Gf;
+        double* P_Gt;
+        double* P_Gf;
         cv::Mat prior_img;
     
         double *P_FgGt, *P_FgGf;
     
-        double *P_GtgF;//posterior
-        double *P_GfgF;
+        double* P_GtgF;//posterior
+        double* P_GfgF;
     
-        double *G_score;
+        double* G_score;
     
         int nos; //nuber of segments
         int img_w;
@@ -76,7 +77,7 @@ namespace GPSSapienza
     
     struct model {
     
-        CvRect* box; //safe area
+        cv::Rect* box; //safe area
         cv::Mat mask; //safe area
         
         //Basic Stats
@@ -91,8 +92,8 @@ namespace GPSSapienza
         
         //LBP Stats
         //CvHistogram *HlbpM;
-        CvHistogram *H_M[NUM_FEATURES],*H_M_DISP[NUM_FEATURES];
-        int *dim;
+        CvHistogram* H_M[NUM_FEATURES],*H_M_DISP[NUM_FEATURES];
+        int* dim;
     
     };
     typedef struct model Model;
@@ -120,6 +121,16 @@ namespace GPSSapienza
     };
     
     typedef struct features Features;
+
+    struct algorithm_parameters {
+        cv::Size img_size;
+        
+    };
+    
+    typedef struct algorithm_parameters Algorithm_parameters;
+
+
+    void init_stats(cv::Size img_size, Statistics* S, bool init);
     
 }
 
