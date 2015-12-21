@@ -48,7 +48,7 @@ namespace GPSSapienza
 	void calculateLBP(cv::Mat frame, cv::Mat& lbp);
 	void calculateImageFeatures(GPSSapienza::Features* featuresPtr);
 	void init_images_img_proc(cv::Size img_size);
-	void superPixelStats(cv::Mat superpixels_img, cv::Mat gray, Statistics* stats);
+	void superPixelStats(Features features, Statistics* stats);
 	static inline double GetPrior(int h, cv::Rect* R);
 }
 

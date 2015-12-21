@@ -37,6 +37,7 @@ class Superpixel
 		point2Dvec points;
 		cv::Rect bounding_rect;
 		cv::Mat pixels;
+		cv::Mat pixels_gray;
 		cv::Mat pixels_mask;
 		float probability_floor;
 		float avg_depth;
@@ -55,11 +56,15 @@ class Superpixel
 		cv::Point get_center();
 		point2Dvec get_points();
 		cv::Mat get_histogram();
+		cv::Mat get_pixels();
+		cv::Mat get_pixels_gray();
+		cv::Mat get_pixels_mask();
+		cv::Rect get_bounding_rect();
 		
 		void print_everything();
 		void add_point(cv::Point point);
 		void add_pixels_information(IplImage *img, vector<vector<int>> clusters);
-		void add_pixels_information(cv::Mat img, vector<vector<int>> clusters);
+		void add_pixels_information(cv::Mat img, cv::Mat gray, vector<vector<int>> clusters);
 		void calculate_histogram();
 		void export_to_jpeg(IplImage *img);
 };

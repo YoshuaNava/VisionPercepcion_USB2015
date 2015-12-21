@@ -56,6 +56,26 @@ point2Dvec Superpixel::get_points()
 	return this->points;
 }
 
+cv::Mat Superpixel::get_pixels()
+{
+	return this->pixels;
+}
+
+cv::Mat Superpixel::get_pixels_gray()
+{
+	return this->pixels_gray;
+}
+
+cv::Mat Superpixel::get_pixels_mask()
+{
+	return this->pixels_mask;
+}
+
+cv::Rect Superpixel::get_bounding_rect()
+{
+	return this->bounding_rect;
+}
+
 void Superpixel::add_point(cv::Point point)
 {
 	this->points.push_back(point);
@@ -149,7 +169,7 @@ void Superpixel::add_pixels_information(IplImage *img, vector<vector<int>> clust
 }
 
 
-void Superpixel::add_pixels_information(cv::Mat img, vector<vector<int>> clusters)
+void Superpixel::add_pixels_information(cv::Mat img, cv::Mat gray, vector<vector<int>> clusters)
 {
 	int i, j;
 	int min_x, max_x, min_y, max_y, sp_height, sp_width;
@@ -182,6 +202,7 @@ void Superpixel::add_pixels_information(cv::Mat img, vector<vector<int>> cluster
 	this->bounding_rect = cv::Rect(min_x, min_y, sp_width, sp_height);
 	CvScalar colour;
 	this->pixels = cv::Mat::zeros(sp_height, sp_width, CV_8UC3);
+	this->pixels_gray = cv::Mat::zeros(sp_height, sp_width, CV_8UC1);
 	this->pixels_mask = cv::Mat::zeros(sp_height, sp_width, CV_8UC1);
 
 	int x_coord, y_coord;
@@ -197,6 +218,7 @@ void Superpixel::add_pixels_information(cv::Mat img, vector<vector<int>> cluster
 				(this->pixels.at<cv::Vec3b>(y_coord, x_coord)).val[0] = img.at<cv::Vec3b>(j,i).val[0];
 				(this->pixels.at<cv::Vec3b>(y_coord, x_coord)).val[1] = img.at<cv::Vec3b>(j,i).val[1];
 				(this->pixels.at<cv::Vec3b>(y_coord, x_coord)).val[2] = img.at<cv::Vec3b>(j,i).val[2];
+				this->pixels_gray.at<uchar>(y_coord, x_coord) = gray.at<uchar>(j, i);
 				this->pixels_mask.at<uchar>(y_coord, x_coord) = 255;
 			}
 		}

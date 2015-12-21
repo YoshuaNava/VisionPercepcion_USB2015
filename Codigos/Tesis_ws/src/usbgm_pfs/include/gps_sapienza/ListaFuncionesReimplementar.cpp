@@ -11,7 +11,7 @@ img_proc_fcns.cpp
 	// void convertGray2LBP(IplImage* gray, IplImage* LBP);
 	// void GraphBasedSegmentation(IplImage* seg, IplImage* gray_source);
 		
-	void SuperPixelStats(IplImage *gbs, IplImage *gray, Statistics *sts);
+	// void SuperPixelStats(IplImage *gbs, IplImage *gray, Statistics *sts);
 	void UpdatePrior(IplImage *gbs, Statistics *sts, Features *F);
 	void GetModel(IplImage* gray_img, Features* F, Model* StatModelPtr, bool dynamic);
 	void FeatureAnalysis(Features *F, Model* M, Statistics *sts, IplImage *gbs, bool dynamic);

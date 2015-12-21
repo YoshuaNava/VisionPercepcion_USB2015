@@ -131,12 +131,11 @@ vector<Superpixel> Egbis::storeSuperpixelsMemory()
     // }
     // cout << "**************************************************************************************\n";
 
+	cv::Mat gray;
+	cvtColor(frame, gray, CV_BGR2GRAY);
     for (i = 0; i < (int) superpixels_list.size(); i++) 
     {
-  //   	vector<cv::Point> points = superpixels_list[i].get_points();
-		// cout << "superpixel  " << superpixels_list[i].get_id() << "	points count  " << points.size() << "\n";
-        //superpixels_list[i].calculate_bounding_rect();
-        superpixels_list[i].add_pixels_information(frame, clusters);
+        superpixels_list[i].add_pixels_information(frame, gray, clusters);
         superpixels_list[i].calculate_histogram();
     }
 

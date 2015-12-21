@@ -176,36 +176,37 @@ namespace GPSSapienza{
 
 
 
-void superPixelStats(cv::Mat superpixels_img, cv::Mat gray, Statistics* stats)
+void superPixelStats(Features features, Statistics* stats)
 {
 	int k = 0;
-	cv::calcHist(&superpixels_img, 1, 0, cv::Mat(), superpixels_histogram, 1, &hist_size, &hist_range, true, false);
+	cv::calcHist(&features.seg_img, 1, 0, cv::Mat(), superpixels_histogram, 1, &hist_size, &hist_range, true, false);
 	stats_disp.setTo(cv::Scalar(255,255,255));
 	for(int i=0; i < hist_size ;i++)
 	{
-		if (cvRound(superpixels_histogram.at<float>(0)) > 0)
+		if ((cvRound(superpixels_histogram.at<float>(0)) > 0) && (features.superpixels_list.size() > i))
 		{
+			// std::cout << "i  " << i << "\n";
+			// std::cout << "superpixels size  =  " << features.superpixels_list.size() << "\n";
+			Superpixel curr_superpixel = features.superpixels_list[i];
 			stats->id[k] = k;
 			stats->gray_id[k] = i;
-			cv::compare(superpixels_img, cv::Scalar(i), mask[0], cv::CMP_EQ);
-			//cv::imshow("hola",mask[0]);
-			stats->size[k] = cv::countNonZero(mask[0]); //count number of pixels in current segment
-			cv::meanStdDev(gray, stats->mean[k], stats->stdDev[k], mask[0]);
+			cv::compare(features.seg_img, cv::Scalar(i), mask[0], cv::CMP_EQ);
+			stats->size[k] = curr_superpixel.get_points().size(); //count number of pixels in current segment
+
+			cv::meanStdDev(curr_superpixel.get_pixels_gray(), stats->mean[k], stats->stdDev[k], curr_superpixel.get_pixels_mask());
 			//std::cout << "mean = " << stats->mean[k] << "	stddev = " << stats->stdDev[k] << "\n";
 
-				// mask[0].convertTo(mask[0], CV_32FC1);
- 				// stats->box[k] = cv::boundingRect(mask[0]);
- 				// stats->P_Gt[k] = GetPrior(stats->img_h, &stats->box[k]);
-// 				sts->P_Gf[k] =  1. - sts->P_Gt[k];
+			stats->box[k] = curr_superpixel.get_bounding_rect();
+ 			// stats->P_Gt[k] = GetPrior(stats->img_h, &stats->box[k]);
+			stats->P_Gt[k] = stats->prior_img.at<float>(curr_superpixel.get_center().y, curr_superpixel.get_center().x);
+ 			stats->P_Gf[k] =  1. - stats->P_Gt[k];
 
-// 				cvSet(stats_disp, cvScalarAll(sts->mean[k].val[0]), mask[0]);
-// 				cvSet(sts->prior_img, cvScalar(sts->P_Gt[k]), mask[0]);
+			stats_disp.setTo(cv::Scalar(stats->mean[k].val[0]), mask[0]);
+			// stats->prior_img.setTo(cv::Scalar(stats->P_Gt[k]), mask[0]);
 
-// 				cvRectangle(stats_disp,	cvPoint(sts->box[k].x,sts->box[k].y),
-// 							cvPoint(sts->box[k].x+sts->box[k].width,sts->box[k].y+sts->box[k].height), CV_RGB(255,0,0), 1, 8, 0);
+			cv::rectangle(stats_disp, cvPoint(stats->box[k].x,stats->box[k].y), cvPoint(stats->box[k].x+stats->box[k].width,stats->box[k].y+stats->box[k].height), CV_RGB(255,0,0), 1, 8, 0);
 
-// 				cvLine(stats_disp, cvPoint(sts->box[k].x + (sts->box[k].width)/2 , sts->box[k].y + (sts->box[k].height)/2 ),
-// 						cvPoint(sts->img_w/2,sts->img_h), CV_RGB(255,0,0), 1, 8, 0);
+			cv::line(stats_disp, cvPoint(stats->box[k].x + (stats->box[k].width)/2 , stats->box[k].y + (stats->box[k].height)/2 ), cvPoint(stats->img_w/2,stats->img_h), CV_RGB(255,0,0), 1, 8, 0);
 
 			k++;
 

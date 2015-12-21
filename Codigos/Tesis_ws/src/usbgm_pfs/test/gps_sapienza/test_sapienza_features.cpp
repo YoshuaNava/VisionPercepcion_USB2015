@@ -15,7 +15,6 @@ cv::Mat borders_combined, img_lines, poly_boundary_img, superpixels_below_bounda
 cv::Mat bayes_prob_floor, coloured_bayes_floor;
 
 VideoCapture cap;
-vector<Superpixel> superpixels_list;
 
 SegmentationHandler seg_handler("EGBIS");
 HoughHorizon hough_searcher(proc_H, proc_W);
@@ -129,13 +128,17 @@ int main( int argc, char** argv )
 		CV_TIMER_STOP(B, "Image features ready")
 		superpixels_contours_img = features.rgb.clone();
 		seg_handler.segmentImage(features.rgb, features.gray);
-		superpixels_list = seg_handler.getSuperpixels();
+		features.superpixels_list = seg_handler.getSuperpixels();
 		superpixels_contours_img = seg_handler.getContoursImage();
 		features.seg_img = seg_handler.getSegmentedImage();
 		CV_TIMER_STOP(C, "Superpixels processed")
+		statistics.prior_img = ProbFns::getFloorPrior(features.rgb, features.superpixels_list);
 		
-		GPSSapienza::superPixelStats(features.seg_img, features.gray, statisticsPtr);
-		
+		GPSSapienza::superPixelStats(features, statisticsPtr);
+		CV_TIMER_STOP(D, "Superpixels statistics calculated")
+	
+		// UpdatePrior(gbs_img, StatsPtr, FPtr);
+		// GetModel(gray_img, FPtr, StatModelPtr, p.dynamic);
 
 		showImages();
 		CV_TIMER_STOP(Z, "Loop finished")

@@ -31,6 +31,8 @@
 #include "opencv2/video/tracking.hpp"
 #include "opencv2/core/core.hpp"
 
+#include <libsuperpixel/superpixel.h>
+
 #define NUM_FEATURES    6
 #define ZERO	0 //Binary image zero=0 & one=255
 #define ONE	255
@@ -111,6 +113,7 @@ namespace GPSSapienza
         //Classification
         cv::Mat bin_class_result;
         cv::Mat seg_img;
+        vector<Superpixel> superpixels_list;
     };
     
     typedef struct features Features;
