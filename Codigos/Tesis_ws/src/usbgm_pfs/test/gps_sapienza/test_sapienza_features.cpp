@@ -133,13 +133,24 @@ int main( int argc, char** argv )
 		features.seg_img = seg_handler.getSegmentedImage();
 		CV_TIMER_STOP(C, "Superpixels processed")
 		statistics.prior_img = ProbFns::getFloorPrior(features.rgb, features.superpixels_list);
+		// hough_searcher.doProbabilisticEstimation(features.rgb, features.gray, superpixels_contours_img, statistics.prior_img, features.superpixels_list);
+		// statistics.prior_img = hough_searcher.getProbabilisticFloorEstimate();
+		// hough_searcher.doBayesianEstimation(features.rgb, features.gray, superpixels_contours_img, statistics.prior_img, features.superpixels_list);
+		// statistics.prior_img = hough_searcher.getBayesianFloorEstimate();
+		// hough_searcher.showImages();
+		
 		
 		GPSSapienza::superPixelStats(features, statisticsPtr);
 		CV_TIMER_STOP(D, "Superpixels statistics calculated")
 	
-		// UpdatePrior(gbs_img, StatsPtr, FPtr);
-		// GetModel(gray_img, FPtr, StatModelPtr, p.dynamic);
-
+		GPSSapienza::updatePrior(statisticsPtr, featuresPtr);
+		CV_TIMER_STOP(E, "Prior probability updated")
+		
+		
+		GPSSapienza::GetModel(featuresPtr, stat_modelPtr);
+		CV_TIMER_STOP(F, "Got model")
+		
+		
 		showImages();
 		CV_TIMER_STOP(Z, "Loop finished")
 		printf("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n");

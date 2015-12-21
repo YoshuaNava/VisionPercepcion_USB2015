@@ -42,6 +42,8 @@ namespace GPSSapienza
 	static int hist_size = 256;
 	float range[] = { 0, 256 } ;
 	const float* hist_range = { range };
+	static double alpha = 0.6;
+	static double beta = 1.- alpha;
 	
 	void calculateIIC(cv::Mat Cr, cv::Mat Cb, cv::Mat a, cv::Mat& iic);
 	void calculateMagnitudeOrientationOfGradients(cv::Mat gray, cv::Mat& F_mag, cv::Mat& F_ang);
@@ -49,7 +51,9 @@ namespace GPSSapienza
 	void calculateImageFeatures(GPSSapienza::Features* featuresPtr);
 	void init_images_img_proc(cv::Size img_size);
 	void superPixelStats(Features features, Statistics* stats);
-	static inline double GetPrior(int h, cv::Rect* R);
+	static inline double getPrior(int h, cv::Rect* R);
+	void updatePrior(Statistics *stats, Features* features);
+	void GetModel(Features* features, Model* model);
 }
 
 #endif

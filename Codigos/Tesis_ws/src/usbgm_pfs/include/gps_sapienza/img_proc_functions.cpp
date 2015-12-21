@@ -216,7 +216,74 @@ void superPixelStats(Features features, Statistics* stats)
 
 }
 
-static inline double GetPrior(int h, cv::Rect* R){
+void updatePrior(Statistics *stats, Features* features)
+{	
+	cv::Scalar mean1 = cv::Scalar(0,0,0,0);
+	cv::Scalar mean0 = cv::Scalar(0,0,0,0);
+	
+	mean1.val[0] = cv::mean(features->post1, cv::Mat()).val[0];
+    if(mean1.val[0] > 0)
+	{
+		for(int i = 0; i < stats->nos; i++ )
+		{
+			cv::compare(features->seg_img, stats->gray_id[i], mask[0], CV_CMP_EQ);
+			cv::GaussianBlur(features->post1, features->post1, cv::Size(5, 5), 0, 0);
+			cv::GaussianBlur(features->post0, features->post0, cv::Size(5, 5), 0, 0);
+			
+			mean1.val[0] = cv::mean(features->post1, mask[0]).val[0];
+			mean0.val[0] = cv::mean(features->post0, mask[0]).val[0];
+			
+			if(mean1.val[0] > 0)
+			{
+				double prior1 = alpha*stats->P_Gt[i] + beta*mean1.val[0];
+				double prior0 = alpha*stats->P_Gf[i] + beta*mean0.val[0];			
+				stats->P_Gt[i] = prior1/(prior1+prior0);
+				stats->P_Gf[i] = prior0/(prior1+prior0);
+			}
+			stats->prior_img.setTo(cv::Scalar(stats->P_Gt[i]), mask[0]);
+		}
+	}
+}
+
+
+void GetModel(Features* features, Model* model)
+{
+    int loop;
+//     cvInRangeS( F->hsv, cvScalar(0,   smin, min(vmin,vmax), 0),
+//                         cvScalar(180, 256,  max(vmin,vmax), 0), bin[0] );
+
+//     cvAnd(bin[0], M->mask, bin[1]);
+//     if(dynamic) loop = 200;
+//     if(!dynamic) loop = 0;
+//     static bool acc =1;
+//     //static int loop = 1;
+//     static int j=0;
+//     if(j<loop){
+//         acc = 1;
+//         j++;
+//     }
+//     else{
+//         acc=0;
+//         j=0;
+//     }
+
+//     cvCalcHist( &F->mag, 	M->H_M[0], acc, M->mask );
+//     cvCalcHist( &F->ang32, 	M->H_M[1], acc, M->mask );
+//     cvCalcHist( &F->hue, 	M->H_M[2], acc, bin[1] );
+//     cvCalcHist( &F->sat, 	M->H_M[3], acc, M->mask );
+//     cvCalcHist( &F->lbp, 	M->H_M[4], acc, M->mask );
+//     cvCalcHist( &F->iic, 	M->H_M[5], acc, M->mask );
+
+//     static int dim_9 = 9;
+//     static int dim_32 = 32;
+
+//     for(int i=0;i<N;i++){
+//         cvCopyHist(M->H_M[i], &M->H_M_DISP[i]);
+//     }
+}
+
+
+static inline double getPrior(int h, cv::Rect* R){
     //const static int hmax = h-1;
     const static double lambda = 3./(double)h;
     double height = (double)(h - (R->y + (R->height)/2)) ;
@@ -226,11 +293,7 @@ static inline double GetPrior(int h, cv::Rect* R){
 
 // IplImage *contour_image; //display final binary segmentation
 
-// IplImage *hist_img; //display histogram of GBS
 // CvHistogram *hist = NULL;	    // pointer to histogram object
-
-// IplImage *mask[NUM_FEATURES]; //Images for use as masks eg:superpixels
-
 // IplImage *bin[NUM_FEATURES]; //images to use as masks with colour analysis
 
 // CvHistogram *histH, *histS, *histV; //Histograms of superpixels to match against model
@@ -253,84 +316,6 @@ static inline double GetPrior(int h, cv::Rect* R){
 // CvHistogram *Ghist2DISP = NULL;
 
 // CvSize HistSize;
-
-// 	void SuperPixelStats(IplImage *gbs, IplImage *gray, Statistics *sts)
-// 	{
-// 		static int hist_size = 256;			// size of histogram (number of bins)
-// 		int k = 0;
-	
-// 		cvCalcHist( &gbs, hist, 0, NULL );
-	
-// 		cvSet( stats_disp, cvScalarAll(255), 0 );
-	
-// 		for(int i = 0; i < hist_size; i++ )
-// 		{
-	
-// 			if (cvRound(cvGetReal1D(hist->bins,i)) > 0){
-	
-// 				sts->id[k] = k;
-// 				sts->gray_id[k] = i;
-// 				cvCmpS(gbs, i, mask[0], CV_CMP_EQ); //mask out image segment
-// 				sts->size[k] = cvCountNonZero(mask[0]); //count number of pixels in current segment
-// 				cvAvgSdv(gray, &sts->mean[k], &sts->stdDev[k], mask[0]);
-// 				sts->box[k] = cvBoundingRect(mask[0], 0);
-	
-// 				sts->P_Gt[k] = GetPrior(sts->img_h, &sts->box[k]);
-// 				sts->P_Gf[k] =  1. - sts->P_Gt[k];
-	
-// 				cvSet(stats_disp, cvScalarAll(sts->mean[k].val[0]), mask[0]);
-// 				cvSet(sts->prior_img, cvScalar(sts->P_Gt[k]), mask[0]);
-	
-// 				cvRectangle(stats_disp,	cvPoint(sts->box[k].x,sts->box[k].y),
-// 							cvPoint(sts->box[k].x+sts->box[k].width,sts->box[k].y+sts->box[k].height), CV_RGB(255,0,0), 1, 8, 0);
-	
-// 				cvLine(stats_disp, cvPoint(sts->box[k].x + (sts->box[k].width)/2 , sts->box[k].y + (sts->box[k].height)/2 ),
-// 						cvPoint(sts->img_w/2,sts->img_h), CV_RGB(255,0,0), 1, 8, 0);
-	
-// 				k++;
-	
-// 			}
-	
-// 		}
-// 		sts->nos = k;
-	
-// 	}
-
-// void UpdatePrior(IplImage *gbs, Statistics *sts, Features* F)
-// {
-
-//     CvScalar mean1 = cvScalar(0,0,0,0);
-//     CvScalar mean0 = cvScalar(0,0,0,0);
-//     static double alpha = 0.6;
-//     static double beta = 1.- alpha;
-
-//     cvAvgSdv(F->post1, &mean1, 0, NULL);
-//     if(mean1.val[0] > 0){
-
-//         for(int i = 0; i < sts->nos; i++ )
-// 		{
-// 			cvCmpS(gbs, sts->gray_id[i], mask[0], CV_CMP_EQ); //mask out image segmen
-			
-// 			cvSmooth(F->post1, F->post1, CV_GAUSSIAN, 5, 5);
-// 			cvSmooth(F->post0, F->post0, CV_GAUSSIAN, 5, 5);
-			
-// 			cvAvgSdv(F->post1, &mean1, 0, mask[0]);
-// 			cvAvgSdv(F->post0, &mean0, 0, mask[0]);
-// 			// /*
-// 			if(mean1.val[0] > 0){
-// 			double prior1 = alpha*sts->P_Gt[i] + beta*mean1.val[0];
-// 			//sts->P_Gf[i] =  1. - sts->P_Gt[i];
-// 			double prior0 = alpha*sts->P_Gf[i] + beta*mean0.val[0];
-			
-// 			sts->P_Gt[i] = prior1/(prior1+prior0);
-// 			sts->P_Gf[i] = prior0/(prior1+prior0);
-// 		}
-//        cvSet(sts->prior_img, cvScalar(sts->P_Gt[i]), mask[0]);
-
-//         }
-//     }
-// }
-
 
 
 // void GetModel(IplImage* gray, Features* F, Model* M, bool dynamic)
