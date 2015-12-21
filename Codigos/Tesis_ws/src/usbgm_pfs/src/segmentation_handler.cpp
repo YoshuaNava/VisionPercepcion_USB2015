@@ -47,11 +47,7 @@ void SegmentationHandler::slicSuperpixels()
 	slic.create_connectivity(lab_image);
 	slic.store_superpixels(&frame2);
 	this->superpixels_list = slic.get_superpixels();
-
-	slic.display_contours(&frame2, CV_RGB(255,0,0));
-	//slic.display_center_grid(&frame2, CV_RGB(0,255,0));
-	slic.display_number_grid(&frame2, CV_RGB(0,255,0));
-	this->superpixels_contours_img = cv::cvarrToMat(&frame2, true, true, 0);
+	this->seg_image = slic.get_segmented_image();
 
 	cvReleaseImage(&lab_image);
 }
@@ -60,11 +56,9 @@ void SegmentationHandler::slicSuperpixels()
 void SegmentationHandler::egbisSuperpixels()
 {
 	this->seg_image = egbis.generateSuperpixels(frame, gray);
-    this->superpixels_contours_img = egbis.outlineSuperpixelsContours(cv::Scalar(255,0,0));
     egbis.calculateSuperpixelCenters();
     egbis.storeSuperpixelsMemory();
 	this->superpixels_list = egbis.getSuperpixels();
-    this->superpixels_contours_img = egbis.displayCenterGrid(superpixels_contours_img, cv::Scalar(0,255,0));
 }
 
 
@@ -88,7 +82,28 @@ vector<Superpixel> SegmentationHandler::getSuperpixels()
 	return this->superpixels_list;
 }
 
+
+cv::Mat SegmentationHandler::getSegmentedImage()
+{
+	return this->seg_image;
+}
+
+
 cv::Mat SegmentationHandler::getContoursImage()
 {
+	if(this->segmentationType == "SLIC")
+	{
+		this->superpixels_contours_img = frame.clone();
+		IplImage frame2 = (IplImage)superpixels_contours_img; // Reference on deallocating memory: http://stackoverflow.com/questions/12635978/memory-deallocation-of-iplimage-initialised-from-cvmat
+		slic.display_contours(&frame2, CV_RGB(255,0,0));
+		//slic.display_center_grid(&frame2, CV_RGB(0,255,0));
+		slic.display_number_grid(&frame2, CV_RGB(0,255,0));
+		this->superpixels_contours_img = cv::cvarrToMat(&frame2, true, true, 0);
+	}
+	else if(this->segmentationType == "EGBIS")
+	{
+		this->superpixels_contours_img = egbis.outlineSuperpixelsContours(cv::Scalar(255,0,0));
+		this->superpixels_contours_img = egbis.displayCenterGrid(superpixels_contours_img, cv::Scalar(0,255,0));
+	}
 	return this->superpixels_contours_img;
 }

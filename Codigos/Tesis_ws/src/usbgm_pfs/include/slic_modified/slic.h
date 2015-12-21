@@ -51,6 +51,8 @@ class Slic {
         vector<vector<int>> superpixels_adjacency_matrix;
         vector<vector<int>> superpixels_similarity_matrix;
 
+        cv::Mat segmented_image;
+
         /* The step size per cluster, and the colour (nc) and distance (ns)
          * parameters. */
         int step, nc, ns;
@@ -87,6 +89,7 @@ class Slic {
         void show_histograms(int superpixel_id_1, int superpixel_id_2);
         void export_superpixels_to_files(IplImage *img);
         vector<Superpixel> get_superpixels();
+        cv::Mat get_segmented_image();
 };
 
 #endif

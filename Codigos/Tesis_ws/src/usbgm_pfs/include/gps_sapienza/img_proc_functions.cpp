@@ -98,13 +98,130 @@ namespace GPSSapienza{
 	}
 
 
+	void init_images_img_proc(cv::Size img_size)
+	{
+		int i;
+		stats_disp = cv::Mat::zeros(img_size.height, img_size.width, CV_8UC3);
+	
+		// //View_Histogram Graph Based Segmentation
+		// int GBShist_size = 256;			// size of histogram (number of bins)
+		// float range_0[]={0,256};
+		// float* ranges[] = { range_0 };
+		// hist = cvCreateHist(1, &GBShist_size, CV_HIST_ARRAY, ranges, 1);
+	
+		// int LBPhist_size = 32;
+		// LBPBOXhist = cvCreateHist(1, &LBPhist_size, CV_HIST_ARRAY, ranges, 1);
+		// hist_img = cvCreateImage(cvSize(255,200), 8, 1);
+	
+	
+		// //Histogram Analysis
+		// HistSize = cvSize(128,100);
+		// HistImgH = cvCreateImage( HistSize, 8, 3 );
+		// HistImgS = cvCreateImage( HistSize, 8, 3 );
+		// HistImgV = cvCreateImage( HistSize, 8, 3 );
+	
+		// EdgeHist_img = cvCreateImage(HistSize, 8, 1);
+	
+		// LBPhist_img = cvCreateImage(HistSize, 8, 1);
+		// iichist_img = cvCreateImage(HistSize, 8, 1);
+		// GhistImg = cvCreateImage(cvSize(512,100), 8, 1);
+		// GhistImg2 = cvCreateImage(cvSize(120,100), 8, 1);
+	
+		// for(i=0;i<N;++i)
+		// {
+		//     bin[i] = cvCreateImage( S, 8, 1);
+		//     mask[i] = cvCreateImage( S, 8, 1);
+		//     sobel[i] = cvCreateImage( S, IPL_DEPTH_8U, 1);
+		//     inv_prob[i] = cvCreateImage( S, 32, 1);
+		//     temp[i] = cvCreateImage( S, 32, 1);
+		//     PG[i] = cvCreateImage( S, 32, 1);
+		//     PG_prev[i] = cvCreateImage( S, 32, 1);
+		//     cvZero(PG_prev[i]);
+		//     PG1_DISP[i] = cvCreateImage( cvSize(120,100), 8, 3);
+		//     PG0_DISP[i] = cvCreateImage( cvSize(120,100), 8, 3);
+		// }
+	
+		// static int hdims = 32;
+		// static int hrange = 181;
+		// static int vrange = 256;
+		// float hranges_arr[] = {float(0),float(hrange-1)};
+		// float vranges_arr[] = {float(0),float(vrange-1)};
+		// float* hranges = hranges_arr;
+		// float* vranges = vranges_arr;
+	
+		// static int dim_40 	= 40;
+		// static int range_40 	= 40;
+		// float range_40_arr[] = {float(0),float(range_40-1)};
+		// float* range_40_ptr = range_40_arr;
+	
+		// histH = cvCreateHist( 1, &hdims, CV_HIST_ARRAY, &hranges, 1 );
+		// histS = cvCreateHist( 1, &hdims, CV_HIST_ARRAY, &vranges, 1 );
+		// histV = cvCreateHist( 1, &hdims, CV_HIST_ARRAY, &vranges, 1 );
+		// static int dim_9 	= 9;
+		// static int dim_32 	= 32;
+		// static int range_32 	= 32;
+		// float range_2pi_arr[] = {-CV_PI,CV_PI};
+		// float* range_2pi_ptr = range_2pi_arr;
+		// float range_32_arr[] = {float(0),float(range_32-1)};
+		// float* range_32_ptr = range_32_arr;
+		// float range_log_arr[] = {-30,30};
+		// float* range_log_ptr = range_log_arr;
+		// ANG_HIST = cvCreateHist( 1, &dim_9, CV_HIST_ARRAY, &range_2pi_ptr, 1 );
+		// Ghist = cvCreateHist( 1, &vrange, CV_HIST_ARRAY, &range_log_ptr, 1 );
+		// Ghist2 = cvCreateHist( 1, &dim_40, CV_HIST_ARRAY, &range_40_ptr, 1 );
+		// Ghist2DISP = cvCreateHist( 1, &dim_40, CV_HIST_ARRAY, &range_40_ptr, 1 );
+	
+		// hist_temp = cvCreateImage( cvSize(120,100), 8, 3);
+	}
 
 
 
+void superPixelStats(cv::Mat superpixels_img, cv::Mat gray, Statistics* stats)
+{
+	int k = 0;
+	cv::calcHist(&superpixels_img, 1, 0, cv::Mat(), superpixels_histogram, 1, &hist_size, &hist_range, true, false);
+	stats_disp.setTo(cv::Scalar(255,255,255));
+	for(int i=0; i < hist_size ;i++)
+	{
+		if (cvRound(superpixels_histogram.at<float>(0)) > 0)
+		{
+			stats->id[k] = k;
+			stats->gray_id[k] = i;
+			cv::compare(superpixels_img, cv::Scalar(i), mask[0], cv::CMP_EQ);
+			//cv::imshow("hola",mask[0]);
+			stats->size[k] = cv::countNonZero(mask[0]); //count number of pixels in current segment
+			cv::meanStdDev(gray, stats->mean[k], stats->stdDev[k], mask[0]);
+			//std::cout << "mean = " << stats->mean[k] << "	stddev = " << stats->stdDev[k] << "\n";
 
+				// mask[0].convertTo(mask[0], CV_32FC1);
+ 				// stats->box[k] = cv::boundingRect(mask[0]);
+ 				// stats->P_Gt[k] = GetPrior(stats->img_h, &stats->box[k]);
+// 				sts->P_Gf[k] =  1. - sts->P_Gt[k];
 
+// 				cvSet(stats_disp, cvScalarAll(sts->mean[k].val[0]), mask[0]);
+// 				cvSet(sts->prior_img, cvScalar(sts->P_Gt[k]), mask[0]);
 
+// 				cvRectangle(stats_disp,	cvPoint(sts->box[k].x,sts->box[k].y),
+// 							cvPoint(sts->box[k].x+sts->box[k].width,sts->box[k].y+sts->box[k].height), CV_RGB(255,0,0), 1, 8, 0);
 
+// 				cvLine(stats_disp, cvPoint(sts->box[k].x + (sts->box[k].width)/2 , sts->box[k].y + (sts->box[k].height)/2 ),
+// 						cvPoint(sts->img_w/2,sts->img_h), CV_RGB(255,0,0), 1, 8, 0);
+
+			k++;
+
+		}
+
+	}
+
+}
+
+static inline double GetPrior(int h, cv::Rect* R){
+    //const static int hmax = h-1;
+    const static double lambda = 3./(double)h;
+    double height = (double)(h - (R->y + (R->height)/2)) ;
+
+    return exp(-lambda*height);
+}
 
 // IplImage *contour_image; //display final binary segmentation
 
@@ -135,8 +252,6 @@ namespace GPSSapienza{
 // CvHistogram *Ghist2DISP = NULL;
 
 // CvSize HistSize;
-
-// IplImage *stats_disp, *hist_temp; //Display superpixel statistics
 
 // 	void SuperPixelStats(IplImage *gbs, IplImage *gray, Statistics *sts)
 // 	{

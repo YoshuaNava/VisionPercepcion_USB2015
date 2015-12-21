@@ -36,10 +36,20 @@
 
 namespace GPSSapienza
 {
+	cv::Mat superpixels_histogram;
+	cv::Mat stats_disp;
+	cv::Mat mask[NUM_FEATURES]; //Images for use as masks eg:superpixels
+	static int hist_size = 256;
+	float range[] = { 0, 256 } ;
+	const float* hist_range = { range };
+	
 	void calculateIIC(cv::Mat Cr, cv::Mat Cb, cv::Mat a, cv::Mat& iic);
 	void calculateMagnitudeOrientationOfGradients(cv::Mat gray, cv::Mat& F_mag, cv::Mat& F_ang);
 	void calculateLBP(cv::Mat frame, cv::Mat& lbp);
 	void calculateImageFeatures(GPSSapienza::Features* featuresPtr);
+	void init_images_img_proc(cv::Size img_size);
+	void superPixelStats(cv::Mat superpixels_img, cv::Mat gray, Statistics* stats);
+	static inline double GetPrior(int h, cv::Rect* R);
 }
 
 #endif

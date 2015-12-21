@@ -177,13 +177,11 @@ namespace GPSSapienza
 	
 		M->mean = new cv::Scalar[n];
 		for (int i=0; i<n; i++){
-			cout << "hola\n\n";
 			M->mean[i] = cv::Scalar(0,0,0,0);
 		}
 	
 		M->stdDev = new cv::Scalar[n];
 		for (int i=0; i<n; i++){
-			cout << "epale\n\n";
 			M->stdDev[i] = cv::Scalar(0,0,0,0);
 		}
 	
@@ -263,6 +261,7 @@ namespace GPSSapienza
 		F->post_ratio = cv::Mat::zeros(img_size.height, img_size.width, CV_32FC1);
 	
 		F->bin_class_result = cv::Mat::zeros(img_size.height, img_size.width, CV_8UC1);
+		F->seg_img = cv::Mat::zeros(img_size.height, img_size.width, CV_8UC1);
 	
 		for(int i=0;i<5;i++){
 			F->P_X1[i] = cv::Mat::zeros(img_size.height, img_size.width, CV_32FC1);

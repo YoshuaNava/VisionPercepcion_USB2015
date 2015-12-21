@@ -110,6 +110,7 @@ namespace GPSSapienza
     
         //Classification
         cv::Mat bin_class_result;
+        cv::Mat seg_img;
     };
     
     typedef struct features Features;

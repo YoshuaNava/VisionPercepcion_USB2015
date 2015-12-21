@@ -25,6 +25,7 @@ namespace ProbFloorSearch
 			
 			void segmentImage(cv::Mat frame, cv::Mat gray);
 			vector<Superpixel> getSuperpixels();
+			cv::Mat getSegmentedImage();
 			cv::Mat getContoursImage();
 	};
 }

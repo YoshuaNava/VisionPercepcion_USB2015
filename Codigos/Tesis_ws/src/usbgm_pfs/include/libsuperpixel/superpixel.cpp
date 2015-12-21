@@ -179,6 +179,7 @@ void Superpixel::add_pixels_information(cv::Mat img, vector<vector<int>> cluster
 //	cout << "min_x " << min_x << "  max_x " << max_x << "   min_y " << min_y << "  max_y " << max_y << "\n";
 	sp_height = max_y - min_y;
 	sp_width = max_x - min_x;
+	this->bounding_rect = cv::Rect(min_x, min_y, sp_width, sp_height);
 	CvScalar colour;
 	this->pixels = cv::Mat::zeros(sp_height, sp_width, CV_8UC3);
 	this->pixels_mask = cv::Mat::zeros(sp_height, sp_width, CV_8UC1);

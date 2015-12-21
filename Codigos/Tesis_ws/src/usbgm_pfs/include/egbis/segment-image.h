@@ -227,10 +227,6 @@ i=0;
 			int index = (y*output->width+x)*output->nChannels;
 
 			outputPixelData[index+0] = graycolors[comp]/(floor(255/myvector.size()));
-      //outputPixelData[index+0] = graycolors[comp];
-			//printf("col= %d ", graycolors[comp]);
-
-
     }
   }
 

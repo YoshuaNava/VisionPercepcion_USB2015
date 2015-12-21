@@ -388,6 +388,8 @@ void Slic::store_superpixels(IplImage *image)
     superpixels.clear();
     superpixels_adjacency_matrix.clear();
     superpixels_similarity_matrix.clear();
+    
+    segmented_image = cv::Mat::zeros(cv::Size(image->width, image->height),1);
 
     int i, x, y, k;
     int index = 0;
@@ -416,6 +418,7 @@ void Slic::store_superpixels(IplImage *image)
             if(clusters[x][y] != -1)
             {
                 index = clusters[x][y];
+                segmented_image.at<uchar>(y,x) = index;
             }
             //CvScalar colour = cvGet2D(image, y, x);
             temp_point = cv::Point(x, y);
@@ -498,3 +501,8 @@ vector<Superpixel> Slic::get_superpixels()
     return this->superpixels;
 }
 
+
+cv::Mat Slic::get_segmented_image()
+{
+    return this->segmented_image;   
+}

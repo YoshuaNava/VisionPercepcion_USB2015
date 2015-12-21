@@ -49,7 +49,9 @@ void showImages()
 	DISPLAY_IMAGE_XY(true, features.lbp, 2, 1);
 	cv::resizeWindow("features.lbp", proc_W, proc_H);
 	DISPLAY_IMAGE_XY(true, superpixels_contours_img, 3, 1);
-	cv::resizeWindow("superpixels_contours_img", proc_W, proc_H);	
+	cv::resizeWindow("superpixels_contours_img", proc_W, proc_H);
+	DISPLAY_IMAGE_XY(true, features.seg_img, 4, 1);
+	cv::resizeWindow("features.seg_img", proc_W, proc_H);
 }
 
 
@@ -103,6 +105,7 @@ int main( int argc, char** argv )
 	GPSSapienza::init_stats(alg_params.img_size, statisticsPtr, 1);
 	GPSSapienza::init_model(alg_params.img_size, cv::Rect(), stat_modelPtr);
 	GPSSapienza::init_features(alg_params.img_size, featuresPtr);
+	GPSSapienza::init_images_img_proc(alg_params.img_size);
 	
     
 	while (nh.ok()) 
@@ -128,7 +131,11 @@ int main( int argc, char** argv )
 		seg_handler.segmentImage(features.rgb, features.gray);
 		superpixels_list = seg_handler.getSuperpixels();
 		superpixels_contours_img = seg_handler.getContoursImage();
+		features.seg_img = seg_handler.getSegmentedImage();
 		CV_TIMER_STOP(C, "Superpixels processed")
+		
+		GPSSapienza::superPixelStats(features.seg_img, features.gray, statisticsPtr);
+		
 
 		showImages();
 		CV_TIMER_STOP(Z, "Loop finished")
