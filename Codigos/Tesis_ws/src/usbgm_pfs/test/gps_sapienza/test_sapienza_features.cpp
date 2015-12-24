@@ -102,7 +102,7 @@ int main( int argc, char** argv )
 	
 	alg_params.img_size = cv::Size(proc_W, proc_H);
 	GPSSapienza::init_stats(alg_params.img_size, statisticsPtr, 1);
-	GPSSapienza::init_model(alg_params.img_size, cv::Rect(), stat_modelPtr);
+	GPSSapienza::init_model(alg_params.img_size, stat_modelPtr);
 	GPSSapienza::init_features(alg_params.img_size, featuresPtr);
 	GPSSapienza::init_images_img_proc(alg_params.img_size);
 	

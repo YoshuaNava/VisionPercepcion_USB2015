@@ -127,10 +127,10 @@ namespace GPSSapienza{
 		// GhistImg = cvCreateImage(cvSize(512,100), 8, 1);
 		// GhistImg2 = cvCreateImage(cvSize(120,100), 8, 1);
 	
-		// for(i=0;i<N;++i)
-		// {
-		//     bin[i] = cvCreateImage( S, 8, 1);
-		//     mask[i] = cvCreateImage( S, 8, 1);
+		for(i=0; i<NUM_FEATURES ;++i)
+		{
+		     bin[i] = cv::Mat::zeros(img_size.height, img_size.width, CV_8UC1);
+		     mask[i] = cv::Mat::zeros(img_size.height, img_size.width, CV_8UC3);
 		//     sobel[i] = cvCreateImage( S, IPL_DEPTH_8U, 1);
 		//     inv_prob[i] = cvCreateImage( S, 32, 1);
 		//     temp[i] = cvCreateImage( S, 32, 1);
@@ -139,7 +139,7 @@ namespace GPSSapienza{
 		//     cvZero(PG_prev[i]);
 		//     PG1_DISP[i] = cvCreateImage( cvSize(120,100), 8, 3);
 		//     PG0_DISP[i] = cvCreateImage( cvSize(120,100), 8, 3);
-		// }
+		}
 	
 		// static int hdims = 32;
 		// static int hrange = 181;
@@ -249,23 +249,21 @@ void updatePrior(Statistics *stats, Features* features)
 void GetModel(Features* features, Model* model)
 {
     int loop;
-//     cvInRangeS( F->hsv, cvScalar(0,   smin, min(vmin,vmax), 0),
-//                         cvScalar(180, 256,  max(vmin,vmax), 0), bin[0] );
+	cv:inRange(features->hsv, cv::Scalar(0, smin, min(vmin,vmax), 0), cv::Scalar(180, 256, max(vmin,vmax), 0), bin[0]);
+	cv::bitwise_and(bin[0], model->mask, bin[1]);
+	cv::imshow("safe window", bin[1]);
+	loop = 200;
 
-//     cvAnd(bin[0], M->mask, bin[1]);
-//     if(dynamic) loop = 200;
-//     if(!dynamic) loop = 0;
-//     static bool acc =1;
-//     //static int loop = 1;
-//     static int j=0;
-//     if(j<loop){
-//         acc = 1;
-//         j++;
-//     }
-//     else{
-//         acc=0;
-//         j=0;
-//     }
+    static bool acc =1;
+    static int j=0;
+    if(j<loop){
+        acc = 1;
+        j++;
+    }
+    else{
+        acc=0;
+        j=0;
+    }
 
 //     cvCalcHist( &F->mag, 	M->H_M[0], acc, M->mask );
 //     cvCalcHist( &F->ang32, 	M->H_M[1], acc, M->mask );
@@ -294,7 +292,6 @@ static inline double getPrior(int h, cv::Rect* R){
 // IplImage *contour_image; //display final binary segmentation
 
 // CvHistogram *hist = NULL;	    // pointer to histogram object
-// IplImage *bin[NUM_FEATURES]; //images to use as masks with colour analysis
 
 // CvHistogram *histH, *histS, *histV; //Histograms of superpixels to match against model
 // IplImage *HistImgH, *HistImgS, *HistImgV; //Images to display histograms

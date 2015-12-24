@@ -126,9 +126,9 @@ namespace GPSSapienza
     typedef struct algorithm_parameters Algorithm_parameters;
 
 
-	void init_stats(cv::Size img_size, Statistics* S, bool init);
-    void init_model(cv::Size img_size, cv::Rect SafeRegion, Model* M);
-    void init_features(cv::Size img_size, Features * F);
+	void init_stats(cv::Size img_size, Statistics* stats, bool init);
+    void init_model(cv::Size img_size, Model* model);
+    void init_features(cv::Size img_size, Features* features);
     
 }
 

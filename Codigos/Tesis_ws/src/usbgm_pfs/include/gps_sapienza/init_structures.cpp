@@ -4,71 +4,71 @@ using namespace std;
 
 namespace GPSSapienza
 {
-	void init_stats(cv::Size img_size, Statistics* S, bool init)
+	void init_stats(cv::Size img_size, Statistics* stats, bool init)
 	{
 		static int range = 256;
-		S->no_features = NUM_FEATURES;
+		stats->no_features = NUM_FEATURES;
 	
-		if(init) S->id = new int[range];
+		if(init) stats->id = new int[range];
 		for (int i=0; i<range; i++){
-		S->id[i] = 0;
+			stats->id[i] = 0;
 		}
 	
-		if(init) S->size = new int[range];
+		if(init) stats->size = new int[range];
 		for (int i=0; i<range; i++){
-		S->size[i] = 0;
+			stats->size[i] = 0;
 		}
 	
-		if(init) S->gray_id = new int[range];
+		if(init) stats->gray_id = new int[range];
 		for (int i=0; i<range; i++){
-		S->gray_id[i] = 0;
+			stats->gray_id[i] = 0;
 		}
 	
-		if(init) S->mean = new cv::Scalar[range];
+		if(init) stats->mean = new cv::Scalar[range];
 		for (int i=0; i<range; i++){
-		S->mean[i] = cv::Scalar(0,0,0,0);
+			stats->mean[i] = cv::Scalar(0,0,0,0);
 		}
 	
-		if(init) S->stdDev = new cv::Scalar[range];
+		if(init) stats->stdDev = new cv::Scalar[range];
 		for (int i=0; i<range; i++){
-		S->stdDev[i] = cv::Scalar(0,0,0,0);
+			stats->stdDev[i] = cv::Scalar(0,0,0,0);
 		}
 	
-		if(init) S->box = new cv::Rect[range];
+		if(init) stats->box = new cv::Rect[range];
 		for (int i=0; i<range; i++){
-		S->box[i] = cv::Rect(0,0,0,0);
+			stats->box[i] = cv::Rect(0,0,0,0);
 		}
 	
-		if(init) S->P_Gt = new double[range];
-		if(init) S->P_Gf = new double[range];
-		if(init) S->P_GtgF = new double[range];
-		if(init) S->P_GfgF = new double[range];
+		if(init) stats->P_Gt = new double[range];
+		if(init) stats->P_Gf = new double[range];
+		if(init) stats->P_GtgF = new double[range];
+		if(init) stats->P_GfgF = new double[range];
 		for (int i=0; i<range; i++){
-		S->P_Gt[i] = 0.;
-		S->P_Gf[i] = 0.;
-	
-		S->P_GtgF[i] = 0.;
-		S->P_GfgF[i] = 0.;
+			stats->P_Gt[i] = 0.;
+			stats->P_Gf[i] = 0.;
+		
+			stats->P_GtgF[i] = 0.;
+			stats->P_GfgF[i] = 0.;
 		}
 	
-		if(init) S->P_FgGt = new double[range*S->no_features];
-		if(init) S->P_FgGf = new double[range*S->no_features];
+		if(init) stats->P_FgGt = new double[range * stats->no_features];
+		if(init) stats->P_FgGf = new double[range * stats->no_features];
 	
 		for (int i=0; i<range; i++){
-			for (int j=0; j<S->no_features; j++){
-				S->P_FgGt[S->no_features*i + j] = 0.;
-				S->P_FgGf[S->no_features*i + j] = 0.;
+			for (int j=0; j<stats->no_features; j++){
+				stats->P_FgGt[stats->no_features*i + j] = 0.;
+				stats->P_FgGf[stats->no_features*i + j] = 0.;
 			}
 		}
 	
 	
 
-		S->prior_img = cv::Mat::zeros(img_size.height, img_size.width, CV_32FC1);
+		stats->prior_img = cv::Mat::zeros(img_size.height, img_size.width, CV_32FC1);
 
 	
-		S->nos = 0; //number of segments
-		S->img_w = img_size.width;
-		S->img_h = img_size.height;
+		stats->nos = 0; //number of segments
+		stats->img_w = img_size.width;
+		stats->img_h = img_size.height;
 	
 		unsigned int iseed = (unsigned int)time(NULL);
 		srand (iseed);
@@ -76,34 +76,34 @@ namespace GPSSapienza
 		double min = 0.01;
 		double max = 40.01;
 	
-		if(init) S->L1 = new double[S->no_features];
-		for (int i=0; i<S->no_features; i++){
-			S->L1[i] = 0.01;
+		if(init) stats->L1 = new double[stats->no_features];
+		for (int i=0; i<stats->no_features; i++){
+			stats->L1[i] = 0.01;
 		}
 	
-		if(init) S->L0 = new double[S->no_features];
-		for (int i=0; i<S->no_features; i++){
-			S->L0[i] = 0.01;
+		if(init) stats->L0 = new double[stats->no_features];
+		for (int i=0; i<stats->no_features; i++){
+			stats->L0[i] = 0.01;
 		}
 	
-		if(init) S->gmax = new double[S->no_features];
-		for (int i=0; i<S->no_features; i++){
-			S->gmax[i] = 2.;
+		if(init) stats->gmax = new double[stats->no_features];
+		for (int i=0; i<stats->no_features; i++){
+			stats->gmax[i] = 2.;
 		}
 	
-		if(init) S->Z1 = new double[S->no_features];
-		for (int i=0; i<S->no_features; i++){
-			S->Z1[i] = (1/S->L1[i])*(1-exp(-S->L1[i]*S->gmax[i]));
+		if(init) stats->Z1 = new double[stats->no_features];
+		for (int i=0; i<stats->no_features; i++){
+			stats->Z1[i] = (1/stats->L1[i])*(1-exp(-stats->L1[i]*stats->gmax[i]));
 		}
 	
-		if(init) S->Z0 = new double[S->no_features];
-		for (int i=0; i<S->no_features; i++){
-			S->Z0[i] = (1/S->L0[i])*(exp(S->L0[i]*S->gmax[i])-1);
+		if(init) stats->Z0 = new double[stats->no_features];
+		for (int i=0; i<stats->no_features; i++){
+			stats->Z0[i] = (1/stats->L0[i])*(exp(stats->L0[i]*stats->gmax[i])-1);
 		}
 	
-		if(init) S->G_score = new double[S->no_features];
-		for (int i=0; i<S->no_features; i++){
-			S->G_score[i] = 0;
+		if(init) stats->G_score = new double[stats->no_features];
+		for (int i=0; i<stats->no_features; i++){
+			stats->G_score[i] = 0;
 		}
 	
 		//Histogram Initialization
@@ -113,20 +113,20 @@ namespace GPSSapienza
 		float* range_40_ptr = range_40_arr;
 	
 		if(init){
-		for(int i=0;i<S->no_features;i++){
-		S->H_G1[i] = cvCreateHist(1, &dim_40, CV_HIST_ARRAY, &range_40_ptr, 1);
-		S->H_G0[i] = cvCreateHist(1, &dim_40, CV_HIST_ARRAY, &range_40_ptr, 1);
-		S->H_G1_DISP[i] = cvCreateHist(1, &dim_40, CV_HIST_ARRAY, &range_40_ptr, 1);
-		S->H_G0_DISP[i] = cvCreateHist(1, &dim_40, CV_HIST_ARRAY, &range_40_ptr, 1);
+		for(int i=0;i<stats->no_features;i++){
+		stats->H_G1[i] = cvCreateHist(1, &dim_40, CV_HIST_ARRAY, &range_40_ptr, 1);
+		stats->H_G0[i] = cvCreateHist(1, &dim_40, CV_HIST_ARRAY, &range_40_ptr, 1);
+		stats->H_G1_DISP[i] = cvCreateHist(1, &dim_40, CV_HIST_ARRAY, &range_40_ptr, 1);
+		stats->H_G0_DISP[i] = cvCreateHist(1, &dim_40, CV_HIST_ARRAY, &range_40_ptr, 1);
 		}
 		}
 		if(!init){
-			for(int i=0;i< S->no_features; i++)
+			for(int i=0;i< stats->no_features; i++)
 			{
-				cvClearHist(S->H_G1[i]);
-				cvClearHist(S->H_G0[i]);
-				cvClearHist(S->H_G1_DISP[i]);
-				cvClearHist(S->H_G0_DISP[i]);
+				cvClearHist(stats->H_G1[i]);
+				cvClearHist(stats->H_G0[i]);
+				cvClearHist(stats->H_G1_DISP[i]);
+				cvClearHist(stats->H_G0_DISP[i]);
 			}
 		}
 	
@@ -146,43 +146,45 @@ namespace GPSSapienza
 		float* range_2pi_ptr = range_2pi_arr;
 	
 		if(init){
-			S->H_SF[0] = cvCreateHist( 1, &dim_32, CV_HIST_ARRAY, &range_256_ptr, 1 );
-			S->H_SF[1] = cvCreateHist( 1, &dim_9, CV_HIST_ARRAY, &range_2pi_ptr, 1 );
-			S->H_SF[2] = cvCreateHist( 1, &dim_32, CV_HIST_ARRAY, &range_181_ptr, 1 );
-			S->H_SF[3] = cvCreateHist( 1, &dim_32, CV_HIST_ARRAY, &range_256_ptr, 1 );
-			S->H_SF[4] = cvCreateHist(1, &dim_32, CV_HIST_ARRAY, &range_256_ptr, 1);
-			S->H_SF[5] = cvCreateHist(1, &dim_32, CV_HIST_ARRAY, &range_256_ptr, 1);
+			stats->H_SF[0] = cvCreateHist( 1, &dim_32, CV_HIST_ARRAY, &range_256_ptr, 1 );
+			stats->H_SF[1] = cvCreateHist( 1, &dim_9, CV_HIST_ARRAY, &range_2pi_ptr, 1 );
+			stats->H_SF[2] = cvCreateHist( 1, &dim_32, CV_HIST_ARRAY, &range_181_ptr, 1 );
+			stats->H_SF[3] = cvCreateHist( 1, &dim_32, CV_HIST_ARRAY, &range_256_ptr, 1 );
+			stats->H_SF[4] = cvCreateHist(1, &dim_32, CV_HIST_ARRAY, &range_256_ptr, 1);
+			stats->H_SF[5] = cvCreateHist(1, &dim_32, CV_HIST_ARRAY, &range_256_ptr, 1);
 		}
 		if(!init){
-			for(int i=0;i<S->no_features;i++){
-				cvClearHist(S->H_SF[i]);
+			for(int i=0;i<stats->no_features;i++){
+				cvClearHist(stats->H_SF[i]);
 			}
 		}
 	}
 	
 	
 	
-	void init_model(cv::Size img_size, cv::Rect SafeRegion, Model* M)
+	void init_model(cv::Size img_size, Model* model)
 	{
 		int n = 1; //number of model regions
+		cv::Rect SafeRegion = cv::Rect( cvRound(img_size.width/3),//+25,
+					(img_size.height)-cvRound(img_size.height/7),
+					cvRound(img_size.width/3),
+					cvRound(img_size.height/8) );
 	
-		M->box = &SafeRegion;
+		model->box = &SafeRegion;
+	 
+		model->mask = cv::Mat::zeros(img_size.height, img_size.width, CV_8UC1);
+		cv::Mat roi = (model->mask(SafeRegion));
+		roi.setTo(255);
+		// cv::imshow("roi", model->mask);
 	
-		M->mask = cv::Mat::zeros(img_size.height, img_size.width, CV_8UC1);
-	
-		//cvSetImageROI( M->mask, SafeRegion );
-		M->mask = cv::Mat::ones(img_size.height, img_size.width, CV_32FC1);
-		//cvSet(M->mask,cv::ScalarAll(ONE),0);
-		//cvResetImageROI( M->mask );
-	
-		M->mean = new cv::Scalar[n];
+		model->mean = new cv::Scalar[n];
 		for (int i=0; i<n; i++){
-			M->mean[i] = cv::Scalar(0,0,0,0);
+			model->mean[i] = cv::Scalar(0,0,0,0);
 		}
 	
-		M->stdDev = new cv::Scalar[n];
+		model->stdDev = new cv::Scalar[n];
 		for (int i=0; i<n; i++){
-			M->stdDev[i] = cv::Scalar(0,0,0,0);
+			model->stdDev[i] = cv::Scalar(0,0,0,0);
 		}
 	
 		//Histogram Initialization
@@ -206,66 +208,66 @@ namespace GPSSapienza
 		float* range_91_ptr = range_91_arr;
 		float* range_2pi_ptr = range_2pi_arr;
 	
-		M->dim = new int[NUM_FEATURES];
-		M->dim[0] = 32;
-		M->dim[1] = 9;
+		model->dim = new int[NUM_FEATURES];
+		model->dim[0] = 32;
+		model->dim[1] = 9;
 		for (int i=2; i<NUM_FEATURES; i++){
-			M->dim[i] = 32;
+			model->dim[i] = 32;
 		}
 			
-		M->H_M[0] = cvCreateHist( 1, &dim_32, CV_HIST_ARRAY, &range_256_ptr, 1 );
-		M->H_M[1] = cvCreateHist( 1, &dim_9, CV_HIST_ARRAY, &range_2pi_ptr, 1 );
-		M->H_M[2] = cvCreateHist( 1, &dim_32, CV_HIST_ARRAY, &range_181_ptr, 1 );
-		M->H_M[3] = cvCreateHist( 1, &dim_32, CV_HIST_ARRAY, &range_256_ptr, 1 );
-		M->H_M[4] = cvCreateHist(1, &dim_32, CV_HIST_ARRAY, &range_256_ptr, 1);
-		M->H_M[5] = cvCreateHist(1, &dim_32, CV_HIST_ARRAY, &range_256_ptr, 1);
+		model->H_M[0] = cvCreateHist( 1, &dim_32, CV_HIST_ARRAY, &range_256_ptr, 1 );
+		model->H_M[1] = cvCreateHist( 1, &dim_9, CV_HIST_ARRAY, &range_2pi_ptr, 1 );
+		model->H_M[2] = cvCreateHist( 1, &dim_32, CV_HIST_ARRAY, &range_181_ptr, 1 );
+		model->H_M[3] = cvCreateHist( 1, &dim_32, CV_HIST_ARRAY, &range_256_ptr, 1 );
+		model->H_M[4] = cvCreateHist(1, &dim_32, CV_HIST_ARRAY, &range_256_ptr, 1);
+		model->H_M[5] = cvCreateHist(1, &dim_32, CV_HIST_ARRAY, &range_256_ptr, 1);
 	
-		M->H_M_DISP[0] = cvCreateHist( 1, &dim_32, CV_HIST_ARRAY, &range_256_ptr, 1 );
-		M->H_M_DISP[1] = cvCreateHist( 1, &dim_9, CV_HIST_ARRAY, &range_2pi_ptr, 1 );
-		M->H_M_DISP[2] = cvCreateHist( 1, &dim_32, CV_HIST_ARRAY, &range_181_ptr, 1 );
-		M->H_M_DISP[3] = cvCreateHist( 1, &dim_32, CV_HIST_ARRAY, &range_256_ptr, 1 );
-		M->H_M_DISP[4] = cvCreateHist(1, &dim_32, CV_HIST_ARRAY, &range_256_ptr, 1);
-		M->H_M_DISP[5] = cvCreateHist(1, &dim_32, CV_HIST_ARRAY, &range_256_ptr, 1);
+		model->H_M_DISP[0] = cvCreateHist( 1, &dim_32, CV_HIST_ARRAY, &range_256_ptr, 1 );
+		model->H_M_DISP[1] = cvCreateHist( 1, &dim_9, CV_HIST_ARRAY, &range_2pi_ptr, 1 );
+		model->H_M_DISP[2] = cvCreateHist( 1, &dim_32, CV_HIST_ARRAY, &range_181_ptr, 1 );
+		model->H_M_DISP[3] = cvCreateHist( 1, &dim_32, CV_HIST_ARRAY, &range_256_ptr, 1 );
+		model->H_M_DISP[4] = cvCreateHist(1, &dim_32, CV_HIST_ARRAY, &range_256_ptr, 1);
+		model->H_M_DISP[5] = cvCreateHist(1, &dim_32, CV_HIST_ARRAY, &range_256_ptr, 1);
 	}
 
 
 
 
 
-	void init_features(cv::Size img_size, Features * F)
+	void init_features(cv::Size img_size, Features* features)
 	{
-		F->rgb = cv::Mat::zeros(img_size.height, img_size.width, CV_8UC3);
-		F->gray = cv::Mat::zeros(img_size.height, img_size.width, CV_8UC1);
-		F->mag = cv::Mat::zeros(img_size.height, img_size.width, CV_8UC1);
-		F->ang32 = cv::Mat::zeros(img_size.height, img_size.width, CV_32FC1);
-		F->P_ang = cv::Mat::zeros(img_size.height, img_size.width, CV_32FC1);	
-		F->hsv = cv::Mat::zeros(img_size.height, img_size.width, CV_8UC3);
-		F->lab = cv::Mat::zeros(img_size.height, img_size.width, CV_8UC3);
-		F->YCrCb = cv::Mat::zeros(img_size.height, img_size.width, CV_8UC3);
-		F->hue = cv::Mat::zeros(img_size.height, img_size.width, CV_8UC1);
-		F->sat = cv::Mat::zeros(img_size.height, img_size.width, CV_8UC1);
-		F->val = cv::Mat::zeros(img_size.height, img_size.width, CV_8UC1);
-		F->Cr = cv::Mat::zeros(img_size.height, img_size.width, CV_8UC1);
-		F->a = cv::Mat::zeros(img_size.height, img_size.width, CV_8UC1);
-		F->Cb = cv::Mat::zeros(img_size.height, img_size.width, CV_8UC1);
-		F->iic = cv::Mat::zeros(img_size.height, img_size.width, CV_8UC1);
-		F->P_hue = cv::Mat::zeros(img_size.height, img_size.width, CV_32FC1);
-		F->P_sat = cv::Mat::zeros(img_size.height, img_size.width, CV_32FC1);
-		F->P_val = cv::Mat::zeros(img_size.height, img_size.width, CV_32FC1);
+		features->rgb = cv::Mat::zeros(img_size.height, img_size.width, CV_8UC3);
+		features->gray = cv::Mat::zeros(img_size.height, img_size.width, CV_8UC1);
+		features->mag = cv::Mat::zeros(img_size.height, img_size.width, CV_8UC1);
+		features->ang32 = cv::Mat::zeros(img_size.height, img_size.width, CV_32FC1);
+		features->P_ang = cv::Mat::zeros(img_size.height, img_size.width, CV_32FC1);	
+		features->hsv = cv::Mat::zeros(img_size.height, img_size.width, CV_8UC3);
+		features->lab = cv::Mat::zeros(img_size.height, img_size.width, CV_8UC3);
+		features->YCrCb = cv::Mat::zeros(img_size.height, img_size.width, CV_8UC3);
+		features->hue = cv::Mat::zeros(img_size.height, img_size.width, CV_8UC1);
+		features->sat = cv::Mat::zeros(img_size.height, img_size.width, CV_8UC1);
+		features->val = cv::Mat::zeros(img_size.height, img_size.width, CV_8UC1);
+		features->Cr = cv::Mat::zeros(img_size.height, img_size.width, CV_8UC1);
+		features->a = cv::Mat::zeros(img_size.height, img_size.width, CV_8UC1);
+		features->Cb = cv::Mat::zeros(img_size.height, img_size.width, CV_8UC1);
+		features->iic = cv::Mat::zeros(img_size.height, img_size.width, CV_8UC1);
+		features->P_hue = cv::Mat::zeros(img_size.height, img_size.width, CV_32FC1);
+		features->P_sat = cv::Mat::zeros(img_size.height, img_size.width, CV_32FC1);
+		features->P_val = cv::Mat::zeros(img_size.height, img_size.width, CV_32FC1);
 	
-		F->lbp  = cv::Mat::zeros(img_size.height, img_size.width, CV_8UC1);
-		F->P_lbp = cv::Mat::zeros(img_size.height, img_size.width, CV_32FC1);
+		features->lbp  = cv::Mat::zeros(img_size.height, img_size.width, CV_8UC1);
+		features->P_lbp = cv::Mat::zeros(img_size.height, img_size.width, CV_32FC1);
 	
-		F->post0 = cv::Mat::zeros(img_size.height, img_size.width, CV_32FC1);
-		F->post1 = cv::Mat::zeros(img_size.height, img_size.width, CV_32FC1);
-		F->post_ratio = cv::Mat::zeros(img_size.height, img_size.width, CV_32FC1);
+		features->post0 = cv::Mat::zeros(img_size.height, img_size.width, CV_32FC1);
+		features->post1 = cv::Mat::zeros(img_size.height, img_size.width, CV_32FC1);
+		features->post_ratio = cv::Mat::zeros(img_size.height, img_size.width, CV_32FC1);
 	
-		F->bin_class_result = cv::Mat::zeros(img_size.height, img_size.width, CV_8UC1);
-		F->seg_img = cv::Mat::zeros(img_size.height, img_size.width, CV_8UC1);
+		features->bin_class_result = cv::Mat::zeros(img_size.height, img_size.width, CV_8UC1);
+		features->seg_img = cv::Mat::zeros(img_size.height, img_size.width, CV_8UC1);
 	
 		for(int i=0;i<5;i++){
-			F->P_X1[i] = cv::Mat::zeros(img_size.height, img_size.width, CV_32FC1);
-			F->P_X0[i] = cv::Mat::zeros(img_size.height, img_size.width, CV_32FC1);
+			features->P_X1[i] = cv::Mat::zeros(img_size.height, img_size.width, CV_32FC1);
+			features->P_X0[i] = cv::Mat::zeros(img_size.height, img_size.width, CV_32FC1);
 		}
 	}
 

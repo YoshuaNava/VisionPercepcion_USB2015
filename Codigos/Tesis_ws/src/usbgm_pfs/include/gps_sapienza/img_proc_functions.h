@@ -39,11 +39,14 @@ namespace GPSSapienza
 	cv::Mat superpixels_histogram;
 	cv::Mat stats_disp;
 	cv::Mat mask[NUM_FEATURES]; //Images for use as masks eg:superpixels
+	cv::Mat bin[NUM_FEATURES]; //images to use as masks with colour analysis
 	static int hist_size = 256;
 	float range[] = { 0, 256 } ;
 	const float* hist_range = { range };
 	static double alpha = 0.6;
 	static double beta = 1.- alpha;
+	static int vmin = 10, vmax = 256, smin = 5; // min/max values for Variance/Saturation mask
+	
 	
 	void calculateIIC(cv::Mat Cr, cv::Mat Cb, cv::Mat a, cv::Mat& iic);
 	void calculateMagnitudeOrientationOfGradients(cv::Mat gray, cv::Mat& F_mag, cv::Mat& F_ang);
