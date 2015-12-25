@@ -47,16 +47,35 @@ namespace GPSSapienza
 	static double beta = 1.- alpha;
 	static int vmin = 10, vmax = 256, smin = 5; // min/max values for Variance/Saturation mask
 	
+	const char * HIST_VAL = "Val Image Histogram";
+	const char * HIST_EDGE = "Edge Image Histogram";
+	const char * HIST_HUE = "Hue Image Histogram";
+	const char * HIST_SAT = "Sat Image Histogram";
+	const char * LBP_HIST 		= "LBP Image Histogram"; // window name
+	const char * iic_HIST 		= "IIC Image Histogram"; // window name	
+	const char * GBS_HIST 		= "GBS Image Histogram"; // window name
+
+	cv::Size HistSize;	
+	cv::Mat HistImgH, HistImgS, HistImgV; //Images to display histograms
+	cv::Mat EdgeHist_img, LBPhist_img, iichist_img;
+	cv::Mat GhistImg, GhistImg2;		
 	
 	void calculateIIC(cv::Mat Cr, cv::Mat Cb, cv::Mat a, cv::Mat& iic);
 	void calculateMagnitudeOrientationOfGradients(cv::Mat gray, cv::Mat& F_mag, cv::Mat& F_ang);
 	void calculateLBP(cv::Mat frame, cv::Mat& lbp);
 	void calculateImageFeatures(GPSSapienza::Features* featuresPtr);
 	void init_images_img_proc(cv::Size img_size);
-	void superPixelStats(Features features, Statistics* stats);
 	static inline double getPrior(int h, cv::Rect* R);
+	void superPixelStats(Features features, Statistics* stats);
 	void updatePrior(Statistics *stats, Features* features);
 	void GetModel(Features* features, Model* model);
+	void PrepareHistogramsDisplay(Model* model);
+	static inline cv::Scalar hue2rgb( float hue );
+	static inline void PrintGHistogram(int hist_size, cv::Mat histogram, cv::Mat hist_img, const char *Window, bool flag, int X, int Y);
+	static inline void PrintHistogram(int hist_size, cv::Mat histogram, cv::Mat hist_img, const char *Window, bool flag, int X, int Y);
+	void DisplayHistograms(Model* model);
+	
+	
 }
 
 #endif

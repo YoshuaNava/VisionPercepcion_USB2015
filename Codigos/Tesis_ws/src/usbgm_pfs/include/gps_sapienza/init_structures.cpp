@@ -112,23 +112,23 @@ namespace GPSSapienza
 		float range_40_arr[] = {float(0.),float(range_40-1)};
 		float* range_40_ptr = range_40_arr;
 	
-		if(init){
-		for(int i=0;i<stats->no_features;i++){
-		stats->H_G1[i] = cvCreateHist(1, &dim_40, CV_HIST_ARRAY, &range_40_ptr, 1);
-		stats->H_G0[i] = cvCreateHist(1, &dim_40, CV_HIST_ARRAY, &range_40_ptr, 1);
-		stats->H_G1_DISP[i] = cvCreateHist(1, &dim_40, CV_HIST_ARRAY, &range_40_ptr, 1);
-		stats->H_G0_DISP[i] = cvCreateHist(1, &dim_40, CV_HIST_ARRAY, &range_40_ptr, 1);
-		}
-		}
-		if(!init){
-			for(int i=0;i< stats->no_features; i++)
-			{
-				cvClearHist(stats->H_G1[i]);
-				cvClearHist(stats->H_G0[i]);
-				cvClearHist(stats->H_G1_DISP[i]);
-				cvClearHist(stats->H_G0_DISP[i]);
-			}
-		}
+		// if(init){
+		// for(int i=0;i<stats->no_features;i++){
+		// 	stats->H_G1[i] = cvCreateHist(1, &dim_40, CV_HIST_ARRAY, &range_40_ptr, 1);
+		// 	stats->H_G0[i] = cvCreateHist(1, &dim_40, CV_HIST_ARRAY, &range_40_ptr, 1);
+		// 	stats->H_G1_DISP[i] = cvCreateHist(1, &dim_40, CV_HIST_ARRAY, &range_40_ptr, 1);
+		// 	stats->H_G0_DISP[i] = cvCreateHist(1, &dim_40, CV_HIST_ARRAY, &range_40_ptr, 1);
+		// }
+		// }
+		// if(!init){
+		// 	for(int i=0;i< stats->no_features; i++)
+		// 	{
+		// 		cvClearHist(stats->H_G1[i]);
+		// 		cvClearHist(stats->H_G0[i]);
+		// 		cvClearHist(stats->H_G1_DISP[i]);
+		// 		cvClearHist(stats->H_G0_DISP[i]);
+		// 	}
+		// }
 	
 		//Histogram Initialization
 		static int dim_9	= 9;
@@ -145,19 +145,19 @@ namespace GPSSapienza
 		float* range_181_ptr = range_181_arr;
 		float* range_2pi_ptr = range_2pi_arr;
 	
-		if(init){
-			stats->H_SF[0] = cvCreateHist( 1, &dim_32, CV_HIST_ARRAY, &range_256_ptr, 1 );
-			stats->H_SF[1] = cvCreateHist( 1, &dim_9, CV_HIST_ARRAY, &range_2pi_ptr, 1 );
-			stats->H_SF[2] = cvCreateHist( 1, &dim_32, CV_HIST_ARRAY, &range_181_ptr, 1 );
-			stats->H_SF[3] = cvCreateHist( 1, &dim_32, CV_HIST_ARRAY, &range_256_ptr, 1 );
-			stats->H_SF[4] = cvCreateHist(1, &dim_32, CV_HIST_ARRAY, &range_256_ptr, 1);
-			stats->H_SF[5] = cvCreateHist(1, &dim_32, CV_HIST_ARRAY, &range_256_ptr, 1);
-		}
-		if(!init){
-			for(int i=0;i<stats->no_features;i++){
-				cvClearHist(stats->H_SF[i]);
-			}
-		}
+		// if(init){
+		// 	stats->H_SF[0] = cvCreateHist( 1, &dim_32, CV_HIST_ARRAY, &range_256_ptr, 1 );
+		// 	stats->H_SF[1] = cvCreateHist( 1, &dim_9, CV_HIST_ARRAY, &range_2pi_ptr, 1 );
+		// 	stats->H_SF[2] = cvCreateHist( 1, &dim_32, CV_HIST_ARRAY, &range_181_ptr, 1 );
+		// 	stats->H_SF[3] = cvCreateHist( 1, &dim_32, CV_HIST_ARRAY, &range_256_ptr, 1 );
+		// 	stats->H_SF[4] = cvCreateHist(1, &dim_32, CV_HIST_ARRAY, &range_256_ptr, 1);
+		// 	stats->H_SF[5] = cvCreateHist(1, &dim_32, CV_HIST_ARRAY, &range_256_ptr, 1);
+		// }
+		// if(!init){
+		// 	for(int i=0;i<stats->no_features;i++){
+		// 		cvClearHist(stats->H_SF[i]);
+		// 	}
+		// }
 	}
 	
 	
@@ -215,19 +215,19 @@ namespace GPSSapienza
 			model->dim[i] = 32;
 		}
 			
-		model->H_M[0] = cvCreateHist( 1, &dim_32, CV_HIST_ARRAY, &range_256_ptr, 1 );
-		model->H_M[1] = cvCreateHist( 1, &dim_9, CV_HIST_ARRAY, &range_2pi_ptr, 1 );
-		model->H_M[2] = cvCreateHist( 1, &dim_32, CV_HIST_ARRAY, &range_181_ptr, 1 );
-		model->H_M[3] = cvCreateHist( 1, &dim_32, CV_HIST_ARRAY, &range_256_ptr, 1 );
-		model->H_M[4] = cvCreateHist(1, &dim_32, CV_HIST_ARRAY, &range_256_ptr, 1);
-		model->H_M[5] = cvCreateHist(1, &dim_32, CV_HIST_ARRAY, &range_256_ptr, 1);
+		// model->H_M[0] = cvCreateHist( 1, &dim_32, CV_HIST_ARRAY, &range_256_ptr, 1 );
+		// model->H_M[1] = cvCreateHist( 1, &dim_9, CV_HIST_ARRAY, &range_2pi_ptr, 1 );
+		// model->H_M[2] = cvCreateHist( 1, &dim_32, CV_HIST_ARRAY, &range_181_ptr, 1 );
+		// model->H_M[3] = cvCreateHist( 1, &dim_32, CV_HIST_ARRAY, &range_256_ptr, 1 );
+		// model->H_M[4] = cvCreateHist(1, &dim_32, CV_HIST_ARRAY, &range_256_ptr, 1);
+		// model->H_M[5] = cvCreateHist(1, &dim_32, CV_HIST_ARRAY, &range_256_ptr, 1);
 	
-		model->H_M_DISP[0] = cvCreateHist( 1, &dim_32, CV_HIST_ARRAY, &range_256_ptr, 1 );
-		model->H_M_DISP[1] = cvCreateHist( 1, &dim_9, CV_HIST_ARRAY, &range_2pi_ptr, 1 );
-		model->H_M_DISP[2] = cvCreateHist( 1, &dim_32, CV_HIST_ARRAY, &range_181_ptr, 1 );
-		model->H_M_DISP[3] = cvCreateHist( 1, &dim_32, CV_HIST_ARRAY, &range_256_ptr, 1 );
-		model->H_M_DISP[4] = cvCreateHist(1, &dim_32, CV_HIST_ARRAY, &range_256_ptr, 1);
-		model->H_M_DISP[5] = cvCreateHist(1, &dim_32, CV_HIST_ARRAY, &range_256_ptr, 1);
+		// model->H_M_DISP[0] = cvCreateHist( 1, &dim_32, CV_HIST_ARRAY, &range_256_ptr, 1 );
+		// model->H_M_DISP[1] = cvCreateHist( 1, &dim_9, CV_HIST_ARRAY, &range_2pi_ptr, 1 );
+		// model->H_M_DISP[2] = cvCreateHist( 1, &dim_32, CV_HIST_ARRAY, &range_181_ptr, 1 );
+		// model->H_M_DISP[3] = cvCreateHist( 1, &dim_32, CV_HIST_ARRAY, &range_256_ptr, 1 );
+		// model->H_M_DISP[4] = cvCreateHist(1, &dim_32, CV_HIST_ARRAY, &range_256_ptr, 1);
+		// model->H_M_DISP[5] = cvCreateHist(1, &dim_32, CV_HIST_ARRAY, &range_256_ptr, 1);
 	}
 
 

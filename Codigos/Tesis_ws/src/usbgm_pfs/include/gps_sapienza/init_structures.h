@@ -69,9 +69,9 @@ namespace GPSSapienza
         double *L1, *L0;
         double *Z1, *Z0, *gmax;
     
-        CvHistogram *H_SF[NUM_FEATURES];
-        CvHistogram *H_G1[NUM_FEATURES], *H_G1_DISP[NUM_FEATURES];
-        CvHistogram *H_G0[NUM_FEATURES], *H_G0_DISP[NUM_FEATURES];
+        cv::Mat *Hgram_SF[NUM_FEATURES];
+        cv::Mat *Hgram_G1[NUM_FEATURES], *Hgram_G1_DISP[NUM_FEATURES];
+        cv::Mat *Hgram_G0[NUM_FEATURES], *Hgram_G0_DISP[NUM_FEATURES];
     
     };
     typedef struct statistics Statistics;
@@ -86,7 +86,7 @@ namespace GPSSapienza
         cv::Scalar* mean;
         cv::Scalar* stdDev;
     
-        CvHistogram* H_M[NUM_FEATURES],*H_M_DISP[NUM_FEATURES];
+        cv::Mat Hgram_M[NUM_FEATURES], Hgram_M_DISP[NUM_FEATURES];
         int* dim;
     
     };
