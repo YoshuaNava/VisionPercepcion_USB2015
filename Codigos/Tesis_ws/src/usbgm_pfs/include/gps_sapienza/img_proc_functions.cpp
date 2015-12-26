@@ -331,7 +331,7 @@ namespace GPSSapienza{
 	{
 		float max_value;
 		int bin_w = cvRound((double) hist_img.cols/hist_size);
-		cv::normalize(histogram, histogram, 0, hist_img.rows/2, CV_MINMAX, -1, cv::Mat());
+		cv::normalize(histogram, histogram, 0, (4*hist_img.rows)/5, CV_MINMAX, -1, cv::Mat());
 	
 		if(flag==0)
 		{
