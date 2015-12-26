@@ -383,13 +383,13 @@ void Slic::colour_with_cluster_means(IplImage *image) {
 }
 
 
-void Slic::store_superpixels(IplImage *image)
+void Slic::store_superpixels(cv::Mat image, cv::Mat gray)
 {
     superpixels.clear();
     superpixels_adjacency_matrix.clear();
     superpixels_similarity_matrix.clear();
     
-    segmented_image = cv::Mat::zeros(cv::Size(image->width, image->height),1);
+    segmented_image = cv::Mat::zeros(cv::Size(image.cols, image.rows), CV_8UC1);
 
     int i, x, y, k;
     int index = 0;
@@ -411,9 +411,9 @@ void Slic::store_superpixels(IplImage *image)
         Superpixel sp(i, temp_point);
         superpixels.push_back(sp);
     }
-    for (x = 0; x < image->width; x++)
+    for (x = 0; x < image.cols; x++)
     {
-        for (y = 0; y < image->height; y++)
+        for (y = 0; y < image.rows; y++)
         {
             if(clusters[x][y] != -1)
             {
@@ -426,7 +426,7 @@ void Slic::store_superpixels(IplImage *image)
             superpixels[index].add_point(temp_point);
             for(k=0; k<8 ;k++)
             {
-                if(((x+dx[k]>=0) && (x+dx[k]<image->width)) && ((y+dy[k]>=0) && (y+dy[k]<image->height)))
+                if(((x+dx[k]>=0) && (x+dx[k]<image.cols)) && ((y+dy[k]>=0) && (y+dy[k]<image.rows)))
                 {
                     if(clusters[x+dx[k]][y+dy[k]] == index)
                     {
@@ -458,7 +458,7 @@ void Slic::store_superpixels(IplImage *image)
 */
     for (i = 0; i < (int) superpixels.size(); i++) 
     {
-        superpixels[i].add_pixels_information(image, clusters);
+        superpixels[i].add_pixels_information(image, gray, clusters);
         superpixels[i].calculate_histogram();
     }
 }

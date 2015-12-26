@@ -63,7 +63,6 @@ class Superpixel
 		
 		void print_everything();
 		void add_point(cv::Point point);
-		void add_pixels_information(IplImage *img, vector<vector<int>> clusters);
 		void add_pixels_information(cv::Mat img, cv::Mat gray, vector<vector<int>> clusters);
 		void calculate_histogram();
 		void export_to_jpeg(IplImage *img);

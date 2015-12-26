@@ -28,29 +28,6 @@ GPSSapienza::Model* safewindow_modelPtr = &safewindow_model;
 GPSSapienza::Algorithm_parameters alg_params;
 
 
-cv::Mat generateColorSegmentedImage(cv::Mat mask, cv::Mat img, cv::Scalar colour)
-{
-	cv::Mat output = img.clone();
-	int x, y;
-	uchar blue_tonality, red_tonality;
-	for(x=0; x<img.cols ;x++)
-	{
-		for(y=0; y<img.rows ;y++)
-		{
-			if(mask.at<uchar>(y,x) == 255)
-			{
-				output.at<cv::Vec3b>(y, x)[0] = colour.val[0];
-				output.at<cv::Vec3b>(y, x)[1] = colour.val[1];
-				output.at<cv::Vec3b>(y, x)[2] = colour.val[2];
-			}
-		}
-	}
-
-	// cvtColor(gray, gray, CV_GRAY2RGB);
-	// addWeighted(superpixels_below_boundary, 0.7, gray, 0.3, 0.0, superpixels_below_boundary);
-	return output;
-}
-
 
 void showImages()
 {
@@ -74,10 +51,6 @@ void showImages()
 	cv::resizeWindow("features.lbp", proc_W, proc_H);
 	DISPLAY_IMAGE_XY(true, features.iic, 5, 1);
 	cv::resizeWindow("features.iic", proc_W, proc_H);
-	DISPLAY_IMAGE_XY(true, features.post1, 4, 4);
-	cv::resizeWindow("features.post1", proc_W, proc_H);
-	DISPLAY_IMAGE_XY(true, features.floor_boundary, 5, 4);
-	cv::resizeWindow("features.floor_boundary", proc_W, proc_H);
 }
 
 
@@ -86,11 +59,11 @@ void cameraSetup()
 	//cap = VideoCapture(0); // Declare capture form Video: "eng_stat_obst.avi"
   
 
-    // cap = VideoCapture(0);
+//    cap = VideoCapture(0);
 	cap = VideoCapture("eng_stat_obst.avi");
 	//cap = VideoCapture("Laboratorio.avi");
-	// cap = VideoCapture("LaboratorioMaleta.avi");
-	// cap = VideoCapture("PasilloLabA.avi");
+	//cap = VideoCapture("LaboratorioMaleta.avi");
+	//cap = VideoCapture("PasilloLabA.avi");
 	//cap = VideoCapture("PasilloLabB.avi");
  // cap = VideoCapture("Laboratorio4.avi");
 //  cap = VideoCapture("Calle1.avi");
@@ -160,54 +133,27 @@ int main( int argc, char** argv )
 		features.seg_img = seg_handler.getSegmentedImage();
 		CV_TIMER_STOP(C, "Superpixels processed")
 		statistics.prior_img = ProbFns::getFloorPrior(features.rgb, features.superpixels_list);
-		hough_searcher.doProbabilisticEstimation(features.rgb, features.gray, superpixels_contours_img, statistics.prior_img, features.superpixels_list);
+		// hough_searcher.doProbabilisticEstimation(features.rgb, features.gray, superpixels_contours_img, statistics.prior_img, features.superpixels_list);
 		// statistics.prior_img = hough_searcher.getProbabilisticFloorEstimate();
 		// hough_searcher.doBayesianEstimation(features.rgb, features.gray, superpixels_contours_img, statistics.prior_img, features.superpixels_list);
 		// statistics.prior_img = hough_searcher.getBayesianFloorEstimate();
 		// hough_searcher.showImages();
 		
+		cv::imshow("superpixel segmented image",features.seg_img);
+
 		
-		GPSSapienza::superPixelStats(features, statisticsPtr);
-		CV_TIMER_STOP(D, "Superpixels statistics calculated")
+		// GPSSapienza::superPixelStats(features, statisticsPtr);
+		// CV_TIMER_STOP(D, "Superpixels statistics calculated")
 	
-		GPSSapienza::updatePrior(statisticsPtr, featuresPtr);
-		CV_TIMER_STOP(E, "Prior probability updated")
+		// GPSSapienza::updatePrior(statisticsPtr, featuresPtr);
+		// CV_TIMER_STOP(E, "Prior probability updated")
 		
 		
-		GPSSapienza::getModel(featuresPtr, safewindow_modelPtr);
-		CV_TIMER_STOP(F, "Captured safe window model")
+		// GPSSapienza::getModel(featuresPtr, safewindow_modelPtr);
+		// CV_TIMER_STOP(F, "Got model")
 		
-		GPSSapienza::displayHistograms(safewindow_modelPtr);
-		CV_TIMER_STOP(G, "Showing features histograms")
-
-
-		GPSSapienza::featureAnalysis(featuresPtr, safewindow_modelPtr, statisticsPtr);
-		CV_TIMER_STOP(H, "Analyzing features with G-stat")
-
-		GPSSapienza::displayAnalyzedFeatures(features);
-		CV_TIMER_STOP(I, "Showing analyzed features")
-
-		GPSSapienza::probAnalysis2(featuresPtr, statisticsPtr);
-		CV_TIMER_STOP(J, "Probabilistic analysis ready")
-
-		GPSSapienza::updateParams(features.bin_class_result, statisticsPtr, featuresPtr);
-		CV_TIMER_STOP(K, "Expectation-Maximization completed")
-		
-		features.floor_boundary = features.bin_class_result.clone();
-
-		GPSSapienza::findObstacleBoundary(features.floor_boundary);
-		CV_TIMER_STOP(L, "Extracted the floor boundary")
-		
-		cv::Mat probMask = (hough_searcher.getProbabilisticFloorEstimate() > 0.7);
-		cv::Mat resulting_mask;
-		// features.floor_boundary.copyTo(resulting_mask, probMask);
-		cv::addWeighted(features.floor_boundary, 0.5, probMask, 0.5, 0, resulting_mask);
-		
-		
-		cv::Mat fused_boundary = generateColorSegmentedImage((resulting_mask > 155), features.rgb, cv::Scalar(255,0,0));
-		cv::imshow("hough probabilistic mask", probMask);
-		cv::imshow("resulting_mask", resulting_mask);
-		cv::imshow("fused_boundary", fused_boundary);
+		// GPSSapienza::displayHistograms(safewindow_modelPtr);
+		// CV_TIMER_STOP(G, "Showing features histograms")
 		
 		showImages();
 		CV_TIMER_STOP(Z, "Loop finished")

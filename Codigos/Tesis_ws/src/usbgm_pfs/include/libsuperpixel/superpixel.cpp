@@ -114,61 +114,6 @@ void Superpixel::calculate_histogram()
 
 
 
-void Superpixel::add_pixels_information(IplImage *img, vector<vector<int>> clusters)
-{
-	int i, j;
-	int min_x, max_x, min_y, max_y, sp_height, sp_width;
-	min_x = img->width;
-	min_y = img->height;
-	max_x = 0;
-	max_y = 0;
-	for(i=0; i<points.size() ;i++)
-	{
-		if(points[i].x < min_x)
-		{
-			min_x = points[i].x;
-		}
-		if(points[i].y < min_y)
-		{
-			min_y = points[i].y;
-		}
-		if(points[i].x > max_x)
-		{
-			max_x = points[i].x;
-		}
-		if(points[i].y > max_y)
-		{
-			max_y = points[i].y;
-		}
-	}
-//	cout << "min_x " << min_x << "  max_x " << max_x << "   min_y " << min_y << "  max_y " << max_y << "\n";
-	sp_height = max_y - min_y;
-	sp_width = max_x - min_x;
-	CvScalar colour;
-	this->pixels = cv::Mat::zeros(sp_height, sp_width, CV_8UC3);
-	this->pixels_mask = cv::Mat::zeros(sp_height, sp_width, CV_8UC1);
-
-	int x_coord, y_coord;
-	for (int j = min_y; j < max_y ;j++)
-	{
-		y_coord = j - min_y;
-		for (int i = min_x; i < max_x ;i++)	
-		{
-			if(this->id == clusters[i][j])
-			{
-				x_coord = i - min_x;
-
-				colour = cvGet2D(img, j, i);
-				(this->pixels.at<cv::Vec3b>(y_coord, x_coord)).val[0] = colour.val[0];
-				(this->pixels.at<cv::Vec3b>(y_coord, x_coord)).val[1] = colour.val[1];
-				(this->pixels.at<cv::Vec3b>(y_coord, x_coord)).val[2] = colour.val[2];
-				this->pixels_mask.at<uchar>(y_coord, x_coord) = 255;
-			}
-		}
-	}
-}
-
-
 void Superpixel::add_pixels_information(cv::Mat img, cv::Mat gray, vector<vector<int>> clusters)
 {
 	int i, j;

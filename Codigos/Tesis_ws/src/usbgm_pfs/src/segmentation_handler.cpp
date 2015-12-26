@@ -45,7 +45,7 @@ void SegmentationHandler::slicSuperpixels()
 	slic.clear_data();
 	slic.generate_superpixels(lab_image, step, nc);
 	slic.create_connectivity(lab_image);
-	slic.store_superpixels(&frame2);
+	slic.store_superpixels(this->seg_image, this->gray);
 	this->superpixels_list = slic.get_superpixels();
 	this->seg_image = slic.get_segmented_image();
 

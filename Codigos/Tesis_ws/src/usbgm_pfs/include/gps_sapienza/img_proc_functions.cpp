@@ -156,22 +156,19 @@ namespace GPSSapienza{
 		{
 			if ((cvRound(superpixels_histogram.at<float>(0,1)) > 0) && (features.superpixels_list.size() > i))
 			{
-				// std::cout << "i  " << i << "\n";
-				// std::cout << "superpixels size  =  " << features.superpixels_list.size() << "\n";
 				Superpixel curr_superpixel = features.superpixels_list[i];
 				stats->id[k] = k;
 				stats->gray_id[k] = i;
 				cv::compare(features.seg_img, cv::Scalar(i), mask[0], cv::CMP_EQ);
+					// cv::imshow("mascara superpixel", mask[0]);
 				stats->size[k] = curr_superpixel.get_points().size(); //count number of pixels in current segment
-
+					
 				cv::meanStdDev(curr_superpixel.get_pixels_gray(), stats->mean[k], stats->stdDev[k], curr_superpixel.get_pixels_mask());
-				//std::cout << "mean = " << stats->mean[k] << "	stddev = " << stats->stdDev[k] << "\n";
-
 				stats->box[k] = curr_superpixel.get_bounding_rect();
 				// stats->P_Gt[k] = GetPrior(stats->img_h, &stats->box[k]);
 				stats->P_Gt[k] = stats->prior_img.at<float>(curr_superpixel.get_center().y, curr_superpixel.get_center().x);
 				stats->P_Gf[k] =  1. - stats->P_Gt[k];
-
+				
 				stats_disp.setTo(cv::Scalar(stats->mean[k].val[0]), mask[0]);
 				// stats->prior_img.setTo(cv::Scalar(stats->P_Gt[k]), mask[0]);
 
