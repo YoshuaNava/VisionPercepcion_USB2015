@@ -147,14 +147,14 @@ int main( int argc, char** argv )
 		CV_TIMER_STOP(E, "Prior probability updated")
 		
 		
-		GPSSapienza::GetModel(featuresPtr, stat_modelPtr);
+		GPSSapienza::getModel(featuresPtr, stat_modelPtr);
 		CV_TIMER_STOP(F, "Got model")
 		
-		GPSSapienza::DisplayHistograms(stat_modelPtr);
+		// GPSSapienza::displayHistograms(stat_modelPtr);
 		CV_TIMER_STOP(G, "Showing features histograms")
 
 		
-		// showImages();
+		showImages();
 		CV_TIMER_STOP(Z, "Loop finished")
 		printf("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n");
 	 	ros::spinOnce();

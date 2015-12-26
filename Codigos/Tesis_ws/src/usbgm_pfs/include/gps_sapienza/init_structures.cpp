@@ -165,15 +165,15 @@ namespace GPSSapienza
 	void init_model(cv::Size img_size, Model* model)
 	{
 		int n = 1; //number of model regions
-		cv::Rect SafeRegion = cv::Rect( cvRound(img_size.width/3),//+25,
+		model->SafeRegion = cv::Rect( cvRound(img_size.width/3),//+25,
 					(img_size.height)-cvRound(img_size.height/7),
 					cvRound(img_size.width/3),
 					cvRound(img_size.height/8) );
 	
-		model->box = &SafeRegion;
+		model->box = &(model->SafeRegion);
 	 
 		model->mask = cv::Mat::zeros(img_size.height, img_size.width, CV_8UC1);
-		cv::Mat roi = (model->mask(SafeRegion));
+		cv::Mat roi = (model->mask(model->SafeRegion));
 		roi.setTo(255);
 		// cv::imshow("roi", model->mask);
 	

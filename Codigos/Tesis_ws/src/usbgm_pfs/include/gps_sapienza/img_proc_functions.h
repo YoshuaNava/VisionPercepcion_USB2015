@@ -54,7 +54,23 @@ namespace GPSSapienza
 	const char * LBP_HIST 		= "LBP Image Histogram"; // window name
 	const char * iic_HIST 		= "IIC Image Histogram"; // window name	
 	const char * GBS_HIST 		= "GBS Image Histogram"; // window name
-
+	
+	static int dim_9	= 9;
+    static int dim_16 	= 16;
+    static int dim_32 	= 32;
+    static int dim_64 	= 64;
+    static int dim_128 	= 128;
+	static int range_256 	= 256;
+	static int range_181 	= 181;
+	static int range_91 	= 91;
+	float range_256_arr[] = {float(0),float(range_256-1)};
+	float range_181_arr[] = {float(0),float(range_181-1)};
+	float range_91_arr[] = {float(0),float(range_91-1)};
+	float range_2pi_arr[] = {-CV_PI,CV_PI};
+	const float* range_256_ptr = range_256_arr;
+	const float* range_181_ptr = range_181_arr;
+	const float* range_91_ptr = range_91_arr;
+	const float* range_2pi_ptr = range_2pi_arr;
 	cv::Size HistSize;	
 	cv::Mat HistImgH, HistImgS, HistImgV; //Images to display histograms
 	cv::Mat EdgeHist_img, LBPhist_img, iichist_img;
@@ -68,12 +84,11 @@ namespace GPSSapienza
 	static inline double getPrior(int h, cv::Rect* R);
 	void superPixelStats(Features features, Statistics* stats);
 	void updatePrior(Statistics *stats, Features* features);
-	void GetModel(Features* features, Model* model);
-	void PrepareHistogramsDisplay(Model* model);
+	void getModel(Features* features, Model* model);
 	static inline cv::Scalar hue2rgb( float hue );
-	static inline void PrintGHistogram(int hist_size, cv::Mat histogram, cv::Mat hist_img, const char *Window, bool flag, int X, int Y);
-	static inline void PrintHistogram(int hist_size, cv::Mat histogram, cv::Mat hist_img, const char *Window, bool flag, int X, int Y);
-	void DisplayHistograms(Model* model);
+	static inline void printGHistogram(int hist_size, cv::Mat histogram, cv::Mat &hist_img, const char *Window, bool flag);
+	static inline void printHistogram(int hist_size, cv::Mat &histogram, cv::Mat &hist_img, const char *Window, bool flag);
+	void displayHistograms(Model* model);
 	
 	
 }

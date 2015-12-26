@@ -80,6 +80,7 @@ namespace GPSSapienza
     struct model {
     
         cv::Rect* box; //safe area
+        cv::Rect SafeRegion;
         cv::Mat mask; //safe area
         
         //Basic Stats
