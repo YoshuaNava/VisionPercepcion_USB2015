@@ -16,7 +16,7 @@ img_proc_fcns.cpp
 	// void GetModel(IplImage* gray_img, Features* F, Model* StatModelPtr, bool dynamic);
 	// static inline void PrintHistogram(int hist_size, CvHistogram *Hist, IplImage* Hist_img, const char * Window, bool flag, int X, int Y);
 	// static inline void PrintGHistogram(int hist_size, CvHistogram *Hist, IplImage* Hist_img, const char * Window, bool flag, int X, int Y);
-	void FeatureAnalysis(Features *F, Model* M, Statistics *sts, IplImage *gbs, bool dynamic);
+	// void FeatureAnalysis(Features *F, Model* M, Statistics *sts, IplImage *gbs, bool dynamic);
 	void ProbAnalysis2(Features *F, Statistics* sts, IplImage* gbs);
 	void UpdateParams(IplImage* bin, Statistics *S, Features *F, bool dynamic);
 	

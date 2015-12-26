@@ -148,10 +148,18 @@ int main( int argc, char** argv )
 		
 		
 		GPSSapienza::getModel(featuresPtr, stat_modelPtr);
-		CV_TIMER_STOP(F, "Got model")
+		CV_TIMER_STOP(F, "Captured safe window model")
 		
 		GPSSapienza::displayHistograms(stat_modelPtr);
 		CV_TIMER_STOP(G, "Showing features histograms")
+
+
+		GPSSapienza::featureAnalysis(featuresPtr, stat_modelPtr, statisticsPtr);
+		CV_TIMER_STOP(H, "Analyzing features with G-stat")
+
+		GPSSapienza::displayAnalyzedFeatures(features);
+		CV_TIMER_STOP(I, "Showing analyzed features")
+
 		
 		showImages();
 		CV_TIMER_STOP(Z, "Loop finished")

@@ -75,6 +75,7 @@ namespace GPSSapienza
 	cv::Mat HistImgH, HistImgS, HistImgV; //Images to display histograms
 	cv::Mat EdgeHist_img, LBPhist_img, iichist_img;
 	cv::Mat GhistImg, GhistImg2;		
+	cv::Mat inv_prob[NUM_FEATURES], temp[NUM_FEATURES], PG[NUM_FEATURES], PG_prev[NUM_FEATURES], PG1_DISP[NUM_FEATURES], PG0_DISP[NUM_FEATURES]; //Images for use when calculating probabilities
 	
 	void calculateIIC(cv::Mat Cr, cv::Mat Cb, cv::Mat a, cv::Mat& iic);
 	void calculateMagnitudeOrientationOfGradients(cv::Mat gray, cv::Mat& F_mag, cv::Mat& F_ang);
@@ -89,8 +90,12 @@ namespace GPSSapienza
 	static inline void printGHistogram(int hist_size, cv::Mat histogram, cv::Mat &hist_img, const char *Window, bool flag);
 	static inline void printHistogram(int hist_size, cv::Mat &histogram, cv::Mat &hist_img, const char *Window, bool flag);
 	void displayHistograms(Model* model);
-	
-	
+	void featureAnalysis(Features *features, Model *model, Statistics *stats);	
+	static inline double Gstat(cv::Mat histogram1, cv::Mat histogram2, int size);
+	static inline double EXP_DIST_1(double z, double l, double g);
+	static inline double EXP_DIST_0(double z, double l, double g);
+	void featureAnalysis(Features *features, Model *model, Statistics *stats);
+	void displayAnalyzedFeatures(Features features);	
 }
 
 #endif

@@ -112,6 +112,11 @@ ADD_EXECUTABLE(test_sapienza_features test/gps_sapienza/test_sapienza_features.c
 TARGET_LINK_LIBRARIES(test_sapienza_features fps)
 TARGET_LINK_LIBRARIES(test_sapienza_features gps_sapienza_mod)
 
+
+ADD_EXECUTABLE(test_sapienza_full test/gps_sapienza/test_sapienza_full.cpp)
+TARGET_LINK_LIBRARIES(test_sapienza_full fps)
+TARGET_LINK_LIBRARIES(test_sapienza_full gps_sapienza_mod)
+
 # ADD_EXECUTABLE(test_sapienza_features test/gps_sapienza/test_sapienza_features.cpp)
 # TARGET_LINK_LIBRARIES(test_sapienza_features fps)
 # TARGET_LINK_LIBRARIES(test_sapienza_features gps_sapienza_mod)

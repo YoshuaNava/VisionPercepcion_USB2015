@@ -69,9 +69,9 @@ namespace GPSSapienza
         double *L1, *L0;
         double *Z1, *Z0, *gmax;
     
-        cv::Mat *Hgram_SF[NUM_FEATURES];
-        cv::Mat *Hgram_G1[NUM_FEATURES], *Hgram_G1_DISP[NUM_FEATURES];
-        cv::Mat *Hgram_G0[NUM_FEATURES], *Hgram_G0_DISP[NUM_FEATURES];
+        cv::Mat Hgram_SF[NUM_FEATURES];
+        cv::Mat Hgram_G1[NUM_FEATURES], Hgram_G1_DISP[NUM_FEATURES];
+        cv::Mat Hgram_G0[NUM_FEATURES], Hgram_G0_DISP[NUM_FEATURES];
     
     };
     typedef struct statistics Statistics;
