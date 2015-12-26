@@ -17,7 +17,7 @@ img_proc_fcns.cpp
 	// static inline void PrintHistogram(int hist_size, CvHistogram *Hist, IplImage* Hist_img, const char * Window, bool flag, int X, int Y);
 	// static inline void PrintGHistogram(int hist_size, CvHistogram *Hist, IplImage* Hist_img, const char * Window, bool flag, int X, int Y);
 	// void FeatureAnalysis(Features *F, Model* M, Statistics *sts, IplImage *gbs, bool dynamic);
-	void ProbAnalysis2(Features *F, Statistics* sts, IplImage* gbs);
+	// void ProbAnalysis2(Features *F, Statistics* sts, IplImage* gbs);
 	void UpdateParams(IplImage* bin, Statistics *S, Features *F, bool dynamic);
 	
 	// void ColorHistAnalysis(IplImage*src, IplImage* hsv, IplImage* col_cue, IplImage* col_prob, CvRect Safe);

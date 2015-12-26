@@ -263,6 +263,7 @@ namespace GPSSapienza
 		features->post_ratio = cv::Mat::zeros(img_size.height, img_size.width, CV_32FC1);
 	
 		features->bin_class_result = cv::Mat::zeros(img_size.height, img_size.width, CV_8UC1);
+		features->bin_class_result = 255;
 		features->seg_img = cv::Mat::zeros(img_size.height, img_size.width, CV_8UC1);
 	
 		for(int i=0;i<5;i++){

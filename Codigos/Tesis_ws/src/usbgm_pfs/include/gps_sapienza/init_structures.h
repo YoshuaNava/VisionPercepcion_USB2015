@@ -113,6 +113,8 @@ namespace GPSSapienza
     
         //Classification
         cv::Mat bin_class_result;
+        cv::Mat floor_boundary;
+        
         cv::Mat seg_img;
         vector<Superpixel> superpixels_list;
     };

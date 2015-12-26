@@ -23,8 +23,8 @@ GPSSapienza::Features features;
 GPSSapienza::Features* featuresPtr = &features;
 GPSSapienza::Statistics statistics;
 GPSSapienza::Statistics* statisticsPtr = &statistics;
-GPSSapienza::Model stat_model;
-GPSSapienza::Model* stat_modelPtr = &stat_model;
+GPSSapienza::Model safewindow_model;
+GPSSapienza::Model* safewindow_modelPtr = &safewindow_model;
 GPSSapienza::Algorithm_parameters alg_params;
 
 
@@ -35,22 +35,26 @@ void showImages()
 	cv::resizeWindow("features.rgb", proc_W, proc_H);
 	DISPLAY_IMAGE_XY(true, features.gray, 1, 0);
 	cv::resizeWindow("features.gray", proc_W, proc_H);
-	DISPLAY_IMAGE_XY(true, features.hue, 2, 0);
-	cv::resizeWindow("features.hue", proc_W, proc_H);
-	DISPLAY_IMAGE_XY(true, features.sat, 3, 0);
-	cv::resizeWindow("features.sat", proc_W, proc_H);
-	DISPLAY_IMAGE_XY(true, features.iic, 4, 0);
-	cv::resizeWindow("features.iic", proc_W, proc_H);
-	DISPLAY_IMAGE_XY(true, features.mag, 0, 1);
-	cv::resizeWindow("features.mag", proc_W, proc_H);
-	DISPLAY_IMAGE_XY(true, features.ang32, 1, 1);
-	cv::resizeWindow("features.ang32", proc_W, proc_H);
-	DISPLAY_IMAGE_XY(true, features.lbp, 2, 1);
-	cv::resizeWindow("features.lbp", proc_W, proc_H);
-	DISPLAY_IMAGE_XY(true, superpixels_contours_img, 3, 1);
+	DISPLAY_IMAGE_XY(true, superpixels_contours_img, 2, 0);
 	cv::resizeWindow("superpixels_contours_img", proc_W, proc_H);
-	DISPLAY_IMAGE_XY(true, features.seg_img, 4, 1);
+	DISPLAY_IMAGE_XY(true, features.seg_img, 3, 0);
 	cv::resizeWindow("features.seg_img", proc_W, proc_H);
+	DISPLAY_IMAGE_XY(true, features.hue, 0, 1);
+	cv::resizeWindow("features.hue", proc_W, proc_H);
+	DISPLAY_IMAGE_XY(true, features.sat, 1, 1);
+	cv::resizeWindow("features.sat", proc_W, proc_H);
+	DISPLAY_IMAGE_XY(true, features.mag, 2, 1);
+	cv::resizeWindow("features.mag", proc_W, proc_H);
+	DISPLAY_IMAGE_XY(true, features.ang32, 3, 1);
+	cv::resizeWindow("features.ang32", proc_W, proc_H);
+	DISPLAY_IMAGE_XY(true, features.lbp, 4, 1);
+	cv::resizeWindow("features.lbp", proc_W, proc_H);
+	DISPLAY_IMAGE_XY(true, features.iic, 5, 1);
+	cv::resizeWindow("features.iic", proc_W, proc_H);
+	DISPLAY_IMAGE_XY(true, features.post1, 4, 4);
+	cv::resizeWindow("features.post1", proc_W, proc_H);
+	DISPLAY_IMAGE_XY(true, features.floor_boundary, 5, 4);
+	cv::resizeWindow("features.floor_boundary", proc_W, proc_H);
 }
 
 
@@ -102,7 +106,7 @@ int main( int argc, char** argv )
 	
 	alg_params.img_size = cv::Size(proc_W, proc_H);
 	GPSSapienza::init_stats(alg_params.img_size, statisticsPtr, 1);
-	GPSSapienza::init_model(alg_params.img_size, stat_modelPtr);
+	GPSSapienza::init_model(alg_params.img_size, safewindow_modelPtr);
 	GPSSapienza::init_features(alg_params.img_size, featuresPtr);
 	GPSSapienza::init_images_img_proc(alg_params.img_size);
 	
@@ -147,19 +151,30 @@ int main( int argc, char** argv )
 		CV_TIMER_STOP(E, "Prior probability updated")
 		
 		
-		GPSSapienza::getModel(featuresPtr, stat_modelPtr);
+		GPSSapienza::getModel(featuresPtr, safewindow_modelPtr);
 		CV_TIMER_STOP(F, "Captured safe window model")
 		
-		GPSSapienza::displayHistograms(stat_modelPtr);
+		GPSSapienza::displayHistograms(safewindow_modelPtr);
 		CV_TIMER_STOP(G, "Showing features histograms")
 
 
-		GPSSapienza::featureAnalysis(featuresPtr, stat_modelPtr, statisticsPtr);
+		GPSSapienza::featureAnalysis(featuresPtr, safewindow_modelPtr, statisticsPtr);
 		CV_TIMER_STOP(H, "Analyzing features with G-stat")
 
 		GPSSapienza::displayAnalyzedFeatures(features);
 		CV_TIMER_STOP(I, "Showing analyzed features")
 
+		GPSSapienza::probAnalysis2(featuresPtr, statisticsPtr);
+		CV_TIMER_STOP(J, "Probabilistic analysis ready")
+
+		GPSSapienza::updateParams(features.bin_class_result, statisticsPtr, featuresPtr);
+		CV_TIMER_STOP(K, "Expectation-Maximization completed")
+		
+		features.floor_boundary = features.bin_class_result.clone();
+
+		GPSSapienza::findObstacleBoundary(features.floor_boundary);
+		CV_TIMER_STOP(L, "Extracted the floor boundary")
+		
 		
 		showImages();
 		CV_TIMER_STOP(Z, "Loop finished")

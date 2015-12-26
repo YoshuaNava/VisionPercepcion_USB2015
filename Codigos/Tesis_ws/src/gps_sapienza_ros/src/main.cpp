@@ -344,71 +344,71 @@ int main(int argc, char** argv)
         FeatureAnalysis(FPtr, StatModelPtr, StatsPtr, gbs_img, p.dynamic);
         CV_TIMER_STOP(G, "Feature analysis")
 
-//         ProbAnalysis2(FPtr, StatsPtr, gbs_img);
-//         if (p.disp_img){ DISPLAY_IMAGE_XY(p.refresh, F.post1, 0 , 4);
-//         //cvShowImage(POSTERIOR, F.post1);
+        ProbAnalysis2(FPtr, StatsPtr, gbs_img);
+        if (p.disp_img){ DISPLAY_IMAGE_XY(p.refresh, F.post1, 0 , 4);
+        //cvShowImage(POSTERIOR, F.post1);
 
-//         }
-//         CV_TIMER_STOP(H, "Prob Analysis")
+        }
+        CV_TIMER_STOP(H, "Prob Analysis")
 
-//         UpdateParams(F.bin_class_result, StatsPtr, FPtr, p.dynamic);
-//         CV_TIMER_STOP(I, "EM Analysis")
-
-
-// // EstimarFronteraObstaculo();
-//         //FIND OBSTACLE BOUNDARY AND COMPUTE STEERING DIRECTION
-//         //cvCopy(gbs_img,Bound.Bimg);
-//         cvMerge(F.bin_class_result, F.bin_class_result, F.bin_class_result, NULL, result_img);
-//         cvCopy(F.bin_class_result,Bound.Bimg);
-
-//         //cvSmooth(Bound.Bimg, Bound.Bimg, CV_MEDIAN, 3, 3);//Smooth image
-//         cvDilate(Bound.Bimg,Bound.Bimg, NULL, 1);
-//         cvErode(Bound.Bimg,Bound.Bimg, NULL, 3);
-//         cvSmooth( Bound.Bimg,  Bound.Bimg, CV_MEDIAN, 3, 3);
-//         FindObstacleBoundary(Bound.Bimg);
-//         if (p.disp_img){ DISPLAY_IMAGE_XY(p.refresh, Bound.Bimg, 1 , 4); //cvShowImage(OBSTACLE_BOUND, Bound.Bimg);
-
-//         }
-//         cvCopy(Bound.Bimg, bin_img);
-
-//         //UpdateParams(Bound.Bimg, StatsPtr, FPtr, p.dynamic);
-
-//         ExtractBoundary(FrameSize, BoundPtr);
-//         CalculateDistances(FrameSize, BoundPtr, p.camera, p.bot);
-
-//         InterpretDepthArray(FrameSize, BoundPtr, p.bot);
-//         CV_TIMER_STOP(J, "Path analysis")
-
-//         Contours(F.bin_class_result); //Find contours
-//         DrawContours(contour[0], CV_RGB( 0, 150, 0 ), SafeRegion); //Draw contours
-//         Contours(Bound.Bimg); //Find contours
-//         DrawContours(contour[1], CV_RGB( 255, 0, 0 ), SafeRegion); //Draw contours
-
-//         cvAddWeighted( contour[0], 0.5, contour[1], 1, 0, contour[0] );
-//         cvAddWeighted( contour[0], 0.5, source_img, 1, 0, source_img );
-//         // //checking for memory leaks
-//         DISPLAY_IMAGE(source_img)
-//         //cvNamedWindow("test");
-//         //cvShowImage("test", source_img);
+        UpdateParams(F.bin_class_result, StatsPtr, FPtr, p.dynamic);
+        CV_TIMER_STOP(I, "EM Analysis")
 
 
+// EstimarFronteraObstaculo();
+        //FIND OBSTACLE BOUNDARY AND COMPUTE STEERING DIRECTION
+        //cvCopy(gbs_img,Bound.Bimg);
+        cvMerge(F.bin_class_result, F.bin_class_result, F.bin_class_result, NULL, result_img);
+        cvCopy(F.bin_class_result,Bound.Bimg);
 
-//         if(frame_no%25 == 0 && frame_no>0){
-//             frame_no=j;
-//                 char buffer1 [150];
-//                 char buffer2 [150];
-//                 //char buffer3 [150];
-//                 //cvNamedWindow("result");
-//                 //cvShowImage("result", result_img);
-//             sprintf(buffer1,"results/%s/%d/%s_source_%d.bmp", name[id-1],T,name[id-1],frame_no);
-//             sprintf(buffer2,"results/%s/%d/%s_result_%d.bmp", name[id-1],T,name[id-1],frame_no);
-//             //sprintf(buffer3,"results/%s/%d/%d/%s_bound_%d_%d.bmp", name[id-1],T,frame_no,name[id-1],frame_no,run);
-//             cvSaveImage(buffer1, source_img);
-//             cvSaveImage(buffer2, result_img);
-//             //cvSaveImage(buffer3, bin_img);
-//         }
+        //cvSmooth(Bound.Bimg, Bound.Bimg, CV_MEDIAN, 3, 3);//Smooth image
+        cvDilate(Bound.Bimg,Bound.Bimg, NULL, 1);
+        cvErode(Bound.Bimg,Bound.Bimg, NULL, 3);
+        cvSmooth( Bound.Bimg,  Bound.Bimg, CV_MEDIAN, 3, 3);
+        FindObstacleBoundary(Bound.Bimg);
+        if (p.disp_img){ DISPLAY_IMAGE_XY(p.refresh, Bound.Bimg, 1 , 4); //cvShowImage(OBSTACLE_BOUND, Bound.Bimg);
 
-//         ReleaseContours();
+        }
+        cvCopy(Bound.Bimg, bin_img);
+
+        //UpdateParams(Bound.Bimg, StatsPtr, FPtr, p.dynamic);
+
+        ExtractBoundary(FrameSize, BoundPtr);
+        CalculateDistances(FrameSize, BoundPtr, p.camera, p.bot);
+
+        InterpretDepthArray(FrameSize, BoundPtr, p.bot);
+        CV_TIMER_STOP(J, "Path analysis")
+
+        Contours(F.bin_class_result); //Find contours
+        DrawContours(contour[0], CV_RGB( 0, 150, 0 ), SafeRegion); //Draw contours
+        Contours(Bound.Bimg); //Find contours
+        DrawContours(contour[1], CV_RGB( 255, 0, 0 ), SafeRegion); //Draw contours
+
+        cvAddWeighted( contour[0], 0.5, contour[1], 1, 0, contour[0] );
+        cvAddWeighted( contour[0], 0.5, source_img, 1, 0, source_img );
+        // //checking for memory leaks
+        DISPLAY_IMAGE(source_img)
+        //cvNamedWindow("test");
+        //cvShowImage("test", source_img);
+
+
+
+        if(frame_no%25 == 0 && frame_no>0){
+            frame_no=j;
+                char buffer1 [150];
+                char buffer2 [150];
+                //char buffer3 [150];
+                //cvNamedWindow("result");
+                //cvShowImage("result", result_img);
+            sprintf(buffer1,"results/%s/%d/%s_source_%d.bmp", name[id-1],T,name[id-1],frame_no);
+            sprintf(buffer2,"results/%s/%d/%s_result_%d.bmp", name[id-1],T,name[id-1],frame_no);
+            //sprintf(buffer3,"results/%s/%d/%d/%s_bound_%d_%d.bmp", name[id-1],T,frame_no,name[id-1],frame_no,run);
+            cvSaveImage(buffer1, source_img);
+            cvSaveImage(buffer2, result_img);
+            //cvSaveImage(buffer3, bin_img);
+        }
+
+        ReleaseContours();
 
         ////cvReleaseImage(&input_image);
 

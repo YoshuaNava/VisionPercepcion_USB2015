@@ -122,6 +122,7 @@ namespace GPSSapienza{
 		iichist_img = cv::Mat::zeros(HistSize, CV_8UC1);
 		GhistImg = cv::Mat::zeros(cv::Size(512,100), CV_8UC1);
 		GhistImg2 = cv::Mat::zeros(cv::Size(120,100), CV_8UC1);
+		hist_temp = cv::Mat::zeros(cv::Size(120,100), CV_8UC3);
 
 		for(i=0; i<NUM_FEATURES ;++i)
 		{
@@ -248,380 +249,464 @@ namespace GPSSapienza{
 	}
 
 
-void displayHistograms(Model* model)
-{
-	static int row = 1;
-	for(int i=0;i<NUM_FEATURES;i++)
+	void displayHistograms(Model* model)
 	{
-		model->Hgram_M_DISP[i] = (model->Hgram_M[i]).clone();
-	}
-	// for(int i = 0; i < hist_size; i++ )
-	// {
-	//     int val = cvRound(model->Hgram_M_DISP[5].at<float>(i,0));
-	// 	cout << "i = " << i << "   val = " << val << "\n";
-	// }
-	
-	printHistogram(dim_32, model->Hgram_M[0], HistImgV, HIST_VAL, 1);
-	printHistogram(dim_9, model->Hgram_M_DISP[1], EdgeHist_img, HIST_EDGE, 0);
-	printHistogram(dim_32, model->Hgram_M_DISP[2], HistImgH, HIST_HUE, 1);
-	printHistogram(dim_32, model->Hgram_M_DISP[3], HistImgS, HIST_SAT, 1);
-	printHistogram(dim_32, model->Hgram_M_DISP[4], LBPhist_img, LBP_HIST, 0);
-	printHistogram(dim_32, model->Hgram_M_DISP[5], iichist_img, iic_HIST, 0);
-	
-	DISPLAY_IMAGE_XY(true, HistImgH, 0, 2);
-	cv::resizeWindow("HistImgH", HistImgH.cols, HistImgH.rows);
-	DISPLAY_IMAGE_XY(true, HistImgS, 1, 2);
-	cv::resizeWindow("HistImgS", HistImgS.cols, HistImgS.rows);
-	DISPLAY_IMAGE_XY(true, HistImgV, 2, 2);
-	cv::resizeWindow("HistImgV", HistImgV.cols, HistImgV.rows);
-	DISPLAY_IMAGE_XY(true, EdgeHist_img, 3, 2);
-	cv::resizeWindow("EdgeHist_img", EdgeHist_img.cols, EdgeHist_img.rows);
-	DISPLAY_IMAGE_XY(true, LBPhist_img, 4, 2);
-	cv::resizeWindow("LBPhist_img", LBPhist_img.cols, LBPhist_img.rows);
-	DISPLAY_IMAGE_XY(true, iichist_img, 5, 2);
-	cv::resizeWindow("iichist_img", iichist_img.cols, iichist_img.rows);
-}
-
-
-static inline cv::Scalar hue2rgb( float hue )
-{
-    // hue to RGB conversion : coverts a given hue value to a RGB triplet for
-    // display
-    // parameters:
-    // hue - hue value in range 0 to 180 (OpenCV implementation of HSV)
-    // return value - CvScalar as RGB triple
-    // taken from OpenCV 1.0 camshiftdemo.c example
-    int rgb[3], p, sector;
-    static const int sector_data[][3]= {{0,2,1}, {1,2,0}, {1,0,2}, {2,0,1}, {2,1,0}, {0,1,2}};
-    hue *= 0.033333333333333333333333333333333f;
-    sector = cvFloor(hue);
-    p = cvRound(255*(hue - sector));
-    p ^= sector & 1 ? 255 : 0;
-	
-    rgb[sector_data[sector][0]] = 255;
-    rgb[sector_data[sector][1]] = 0;
-    rgb[sector_data[sector][2]] = p;
-
-    return cv::Scalar(rgb[2], rgb[1], rgb[0], 0);
-}
-
-
-static inline void printGHistogram(int hist_size, cv::Mat histogram, cv::Mat& hist_img, const char *Window, bool flag)
-{
-    float max_value;
-    int bin_w = cvRound((double) hist_img.cols/hist_size);
-	cv::normalize(histogram, histogram, 0, (10*hist_img.rows), CV_MINMAX);
-
-    if(flag==0)
-	{
-		hist_img.setTo(255);
-        for(int i = 0; i < hist_size; i++ )
+		static int row = 1;
+		for(int i=0;i<NUM_FEATURES;i++)
 		{
-        	int val = cvRound(histogram.at<float>(i,1));
-            cv::rectangle( hist_img, cv::Point(i*bin_w, hist_img.rows),
-                            cv::Point((i+1)*bin_w, hist_img.rows - val),
-                            cv::Scalar(0), -1, 8, 0 );        }
-    }
-}
-
-
-
-static inline void printHistogram(int hist_size, cv::Mat& histogram, cv::Mat& hist_img, const char *Window, bool flag)
-{
-    float max_value;
-    int bin_w = cvRound((double) hist_img.cols/hist_size);
-	cv::normalize(histogram, histogram, 0, hist_img.rows/2, cv::NORM_MINMAX, -1, cv::Mat());
-
-    if(flag==0)
-	{
-        hist_img.setTo(255);
-        for(int i = 0; i < hist_size; i++ )
-		{
-            int val = cvRound(histogram.at<float>(i,0));
-            cv::rectangle( hist_img, cv::Point(i*bin_w, hist_img.rows),
-                            cv::Point((i+1)*bin_w, hist_img.rows - val),
-                            cv::Scalar(0), -1, 8, 0 );
-        }
-    }
-    else if(flag==1)
-	{
-        hist_img.setTo(0);
-		for(int i = 0; i < hist_size; i++ )
-		{
-            int val = cvRound(histogram.at<float>(i,0));
-            cv::Scalar color = hue2rgb(i*180.f/hist_size);
-            cv::rectangle( hist_img, cv::Point(i*bin_w, hist_img.rows),
-                            cv::Point((i+1)*bin_w, hist_img.rows - val),
-                            color, -1, 8, 0 );
-        }
-    }
-}
-
-
-
-static inline double Gstat(cv::Mat histogram1, cv::Mat histogram2, int size)
-{
-    double G = 0.;
-    const static double SMALL = 0.000001;
-	cv::normalize(histogram1, histogram1, 0, 1, cv::NORM_MINMAX, -1, cv::Mat());
-	cv::normalize(histogram2, histogram2, 0, 1, cv::NORM_MINMAX, -1, cv::Mat());
-
-	for(int i=0; i<size; i++)
-	{
-        double M = histogram1.at<float>(i,0); //sample
-        double S = histogram2.at<float>(i,0); //model
-        if(M == 0) M = SMALL;
-        if(S == 0) S = SMALL;
-        G += 2*(S*(log (S)) - S*(log (M)));
-	}
-
-    return G;
-}
-
-
-static inline double EXP_DIST_1(double z, double l, double g)
-{
-    return (1/z)*exp(-l*g);
-}
-
-static inline double EXP_DIST_0(double z, double l, double g)
-{
-    return (1/z)*exp(l*g);
-}
-
-void featureAnalysis(Features *features, Model *model, Statistics *stats)
-{
-	cv:inRange(features->hsv, cv::Scalar(0, smin, min(vmin,vmax), 0), cv::Scalar(180, 256, max(vmin,vmax), 0), bin[0]);
-	// long time = cvGetTickCount();
-	
-    for(int i=0; i<stats->no_features ;i++)
-	{
-        stats->L1[i] = stats->L1[i] > 0 ? stats->L1[i] : 0.01;
-        stats->L0[i] = stats->L0[i] > 0 ? stats->L0[i] : 0.01;
-        stats->gmax[i] = stats->gmax[i] > 0 ? stats->gmax[i] : 1.;
-    }
-	// cout << "Primer ciclo	" << (cvGetTickCount() - time)/((double)cvGetTickFrequency()*1000.) << "ms\n";
-	// time = cvGetTickCount();
-
-    for(int i=0; i<stats->nos ;i++)
-    {
-		cv::compare(features->seg_img, stats->gray_id[i], mask[0], CV_CMP_EQ);
-		cv::bitwise_and(bin[0], mask[0], bin[1]);
-		cv::calcHist(&features->mag, 1, 0, mask[0], stats->Hgram_SF[0], 1, &model->dim[0], &range_256_ptr, true, false);
-		cv::calcHist(&features->ang32, 1, 0, mask[0], stats->Hgram_SF[1], 1, &model->dim[1], &range_2pi_ptr, true, false);
-		cv::calcHist(&features->hue, 1, 0, bin[1], stats->Hgram_SF[2], 1, &model->dim[2], &range_181_ptr, true, false);
-		cv::calcHist(&features->sat, 1, 0, mask[0], stats->Hgram_SF[3], 1, &model->dim[3], &range_256_ptr, true, false);
-		cv::calcHist(&features->lbp, 1, 0, mask[0], stats->Hgram_SF[4], 1, &model->dim[4], &range_256_ptr, true, false);
-		cv::calcHist(&features->iic, 1, 0, mask[0], stats->Hgram_SF[5], 1, &model->dim[5], &range_256_ptr, true, false);
-
-		// cout << i << " A)  Segundo ciclo	" << (cvGetTickCount() - time)/((double)cvGetTickFrequency()*1000.) << "ms\n";
-
-		for(int j=0; j<stats->no_features ;j++)
-		{
-			stats->G_score[j] = Gstat(model->Hgram_M[j], stats->Hgram_SF[j], model->dim[j]);
-			stats->P_FgGt[stats->no_features*i+j] = EXP_DIST_1(stats->Z1[j], stats->L1[j], stats->G_score[j]); //0.9*exp(-lambda*G_scoreV);
-			stats->P_FgGf[stats->no_features*i+j] = EXP_DIST_0(stats->Z0[j], stats->L0[j], stats->G_score[j]); //1. - S->P_VgGt[i];
-			PG[j].setTo(cv::Scalar(stats->G_score[j]), mask[0]);
-			features->P_X1[j].setTo(cv::Scalar(stats->P_FgGt[stats->no_features*i+j]	/	(stats->P_FgGt[stats->no_features*i+j] + stats->P_FgGf[stats->no_features*i+j])), mask[0]);
-			features->P_X0[j].setTo(cv::Scalar(stats->P_FgGf[stats->no_features*i+j]	/	(stats->P_FgGt[stats->no_features*i+j] + stats->P_FgGf[stats->no_features*i+j])), mask[0]);
+			model->Hgram_M_DISP[i] = (model->Hgram_M[i]).clone();
 		}
-		// cout << i << " B)  Segundo ciclo	" << (cvGetTickCount() - time)/((double)cvGetTickFrequency()*1000.) << "ms\n";
-    }
-	// cout << "Segundo ciclo	" << (cvGetTickCount() - time)/((double)cvGetTickFrequency()*1000.) << "ms\n";
-	// time = cvGetTickCount();
-	
-
-	static bool flag = 0;
-	for(int i=0; i<stats->no_features ;i++)
-	{
-		if(flag)
-		{
-			cv::addWeighted(PG[i], 0.5, PG_prev[i], 0.5, 0, PG[i]);
-		}
-		PG_prev[i] = PG[i].clone();
+		// for(int i = 0; i < hist_size; i++ )
+		// {
+		//     int val = cvRound(model->Hgram_M_DISP[5].at<float>(i,0));
+		// 	cout << "i = " << i << "   val = " << val << "\n";
+		// }
+		
+		printHistogram(dim_32, model->Hgram_M[0], HistImgV, HIST_VAL, 1);
+		printHistogram(dim_9, model->Hgram_M_DISP[1], EdgeHist_img, HIST_EDGE, 0);
+		printHistogram(dim_32, model->Hgram_M_DISP[2], HistImgH, HIST_HUE, 1);
+		printHistogram(dim_32, model->Hgram_M_DISP[3], HistImgS, HIST_SAT, 1);
+		printHistogram(dim_32, model->Hgram_M_DISP[4], LBPhist_img, LBP_HIST, 0);
+		printHistogram(dim_32, model->Hgram_M_DISP[5], iichist_img, iic_HIST, 0);
+		
+		DISPLAY_IMAGE_XY(true, HistImgH, 0, 2);
+		cv::resizeWindow("HistImgH", HistImgH.cols, HistImgH.rows);
+		DISPLAY_IMAGE_XY(true, HistImgS, 1, 2);
+		cv::resizeWindow("HistImgS", HistImgS.cols, HistImgS.rows);
+		DISPLAY_IMAGE_XY(true, HistImgV, 2, 2);
+		cv::resizeWindow("HistImgV", HistImgV.cols, HistImgV.rows);
+		DISPLAY_IMAGE_XY(true, EdgeHist_img, 3, 2);
+		cv::resizeWindow("EdgeHist_img", EdgeHist_img.cols, EdgeHist_img.rows);
+		DISPLAY_IMAGE_XY(true, LBPhist_img, 4, 2);
+		cv::resizeWindow("LBPhist_img", LBPhist_img.cols, LBPhist_img.rows);
+		DISPLAY_IMAGE_XY(true, iichist_img, 5, 2);
+		cv::resizeWindow("iichist_img", iichist_img.cols, iichist_img.rows);
 	}
-	flag =1;
-	// cout << "Tercer ciclo	" << (cvGetTickCount() - time)/((double)cvGetTickFrequency()*1000.) << "ms\n";
+	
+	
+	static inline cv::Scalar hue2rgb( float hue )
+	{
+		// hue to RGB conversion : coverts a given hue value to a RGB triplet for
+		// display
+		// parameters:
+		// hue - hue value in range 0 to 180 (OpenCV implementation of HSV)
+		// return value - CvScalar as RGB triple
+		// taken from OpenCV 1.0 camshiftdemo.c example
+		int rgb[3], p, sector;
+		static const int sector_data[][3]= {{0,2,1}, {1,2,0}, {1,0,2}, {2,0,1}, {2,1,0}, {0,1,2}};
+		hue *= 0.033333333333333333333333333333333f;
+		sector = cvFloor(hue);
+		p = cvRound(255*(hue - sector));
+		p ^= sector & 1 ? 255 : 0;
+		
+		rgb[sector_data[sector][0]] = 255;
+		rgb[sector_data[sector][1]] = 0;
+		rgb[sector_data[sector][2]] = p;
+	
+		return cv::Scalar(rgb[2], rgb[1], rgb[0], 0);
+	}
+	
+	
+	static inline void printGHistogram(int hist_size, cv::Mat histogram, cv::Mat& hist_img, const char *Window, bool flag)
+	{
+		float max_value;
+		int bin_w = cvRound((double) hist_img.cols/hist_size);
+		cv::normalize(histogram, histogram, 0, (10*hist_img.rows), CV_MINMAX);
+	
+		if(flag==0)
+		{
+			hist_img.setTo(255);
+			for(int i = 0; i < hist_size; i++ )
+			{
+				int val = cvRound(histogram.at<float>(i,1));
+				cv::rectangle( hist_img, cv::Point(i*bin_w, hist_img.rows),
+								cv::Point((i+1)*bin_w, hist_img.rows - val),
+								cv::Scalar(0), -1, 8, 0 );        }
+		}
+	}
+	
+	
+	
+	static inline void printHistogram(int hist_size, cv::Mat& histogram, cv::Mat& hist_img, const char *Window, bool flag)
+	{
+		float max_value;
+		int bin_w = cvRound((double) hist_img.cols/hist_size);
+		cv::normalize(histogram, histogram, 0, hist_img.rows/2, CV_MINMAX, -1, cv::Mat());
+	
+		if(flag==0)
+		{
+			hist_img.setTo(255);
+			for(int i = 0; i < hist_size; i++ )
+			{
+				int val = cvRound(histogram.at<float>(i,0));
+				cv::rectangle( hist_img, cv::Point(i*bin_w, hist_img.rows),
+								cv::Point((i+1)*bin_w, hist_img.rows - val),
+								cv::Scalar(0), -1, 8, 0 );
+			}
+		}
+		else if(flag==1)
+		{
+			hist_img.setTo(0);
+			for(int i = 0; i < hist_size; i++ )
+			{
+				int val = cvRound(histogram.at<float>(i,0));
+				cv::Scalar color = hue2rgb(i*180.f/hist_size);
+				cv::rectangle( hist_img, cv::Point(i*bin_w, hist_img.rows),
+								cv::Point((i+1)*bin_w, hist_img.rows - val),
+								color, -1, 8, 0 );
+			}
+		}
+	}
+	
+	
+	
+	static inline double Gstat(cv::Mat histogram1, cv::Mat histogram2, int size)
+	{
+		double G = 0.;
+		const static double SMALL = 0.000001;
+		cv::normalize(histogram1, histogram1, 0, 1, cv::NORM_MINMAX, -1, cv::Mat());
+		cv::normalize(histogram2, histogram2, 0, 1, cv::NORM_MINMAX, -1, cv::Mat());
+	
+		for(int i=0; i<size; i++)
+		{
+			double M = histogram1.at<float>(i,0); //sample
+			double S = histogram2.at<float>(i,0); //model
+			if(M == 0) M = SMALL;
+			if(S == 0) S = SMALL;
+			G += 2*(S*(log (S)) - S*(log (M)));
+		}
+	
+		return G;
+	}
+	
+	
+	static inline double EXP_DIST_1(double z, double l, double g)
+	{
+		return (1/z)*exp(-l*g);
+	}
+	
+	static inline double EXP_DIST_0(double z, double l, double g)
+	{
+		return (1/z)*exp(l*g);
+	}
+	
+	void featureAnalysis(Features *features, Model *model, Statistics *stats)
+	{
+		cv:inRange(features->hsv, cv::Scalar(0, smin, min(vmin,vmax), 0), cv::Scalar(180, 256, max(vmin,vmax), 0), bin[0]);
+		// long time = cvGetTickCount();
+		
+		for(int i=0; i<stats->no_features ;i++)
+		{
+			stats->L1[i] = stats->L1[i] > 0 ? stats->L1[i] : 0.01;
+			stats->L0[i] = stats->L0[i] > 0 ? stats->L0[i] : 0.01;
+			stats->gmax[i] = stats->gmax[i] > 0 ? stats->gmax[i] : 1.;
+		}
+		// cout << "Primer ciclo	" << (cvGetTickCount() - time)/((double)cvGetTickFrequency()*1000.) << "ms\n";
+		// time = cvGetTickCount();
+	
+		for(int i=0; i<stats->nos ;i++)
+		{
+			cv::compare(features->seg_img, stats->gray_id[i], mask[0], CV_CMP_EQ);
+			cv::bitwise_and(bin[0], mask[0], bin[1]);
+			cv::calcHist(&features->mag, 1, 0, mask[0], stats->Hgram_SF[0], 1, &model->dim[0], &range_256_ptr, true, false);
+			cv::calcHist(&features->ang32, 1, 0, mask[0], stats->Hgram_SF[1], 1, &model->dim[1], &range_2pi_ptr, true, false);
+			cv::calcHist(&features->hue, 1, 0, bin[1], stats->Hgram_SF[2], 1, &model->dim[2], &range_181_ptr, true, false);
+			cv::calcHist(&features->sat, 1, 0, mask[0], stats->Hgram_SF[3], 1, &model->dim[3], &range_256_ptr, true, false);
+			cv::calcHist(&features->lbp, 1, 0, mask[0], stats->Hgram_SF[4], 1, &model->dim[4], &range_256_ptr, true, false);
+			cv::calcHist(&features->iic, 1, 0, mask[0], stats->Hgram_SF[5], 1, &model->dim[5], &range_256_ptr, true, false);
+	
+			// cout << i << " A)  Segundo ciclo	" << (cvGetTickCount() - time)/((double)cvGetTickFrequency()*1000.) << "ms\n";
+	
+			for(int j=0; j<stats->no_features ;j++)
+			{
+				stats->G_score[j] = Gstat(model->Hgram_M[j], stats->Hgram_SF[j], model->dim[j]);
+				stats->P_FgGt[stats->no_features*i+j] = EXP_DIST_1(stats->Z1[j], stats->L1[j], stats->G_score[j]); //0.9*exp(-lambda*G_scoreV);
+				stats->P_FgGf[stats->no_features*i+j] = EXP_DIST_0(stats->Z0[j], stats->L0[j], stats->G_score[j]); //1. - S->P_VgGt[i];
+				PG[j].setTo(cv::Scalar(stats->G_score[j]), mask[0]);
+				features->P_X1[j].setTo(cv::Scalar(stats->P_FgGt[stats->no_features*i+j]	/	(stats->P_FgGt[stats->no_features*i+j] + stats->P_FgGf[stats->no_features*i+j])), mask[0]);
+				features->P_X0[j].setTo(cv::Scalar(stats->P_FgGf[stats->no_features*i+j]	/	(stats->P_FgGt[stats->no_features*i+j] + stats->P_FgGf[stats->no_features*i+j])), mask[0]);
+			}
+			// cout << i << " B)  Segundo ciclo	" << (cvGetTickCount() - time)/((double)cvGetTickFrequency()*1000.) << "ms\n";
+		}
+		// cout << "Segundo ciclo	" << (cvGetTickCount() - time)/((double)cvGetTickFrequency()*1000.) << "ms\n";
+		// time = cvGetTickCount();
+		
+	
+		static bool flag = 0;
+		for(int i=0; i<stats->no_features ;i++)
+		{
+			if(flag)
+			{
+				cv::addWeighted(PG[i], 0.5, PG_prev[i], 0.5, 0, PG[i]);
+			}
+			PG_prev[i] = PG[i].clone();
+		}
+		flag =1;
+		// cout << "Tercer ciclo	" << (cvGetTickCount() - time)/((double)cvGetTickFrequency()*1000.) << "ms\n";
+	}
+	
+	
+	
+	void displayAnalyzedFeatures(Features features)
+	{
+		DISPLAY_IMAGE_XY(true, features.P_X1[0], 0, 3);
+		cv::resizeWindow("features.P_X1[0]", features.P_X1[0].cols, features.P_X1[0].rows);
+		DISPLAY_IMAGE_XY(true, features.P_X1[1], 1, 3);
+		cv::resizeWindow("features.P_X1[1]", features.P_X1[1].cols, features.P_X1[1].rows);
+		DISPLAY_IMAGE_XY(true, features.P_X1[2], 2, 3);
+		cv::resizeWindow("features.P_X1[2]", features.P_X1[2].cols, features.P_X1[2].rows);
+		DISPLAY_IMAGE_XY(true, features.P_X1[3], 3, 3);
+		cv::resizeWindow("features.P_X1[3]", features.P_X1[3].cols, features.P_X1[3].rows);
+		DISPLAY_IMAGE_XY(true, features.P_X1[4], 4, 3);
+		cv::resizeWindow("features.P_X1[4]", features.P_X1[4].cols, features.P_X1[4].rows);
+		DISPLAY_IMAGE_XY(true, features.P_X1[5], 5, 3);
+		cv::resizeWindow("features.P_X1[5]", features.P_X1[5].cols, features.P_X1[5].rows);
+	}
+	
+	
+	
+	void probAnalysis2(Features *features, Statistics* stats)
+	{
+		double t = (double)(0*10 + 300)*0.1 - 30;
+	
+		for(int i=0; i<stats->nos; i++)
+		{
+			cv::compare(features->seg_img, stats->gray_id[i], mask[0], CV_CMP_EQ);
+	
+			for(int j=0; j<stats->no_features ;j++)
+			{
+				stats->P_FgGt[stats->no_features*i+j] = stats->P_FgGt[stats->no_features*i+j] > 0.00001 ? stats->P_FgGt[stats->no_features*i+j] : LP;
+			}
+			double post1 = (stats->P_Gt[i]) * (stats->P_FgGt[stats->no_features*i+0]); 
+			post1 = post1 * (stats->P_FgGt[stats->no_features*i+1]) * (stats->P_FgGt[stats->no_features*i+2]);
+			post1 = post1 * (stats->P_FgGt[stats->no_features*i+3]) * (stats->P_FgGt[stats->no_features*i+4]) * (stats->P_FgGt[stats->no_features*i+5]);
+	
+			double post0 = (stats->P_Gf[i]) * (stats->P_FgGf[stats->no_features*i+0]) * (stats->P_FgGf[stats->no_features*i+1]) * (stats->P_FgGf[stats->no_features*i+2]);
+			post0 = post0 * (stats->P_FgGf[stats->no_features*i+3]) * (stats->P_FgGf[stats->no_features*i+4]) * (stats->P_FgGf[stats->no_features*i+5]);
+	
+			stats->P_GtgF[i] = post1 / (post1 + post0);
+			stats->P_GfgF[i] = post0 / (post1 + post0);
+			
+			features->post1.setTo(cv::Scalar(stats->P_GtgF[i]), mask[0]);
+			features->post0.setTo(cv::Scalar(stats->P_GtgF[i]), mask[0]);
+			features->post_ratio.setTo(cv::Scalar(log(post1/post0)), mask[0]);
+		}
+	
+		cv::calcHist(&features->post_ratio, 1, 0, cv::Mat(), Ghist, 1, &vrange, &range_log_ptr, true, false);
+		cv::threshold(features->post_ratio, features->bin_class_result, t, 255, CV_THRESH_BINARY);
+		features->bin_class_result.convertTo(features->bin_class_result, CV_8UC1);
+		cv::normalize(features->post_ratio, inv_prob[0], 0, 1, CV_MINMAX);
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	void draw_dist(int range, double gmax, double Z, double L, cv::Mat& img, bool T)
+	{
+		int bin_w = cvRound((double)img.cols/(range));
+	
+		double value;
+		for(int g=0; g<cvRound(gmax); g++)
+		{
+			if (T==1) 
+			{
+				value = 50*(EXP_DIST_1(Z, L, g));
+			}
+			if (T==0)
+			{
+				value = 50*(EXP_DIST_0(Z, L, g));
+			}
+	
+			value = value > 0 ? value : 0.001;
+			value = value > img.rows ? img.rows : value;
+			//double value = 100*(value1+value0)/2;
+	
+			cv::rectangle(img, cv::Point(cvRound(g)*bin_w,img.rows), cv::Point((cvRound(g)+1)*bin_w, cvRound(img.rows - value)), CV_RGB(200,0,0), -1, 8, 0 );
+	
+		}
+	
+	}
+	
+	
+	
+	
+	
+	void updateParams(cv::Mat T, Statistics *stats, Features *features)
+	{
+		//initializations
+		static int loop;
+		static int GmaxInt;
+		static int L1Int;
+		static int L0Int;
+		static int dim_40 = 40;
+		static bool weighted_mean=0;
+		static double mean_trial;
+		static bool truncated = 1;
+	
+		loop = 200;
+	
+		static bool acc = true;
+		static int j=0;
+		static double gmax=5;
+		static double mean1=0.;
+		static double mean0=0.;
+		static cv::Scalar mean, stddev;
+		const static double min_mean1 = 0.025;
+		const static double max_mean1 = 10;
+		const static double min_mean0 = 0.25;
+	
+		bin[4] = T.clone();
+		cv::bitwise_not(T, bin[3]);
+		cv::normalize(features->post_ratio, inv_prob[0], 0, 1, CV_MINMAX);
+		cv::absdiff(inv_prob[0], cv::Scalar(1), inv_prob[3]);
+	
+		if(j<loop)
+		{
+			acc = true;
+			j++;
+		}
+		else
+		{
+			acc=false;
+			j=0;
+		}
+	
+		for(int i=0; i<stats->no_features ;i++)
+		{
+			temp[5] = PG[i].clone();
+			cv::normalize(temp[5], temp[5], 0, 39, CV_MINMAX);
+			cv::calcHist(&temp[5], 1, 0, cv::Mat(), Ghist2, 1, &dim_40, &range_40_ptr, true, false);
+			Ghist2DISP = Ghist2.clone();
+			cv::minMaxLoc(PG[i], NULL, &gmax, NULL, NULL, cv::Mat());
+	
+			stats->gmax[i] = (0.5*gmax + 0.5*stats->gmax[i]) > 0 ? (0.5*gmax + 0.5*stats->gmax[i]) : 0.5;
+	
+			if(weighted_mean)
+			{
+				inv_prob[1] = inv_prob[0] * PG[i];
+				cv::meanStdDev(inv_prob[1], mean, stddev);
+			}
+			else
+			{
+				cv::meanStdDev(PG[i], mean, stddev);
+			}
+			mean.val[0] = mean.val[0] > min_mean1 ? mean.val[0] : min_mean1;
+			mean.val[0] = mean.val[0] > max_mean1 ? max_mean1 : mean.val[0];
+	
+			if (mean1==0.) 
+			{
+				mean1 = mean.val[0];
+			}
+			mean1 = 0.5*mean1 + 0.5*mean.val[0];
+			if(truncated){
+				if(mean1<(gmax/2)) mean1 = mean1 - gmax/(exp(gmax/mean1)-1);
+				if(mean1>=(gmax/2)) mean1 = (gmax/2);
+			}
+	
+			stats->L1[i] = (1./(mean1)) > 0 ? (1./(mean1)) : 1 ;
+	
+			hist_temp = cv::Scalar(255, 255, 255);
+	
+			cv::calcHist(&PG[i], 1, 0, bin[4], stats->Hgram_G1[i], 1, &dim_40, &range_40_ptr, true, acc);
+			stats->Hgram_G1_DISP[i] = stats->Hgram_G1[i].clone();
+			draw_dist(40, stats->gmax[i], stats->Z1[i], stats->L1[i], hist_temp, 1);
+			cv::addWeighted(hist_temp, 0.5, PG1_DISP[i], 0.5, 0, PG1_DISP[i]);
+		
+	
+			hist_temp = cv::Scalar(255, 255, 255);
+		
+			if(weighted_mean)
+			{
+				inv_prob[2] = inv_prob[3] * PG[i];
+				cv::meanStdDev(inv_prob[2], mean, stddev);
+			}
+			else
+			{
+				cv::meanStdDev(PG[i], mean, stddev);
+			}
+	
+			mean.val[0] = gmax-mean.val[0];
+			mean.val[0] = mean.val[0] > min_mean0 ? mean.val[0] : min_mean0;
+	
+			if (mean0==0.)
+			{
+				mean0 = mean.val[0];
+			}
+			mean0 = 0.5*mean0 + 0.5*mean.val[0];
+		
+			if(truncated)
+			{
+				if(mean0<(gmax/2))
+				{
+					mean0 = mean0 - gmax/(exp(gmax/mean0)-1);
+				}
+				if(mean0>=(gmax/2))
+				{
+					mean0 = (gmax/2);
+				}
+			}
+			stats->L0[i] = (1./(mean0)) > 0 ? (1./(mean0)) : 1 ;
+			cv::calcHist(&PG[i], 1, 0, bin[3], stats->Hgram_G0[i], 1, &dim_40, &range_40_ptr, true, acc);
+			stats->Hgram_G0_DISP[i] = stats->Hgram_G0[i].clone();
+		
+			draw_dist(40, stats->gmax[i], stats->Z0[i], stats->L0[i], hist_temp, 0);
+		
+			cv::addWeighted(hist_temp, 0.5, PG0_DISP[i], 0.5, 0, PG0_DISP[i]);
+		
+			stats->Z1[i] = (1/stats->L1[i]) * (1-exp(-stats->L1[i] * stats->gmax[i]));
+			stats->Z0[i] = (1/stats->L0[i]) * (exp(stats->L0[i] * stats->gmax[i])-1);
+	
+		}
+	}
+
+
+
+
+
+	void findObstacleBoundary(cv::Mat& Out)
+	{
+	
+		static int y = (Out.rows) -1;
+	
+		bool flag0 = 0, flag1 = 0;
+	
+		for (int x=1; x < cvRound((Out.cols)/2)-1 ;x++) 
+		{
+			int x0 = cvRound((Out.cols)/2) - (x+1);
+			int x1 = cvRound((Out.cols)/2) + (x+1);
+	
+			//		int In_index_0 	= (y*In->width+x0)*In->nChannels;
+			//		int In_index_1 	= (y*In->width+x1)*In->nChannels;
+	
+			if(flag0 == 1 || Out.at<uchar>(y,x0) != 255){
+				flag0 = 1;
+				Out.at<uchar>(y,x0) = 0;
+			}
+			if(flag1 == 1 || Out.at<uchar>(y,x1) != 255){
+				flag1 = 1;
+				Out.at<uchar>(y,x1) = 0;
+			}
+		}
+	
+	
+		for (int x=0; x < Out.cols ;x++) 
+		{
+			int flag = 0;
+			for (int y=0; y < Out.rows ;y++) 
+			{
+				int y1 = (Out.rows) - (y+1);
+	
+				if(flag == 1 || Out.at<uchar>(y1,x) != 255){
+					flag = 1;
+					Out.at<uchar>(y1,x) = 0;
+				}
+			}
+		}
+	
+	}
+
 }
-
-
-
-void displayAnalyzedFeatures(Features features)
-{
-	DISPLAY_IMAGE_XY(true, features.P_X1[0], 0, 3);
-	cv::resizeWindow("features.P_X1[0]", features.P_X1[0].cols, features.P_X1[0].rows);
-	DISPLAY_IMAGE_XY(true, features.P_X1[1], 1, 3);
-	cv::resizeWindow("features.P_X1[1]", features.P_X1[1].cols, features.P_X1[1].rows);
-	DISPLAY_IMAGE_XY(true, features.P_X1[2], 2, 3);
-	cv::resizeWindow("features.P_X1[2]", features.P_X1[2].cols, features.P_X1[2].rows);
-	DISPLAY_IMAGE_XY(true, features.P_X1[3], 3, 3);
-	cv::resizeWindow("features.P_X1[3]", features.P_X1[3].cols, features.P_X1[3].rows);
-	DISPLAY_IMAGE_XY(true, features.P_X1[4], 4, 3);
-	cv::resizeWindow("features.P_X1[4]", features.P_X1[4].cols, features.P_X1[4].rows);
-	DISPLAY_IMAGE_XY(true, features.P_X1[5], 5, 3);
-	cv::resizeWindow("features.P_X1[5]", features.P_X1[5].cols, features.P_X1[5].rows);
-}
-
-
-
-void ProbAnalysis2(Features *features, Statistics* stats)
-{
-//     double t = (double)(0*10 + 300)*0.1 - 30;
-
-//     for(int i = 0; i < S->nos; i++ )
-//     {
-//         cvCmpS(gbs, S->gray_id[i], mask[0], CV_CMP_EQ); //mask out image segment
-
-//         for(int j=0;j<S->no_features;j++){
-//         S->P_FgGt[S->no_features*i+j] = S->P_FgGt[S->no_features*i+j] > 0.00001 ? S->P_FgGt[S->no_features*i+j] : LP;
-
-//         }
-//         double post1 =
-//         (S->P_Gt[i])*(S->P_FgGt[S->no_features*i+0])*(S->P_FgGt[S->no_features*i+1])*(S->P_FgGt[S->no_features*i+2])*(S->P_FgGt[S->
-//         no_features*i+3])*(S->P_FgGt[S->no_features*i+4])*(S->P_FgGt[S->no_features*i+5]);
-//         double post0 =
-//         (S->P_Gf[i])*(S->P_FgGf[S->no_features*i+0])*(S->P_FgGf[S->no_features*i+1])*(S->P_FgGf[S->no_features*i+2])*(S->P_FgGf[S->
-//         no_features*i+3])*(S->P_FgGf[S->no_features*i+4])*(S->P_FgGf[S->no_features*i+5]);
-
-
-//         S->P_GtgF[i] = post1 / (post1 + post0);
-//         S->P_GfgF[i] = post0 / (post1 + post0);
-
-//         cvSet(F->post1, cvScalar(S->P_GtgF[i]), mask[0]);
-//         cvSet(F->post0, cvScalar(S->P_GfgF[i]), mask[0]);
-//         cvSet(F->post_ratio, cvScalar(log(post1/post0)), mask[0]);
-//     }
-
-
-//     cvCalcHist( &F->post_ratio, Ghist, 0, 0);
-//     cvThreshold(F->post_ratio, F->bin_class_result, t, ONE, CV_THRESH_BINARY);
-//     cvNormalize(F->post_ratio,inv_prob[0], 0, 1, CV_MINMAX);
-}
-
-
-// void UpdateParams(IplImage* T, Statistics *S, Features *F, bool dynamic)
-// {
-//     //initializations
-//     static int loop;
-//     static int GmaxInt;
-//     static int L1Int;
-//     static int L0Int;
-//     static int dim_40 = 40;
-//     static bool weighted_mean=0;
-//     static double mean_trial;
-//     static bool truncated = 1;
-
-//     if(dynamic) loop = 200;
-//     else loop = 0;
-
-//     static bool acc = 1;
-//     static int j=0;
-//     static double gmax=5;
-//     static double mean1=0.;
-//     static double mean0=0.;
-//     static CvScalar mean;
-//     const static double min_mean1 = 0.025;
-//     const static double max_mean1 = 10;
-//     const static double min_mean0 = 0.25;
-
-//     cvCopy(T, bin[4],0);
-//     cvNot(T,bin[3]);
-//     cvNormalize(F->post_ratio,inv_prob[0], 0, 1, CV_MINMAX);
-//     cvAbsDiffS(inv_prob[0], inv_prob[3], cvScalar(1));
-
-//     if(j<loop){
-//     acc = 1;
-//     j++;
-//     }else{
-//     acc=0;
-//     j=0;
-//     }
-
-//     for(int i=0;i<S->no_features;i++)
-// 	{
-//         cvCopy(PG[i],temp[5],0);
-//         cvNormalize(temp[5],temp[5],0,39,CV_MINMAX);
-//         cvCalcHist( &temp[5], Ghist2, 1, NULL);
-//         cvCopyHist(Ghist2, &Ghist2DISP);
-
-//         cvMinMaxLoc( PG[i], NULL, &gmax, NULL, NULL, NULL);
-//         if(dynamic){
-//             S->gmax[i] = (0.5*gmax + 0.5*S->gmax[i]) > 0 ? (0.5*gmax + 0.5*S->gmax[i]) : 0.5;
-//         }else{
-//             S->gmax[i] = gmax > 0 ? gmax : 0.5;
-//         }
-
-//         if(weighted_mean){
-//             cvMul(inv_prob[0],PG[i],inv_prob[1],1);
-//             cvAvgSdv(inv_prob[1], &mean, NULL, NULL);
-//         }else {
-//             cvAvgSdv(PG[i], &mean, NULL, bin[4]);
-//         }
-//         mean.val[0] = mean.val[0] > min_mean1 ? mean.val[0] : min_mean1;
-//         mean.val[0] = mean.val[0] > max_mean1 ? max_mean1 : mean.val[0];
-//         if (mean1==0.) mean1 = mean.val[0];
-//         if(dynamic){
-//             mean1 = 0.5*mean1 + 0.5*mean.val[0];
-//         }else{
-//             mean1 = mean.val[0];
-//         }
-//         if(truncated){
-//             if(mean1<(gmax/2)) mean1 = mean1 - gmax/(exp(gmax/mean1)-1);
-//             if(mean1>=(gmax/2)) mean1 = (gmax/2);
-//         }
-
-//         S->L1[i] = (1./(mean1)) > 0 ? (1./(mean1)) : 1 ;
-
-//         cvSet( hist_temp, cvScalarAll(255), 0 );
-//         cvCalcHist( &PG[i], S->H_G1[i], acc, bin[4]);
-
-//         cvCopyHist(S->H_G1[i], &S->H_G1_DISP[i]);
-
-
-//         draw_dist(40, S->gmax[i], S->Z1[i], S->L1[i], hist_temp, 1);
-//         cvAddWeighted( hist_temp, 0.5, PG1_DISP[i], 0.5, 0, PG1_DISP[i] );
-
-//     }
-
-// 	cvSet( hist_temp, cvScalarAll(255), 0 );
-
-// 	if(weighted_mean){
-// 		//cvMul(F->post0,PG[i],inv_prob[2],1);
-// 		cvMul(inv_prob[3],PG[i],inv_prob[2],1);
-// 		cvAvgSdv(inv_prob[2], &mean, NULL, NULL);
-// 	}else{
-// 		cvAvgSdv(PG[i], &mean, NULL, bin[3]);
-// 	}
-
-// 	mean.val[0] = gmax-mean.val[0];
-// 	mean.val[0] = mean.val[0] > min_mean0 ? mean.val[0] : min_mean0;
-
-// 	if (mean0==0.) mean0 = mean.val[0];
-// 	if(dynamic){
-// 		mean0 = 0.5*mean0 + 0.5*mean.val[0];
-// 	}else{
-// 		mean0 = mean.val[0];
-// 	}
-// 	if(truncated){
-// 		if(mean0<(gmax/2)) mean0 = mean0 - gmax/(exp(gmax/mean0)-1);
-// 		if(mean0>=(gmax/2)) mean0 = (gmax/2);
-// 	}
-// 	S->L0[i] = (1./(mean0)) > 0 ? (1./(mean0)) : 1 ;
-// 	cvCalcHist( &PG[i], S->H_G0[i], acc, bin[3]);
-
-// 	cvCopyHist(S->H_G0[i], &S->H_G0_DISP[i]);
-
-// 	draw_dist(40, S->gmax[i], S->Z0[i], S->L0[i], hist_temp, 0);
-
-// 	cvAddWeighted( hist_temp, 0.5, PG0_DISP[i], 0.5, 0, PG0_DISP[i] );
-
-// 	S->Z1[i] = (1/S->L1[i])*(1-exp(-S->L1[i]*S->gmax[i]));
-// 	S->Z0[i] = (1/S->L0[i])*(exp(S->L0[i]*S->gmax[i])-1);
-
-
-// }
-
-
-
-}
-
