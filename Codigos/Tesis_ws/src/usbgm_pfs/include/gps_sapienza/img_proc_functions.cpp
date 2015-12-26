@@ -55,24 +55,29 @@ namespace GPSSapienza{
 	void calculateLBP(cv::Mat frame, cv::Mat& lbp)
 	{
 		lbp = cv::Mat::zeros(frame.rows, frame.cols, CV_8UC1);
-		const int dx[8] = {-1, -1, -1, 0, +1, +1, +1, 0};
-		const int dy[8] = {-1, 0, +1, +1, +1, 0, -1, -1};
+		// const int dx[8] = {-1, -1, -1, 0, +1, +1, +1, 0};
+		// const int dy[8] = {-1, 0, +1, +1, +1, 0, -1, -1};
+		
+		//LBP kernel used by Michael Sapienza in the original implementation:
+		const int dx[8] = {-1, 0, +1, +1, +1, 0, -1, -1};
+		const int dy[8] = {-1, -1, -1, 0, +1, +1, -1, 0};
 		uchar center, code, periphery_value;
 
-		for(int i=1; i<frame.rows-1 ;i++)
+		for(int i=1; i<frame.rows ;i++)
 		{
-			for(int j=1; j<frame.cols-1 ;j++)
+			for(int j=1; j<frame.cols ;j++)
 			{
 				center = frame.ptr<uchar>(i)[j];
 				code = 0;
 				for(int k=0; k<8 ;k++)
 				{
 					periphery_value = (frame.ptr<uchar>(i+dx[k]))[j+dy[k]];
-					code |= (periphery_value > center) << 7-k;
+					code |= (periphery_value < center) << 7-k;
 				}
-				(lbp.ptr<uchar>(i-1))[j-1] = code;
+				(lbp.ptr<uchar>(i))[j] = code;
 			}
 		}
+		lbp = 255 - lbp;
 	}
 
 
@@ -384,11 +389,11 @@ static inline void printHistogram(int hist_size, cv::Mat& histogram, cv::Mat& hi
     int bin_w = cvRound((double) hist_img.cols/hist_size);
 	cv::normalize(histogram, histogram, 0, hist_img.rows/2, cv::NORM_MINMAX, -1, cv::Mat());
 
-		for(int i = 0; i < hist_size; i++ )
-		{
-            int val = cvRound(histogram.at<float>(i,0));
-			cout << "i = " << i << "   val = " << val << "\n";
-        }
+		// for(int i = 0; i < hist_size; i++ )
+		// {
+        //     int val = cvRound(histogram.at<float>(i,0));
+		// 	cout << "i = " << i << "   val = " << val << "\n";
+        // }
 
     if(flag==0)
 	{

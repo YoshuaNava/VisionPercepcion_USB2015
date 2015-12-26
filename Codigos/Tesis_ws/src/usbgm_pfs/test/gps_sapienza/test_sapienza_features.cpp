@@ -150,11 +150,11 @@ int main( int argc, char** argv )
 		GPSSapienza::getModel(featuresPtr, stat_modelPtr);
 		CV_TIMER_STOP(F, "Got model")
 		
-		// GPSSapienza::displayHistograms(stat_modelPtr);
+		GPSSapienza::displayHistograms(stat_modelPtr);
 		CV_TIMER_STOP(G, "Showing features histograms")
 
 		
-		showImages();
+		// showImages();
 		CV_TIMER_STOP(Z, "Loop finished")
 		printf("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n");
 	 	ros::spinOnce();
