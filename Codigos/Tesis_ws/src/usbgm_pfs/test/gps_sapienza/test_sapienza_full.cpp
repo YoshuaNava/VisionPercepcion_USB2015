@@ -16,7 +16,7 @@ cv::Mat bayes_prob_floor, coloured_bayes_floor;
 
 VideoCapture cap;
 
-SegmentationHandler seg_handler("SLIC");
+SegmentationHandler seg_handler("EGBIS");
 HoughHorizon hough_searcher(proc_H, proc_W);
 
 GPSSapienza::Features features;
@@ -200,11 +200,11 @@ int main( int argc, char** argv )
 		
 		cv::Mat probMask = (hough_searcher.getProbabilisticFloorEstimate() > 0.7);
 		cv::Mat resulting_mask;
-		// features.floor_boundary.copyTo(resulting_mask, probMask);
-		cv::addWeighted(features.floor_boundary, 0.5, probMask, 0.5, 0, resulting_mask);
+		features.floor_boundary.copyTo(resulting_mask, probMask);
+		cv::addWeighted(resulting_mask, 0.5, probMask, 0.5, 0, resulting_mask);
 		
 		
-		cv::Mat fused_boundary = generateColorSegmentedImage((resulting_mask > 155), features.rgb, cv::Scalar(255,0,0));
+		cv::Mat fused_boundary = generateColorSegmentedImage((resulting_mask > 100), features.rgb, cv::Scalar(255,0,0));
 		cv::imshow("hough probabilistic mask", probMask);
 		cv::imshow("resulting_mask", resulting_mask);
 		cv::imshow("fused_boundary", fused_boundary);

@@ -16,7 +16,7 @@ cv::Mat bayes_prob_floor, coloured_bayes_floor;
 
 VideoCapture cap;
 
-SegmentationHandler seg_handler("SLIC");
+SegmentationHandler seg_handler("EGBIS");
 HoughHorizon hough_searcher(proc_H, proc_W);
 
 GPSSapienza::Features features;

@@ -243,7 +243,7 @@ cv::Mat Egbis::generateSuperpixels(cv::Mat image, cv::Mat gray_image)
 
 	IplImage gray_temp = (IplImage)gray;
 	IplImage* ipl_gray = &gray_temp; // Reference on deallocating memory: http://stackoverflow.com/questions/12635978/memory-deallocation-of-iplimage-initialised-from-cvmat
-	IplImage* seg = cvCreateImage(cv::Size(frame.cols, frame.rows), 8, 1);;
+	IplImage* seg = cvCreateImage(cv::Size(frame.cols, frame.rows), 8, CV_8UC1);;
 
     static int num_ccs;
     static float sigma;

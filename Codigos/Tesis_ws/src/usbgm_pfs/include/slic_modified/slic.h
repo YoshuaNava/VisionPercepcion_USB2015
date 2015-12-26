@@ -27,7 +27,7 @@ using namespace std;
 #define vec2di vector<vector<int> >
 #define vec2db vector<vector<bool> >
 /* The number of iterations run by the clustering algorithm. */
-#define NR_ITERATIONS 1
+#define NR_ITERATIONS 3
 
 /*
  * class Slic.
