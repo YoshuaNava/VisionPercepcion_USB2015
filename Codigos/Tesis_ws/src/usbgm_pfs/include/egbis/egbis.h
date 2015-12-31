@@ -25,9 +25,9 @@
 
  class Egbis {
  	private:
-		int int_sigma = 5;
-		int int_k = 100;
-		int min_size = 100;
+		int int_sigma = 100;
+		int int_k = 1000;
+		int min_size = 400;
 		float floatsigma;
 		const char * GBS 		= "seg"; //"Graph Based Segmentation";
 		vector<vector<int>> clusters;

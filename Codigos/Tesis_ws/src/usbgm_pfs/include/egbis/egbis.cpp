@@ -273,7 +273,7 @@ cv::Mat Egbis::generateSuperpixels(cv::Mat image, cv::Mat gray_image)
 		clusters.push_back(seg_row);
 	}
 	num_superpixels = num_superpixels + 1;
-
+        
 	for(i=0; i<num_superpixels ;i++)
 	{
 		superpixels_centers.push_back(cv::Point(0.0, 0.0));

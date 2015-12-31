@@ -16,7 +16,8 @@ cv::Mat bayes_prob_floor, coloured_bayes_floor;
 
 VideoCapture cap;
 
-SegmentationHandler seg_handler("EGBIS");
+const string segmentationAlgorithm = "EGBIS";
+SegmentationHandler seg_handler(segmentationAlgorithm);
 HoughHorizon hough_searcher(proc_H, proc_W);
 
 GPSSapienza::Features features;
@@ -60,6 +61,10 @@ void showImages()
 	cv::resizeWindow("features.gray", proc_W, proc_H);
 	DISPLAY_IMAGE_XY(true, superpixels_contours_img, 2, 0);
 	cv::resizeWindow("superpixels_contours_img", proc_W, proc_H);
+	if(segmentationAlgorithm == "EGBIS")
+	{
+		features.seg_img = features.seg_img * floor(255/features.superpixels_list.size());
+	}
 	DISPLAY_IMAGE_XY(true, features.seg_img, 3, 0);
 	cv::resizeWindow("features.seg_img", proc_W, proc_H);
 	DISPLAY_IMAGE_XY(true, features.hue, 0, 1);
@@ -87,10 +92,10 @@ void cameraSetup()
   
 
     // cap = VideoCapture(0);
-	cap = VideoCapture("eng_stat_obst.avi");
-	//cap = VideoCapture("Laboratorio.avi");
+	// cap = VideoCapture("eng_stat_obst.avi");
+	// cap = VideoCapture("Laboratorio.avi");
 	// cap = VideoCapture("LaboratorioMaleta.avi");
-	// cap = VideoCapture("PasilloLabA.avi");
+	cap = VideoCapture("PasilloLabA.avi");
 	//cap = VideoCapture("PasilloLabB.avi");
  // cap = VideoCapture("Laboratorio4.avi");
 //  cap = VideoCapture("Calle1.avi");
@@ -159,13 +164,7 @@ int main( int argc, char** argv )
 		superpixels_contours_img = seg_handler.getContoursImage();
 		features.seg_img = seg_handler.getSegmentedImage();
 		CV_TIMER_STOP(C, "Superpixels processed")
-		statistics.prior_img = ProbFns::getFloorPrior(features.rgb, features.superpixels_list);
-		hough_searcher.doProbabilisticEstimation(features.rgb, features.gray, superpixels_contours_img, statistics.prior_img, features.superpixels_list);
-		// statistics.prior_img = hough_searcher.getProbabilisticFloorEstimate();
-		// hough_searcher.doBayesianEstimation(features.rgb, features.gray, superpixels_contours_img, statistics.prior_img, features.superpixels_list);
-		// statistics.prior_img = hough_searcher.getBayesianFloorEstimate();
-		// hough_searcher.showImages();
-		
+		statistics.prior_img = ProbFns::getFloorPrior(features.rgb, features.superpixels_list);		
 		
 		GPSSapienza::superPixelStats(features, statisticsPtr);
 		CV_TIMER_STOP(D, "Superpixels statistics calculated")
@@ -198,11 +197,19 @@ int main( int argc, char** argv )
 		GPSSapienza::findObstacleBoundary(features.floor_boundary);
 		CV_TIMER_STOP(L, "Extracted the floor boundary")
 		
+		hough_searcher.doProbabilisticEstimation(features.rgb, features.gray, superpixels_contours_img, statistics.prior_img, features.superpixels_list);
+		// statistics.prior_img = hough_searcher.getProbabilisticFloorEstimate();
+		// hough_searcher.doBayesianEstimation(features.rgb, features.gray, superpixels_contours_img, statistics.prior_img, features.superpixels_list);
+		// statistics.prior_img = hough_searcher.getBayesianFloorEstimate();
+		// hough_searcher.showImages();
+		CV_TIMER_STOP(M, "Hough-based floor boundary search")
 		cv::Mat probMask = (hough_searcher.getProbabilisticFloorEstimate() > 0.7);
 		cv::Mat resulting_mask;
 		features.floor_boundary.copyTo(resulting_mask, probMask);
 		cv::addWeighted(resulting_mask, 0.5, probMask, 0.5, 0, resulting_mask);
 		
+		cv::imshow("hough poly", hough_searcher.getPolyBoundaryImage());
+		cv::imshow("hough search", hough_searcher.getTaggedSuperpixelsImage());
 		
 		cv::Mat fused_boundary = generateColorSegmentedImage((resulting_mask > 100), features.rgb, cv::Scalar(255,0,0));
 		cv::imshow("hough probabilistic mask", probMask);

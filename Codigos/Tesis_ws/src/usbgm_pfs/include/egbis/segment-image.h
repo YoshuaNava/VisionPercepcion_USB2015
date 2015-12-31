@@ -203,20 +203,20 @@ void SegmentImage(IplImage* output, IplImage *im, float sigma, float c, int min_
   myvector.resize( it - myvector.begin() );
 
 
-segments = new int[length];
+  segments = new int[length];
 
 
 
-i=0;
-  for (it=myvector.begin(); it!=myvector.end(); ++it){
-	segments[i] = *it;
-    //cout << " " << segments[i];
-	i++;
-	}
+  i=0;
+  for (it=myvector.begin(); it!=myvector.end(); ++it)
+  {
+    segments[i] = *it;
+    i++;
+  }
   graycolors = new uchar[width*height];
   for(i = 0; i < myvector.size(); i++)  
   {
-    graycolors[ segments[i] ] = i*(floor(255/myvector.size()));
+    graycolors[ segments[i] ] = i;
   }
 
 
@@ -226,19 +226,19 @@ i=0;
 
 			int index = (y*output->width+x)*output->nChannels;
 
-			outputPixelData[index+0] = graycolors[comp]/(floor(255/myvector.size()));
+			outputPixelData[index+0] = graycolors[comp];
     }
   }
-
-delete u;
-delete [] comp_arr;
-comp_arr = NULL;
-
-delete [] segments;
-segments = NULL;
-
-delete [] graycolors;
-graycolors = NULL;
+ 
+  delete u;
+  delete [] comp_arr;
+  comp_arr = NULL;
+  
+  delete [] segments;
+  segments = NULL;
+  
+  delete [] graycolors;
+  graycolors = NULL;
 
 }
 

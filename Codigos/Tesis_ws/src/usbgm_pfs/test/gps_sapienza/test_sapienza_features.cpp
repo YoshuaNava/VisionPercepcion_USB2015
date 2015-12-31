@@ -16,7 +16,8 @@ cv::Mat bayes_prob_floor, coloured_bayes_floor;
 
 VideoCapture cap;
 
-SegmentationHandler seg_handler("EGBIS");
+const string segmentationAlgorithm = "EGBIS";
+SegmentationHandler seg_handler(segmentationAlgorithm);
 HoughHorizon hough_searcher(proc_H, proc_W);
 
 GPSSapienza::Features features;
@@ -38,6 +39,10 @@ void showImages()
 	DISPLAY_IMAGE_XY(true, superpixels_contours_img, 2, 0);
 	cv::resizeWindow("superpixels_contours_img", proc_W, proc_H);
 	DISPLAY_IMAGE_XY(true, features.seg_img, 3, 0);
+	if(segmentationAlgorithm == "EGBIS")
+	{
+		features.seg_img = features.seg_img * floor(255/features.superpixels_list.size());
+	}
 	cv::resizeWindow("features.seg_img", proc_W, proc_H);
 	DISPLAY_IMAGE_XY(true, features.hue, 0, 1);
 	cv::resizeWindow("features.hue", proc_W, proc_H);
