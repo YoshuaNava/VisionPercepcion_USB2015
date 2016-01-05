@@ -90,13 +90,18 @@ int main( int argc, char** argv )
 		superpixels_list = seg_handler.getSuperpixels();
 		superpixels_contours_img = seg_handler.getContoursImage();
 		CV_TIMER_STOP(B, "Superpixels processed")
+		
 		floor_prior = ProbFns::getFloorPrior(frame, superpixels_list);
 		CV_TIMER_STOP(C, "Prior probability calculated")
+		
+		
+		hough_searcher.setMinScoreHough(70);
 		// hough_searcher.doSimpleEstimation(frame, gray, superpixels_contours_img, floor_prior, superpixels_list);
 		hough_searcher.doProbabilisticEstimation(frame, gray, superpixels_contours_img, floor_prior, superpixels_list);
-		hough_searcher.doBayesianEstimation(frame, gray, superpixels_contours_img, floor_prior, superpixels_list);
+		// hough_searcher.doBayesianEstimation(frame, gray, superpixels_contours_img, floor_prior, superpixels_list);
 		CV_TIMER_STOP(D, "Tagged superpixels below Hough-based bayesian boundary")
 
+		hough_searcher.showImages();
 
 		CV_TIMER_STOP(Z, "Loop finished")
 		printf("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n");

@@ -92,17 +92,8 @@ TARGET_LINK_LIBRARIES(gps_sapienza_mod ${LINK_LIBS})
 ADD_EXECUTABLE(test_prob_floor_prior test/horizon_search/test_prob_floor_prior.cpp)
 TARGET_LINK_LIBRARIES(test_prob_floor_prior fps)
 
-# ADD_EXECUTABLE(test_encapsulated_horizon_search test/horizon_search/test_encapsulated_horizon_search.cpp)
-# TARGET_LINK_LIBRARIES(test_encapsulated_horizon_search fps)
-
-
-# ADD_EXECUTABLE(test_egbis_superpixel_segmentation test/segmentation/test_egbis_superpixel_segmentation.cpp)
-# TARGET_LINK_LIBRARIES(test_egbis_superpixel_segmentation ${LINK_LIBS})
-# TARGET_LINK_LIBRARIES(test_egbis_superpixel_segmentation egbis)
-
-# ADD_EXECUTABLE(test_slic_superpixel_segmentation test/segmentation/test_slic_superpixel_segmentation.cpp)
-# TARGET_LINK_LIBRARIES(test_slic_superpixel_segmentation ${LINK_LIBS})
-# TARGET_LINK_LIBRARIES(test_slic_superpixel_segmentation slic)
+ADD_EXECUTABLE(test_encapsulated_horizon_search test/horizon_search/test_encapsulated_horizon_search.cpp)
+TARGET_LINK_LIBRARIES(test_encapsulated_horizon_search fps)
 
 ADD_EXECUTABLE(test_histogram_superpixel_comparison test/segmentation/test_histogram_superpixel_comparison.cpp)
 TARGET_LINK_LIBRARIES(test_histogram_superpixel_comparison fps)

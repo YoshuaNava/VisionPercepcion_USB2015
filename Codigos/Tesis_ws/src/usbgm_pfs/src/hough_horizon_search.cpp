@@ -69,6 +69,11 @@ cv::Mat HoughHorizon::getBayesianFloorEstimate()
 }
 
 
+void HoughHorizon::setMinScoreHough(int minScoreHough)
+{
+	this->minScoreHough = minScoreHough;
+}
+
 void HoughHorizon::showImages()
 {
 	if(algorithmType == 's')
@@ -175,7 +180,7 @@ void HoughHorizon::findLinesHough()
 	cv::Point aux_point;
 	vector<cv::Point> lines_points;
 	img_lines = frame.clone();
-	HoughLinesP(borders_combined, lines, 1, CV_PI/180, 80, 20, 5);
+	HoughLinesP(borders_combined, lines, 1, CV_PI/180, minScoreHough, 20, 5);
 	// Threshold for Sapienza dataset = 70
 	// Threshold for ps3eye camera = 120
 	

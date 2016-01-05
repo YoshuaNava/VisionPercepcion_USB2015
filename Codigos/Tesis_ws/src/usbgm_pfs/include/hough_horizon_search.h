@@ -23,6 +23,7 @@ namespace ProbFloorSearch
 			cv::Mat borders_combined, img_lines, poly_boundary_img, superpixels_below_boundary, floor_prob_map;
 			cv::Mat bayes_prob_floor, coloured_bayes_floor;
 			
+			int minScoreHough = 40;
 			vector<cv::Point> lines_dataset;
 			int lines_history = 5;
 			deque<vector<cv::Point>> acc_lines_points;
@@ -49,6 +50,7 @@ namespace ProbFloorSearch
 			cv::Mat getColouredBayesImage();
 			cv::Mat getProbabilisticFloorEstimate();
 			cv::Mat getBayesianFloorEstimate();
+			void setMinScoreHough(int minScoreHough);
 			
 			void showImages();
 			void calculateSobelCannyBorders();

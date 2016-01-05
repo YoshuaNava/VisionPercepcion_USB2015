@@ -44,18 +44,6 @@ void showImages()
 	}
 	DISPLAY_IMAGE_XY(true, features.seg_img, 3, 0);
 	cv::resizeWindow("features.seg_img", proc_W, proc_H);
-	DISPLAY_IMAGE_XY(true, features.hue, 0, 1);
-	cv::resizeWindow("features.hue", proc_W, proc_H);
-	DISPLAY_IMAGE_XY(true, features.sat, 1, 1);
-	cv::resizeWindow("features.sat", proc_W, proc_H);
-	DISPLAY_IMAGE_XY(true, features.mag, 2, 1);
-	cv::resizeWindow("features.mag", proc_W, proc_H);
-	DISPLAY_IMAGE_XY(true, features.ang32, 3, 1);
-	cv::resizeWindow("features.ang32", proc_W, proc_H);
-	DISPLAY_IMAGE_XY(true, features.lbp, 4, 1);
-	cv::resizeWindow("features.lbp", proc_W, proc_H);
-	DISPLAY_IMAGE_XY(true, features.iic, 5, 1);
-	cv::resizeWindow("features.iic", proc_W, proc_H);
 }
 
 
@@ -129,36 +117,12 @@ int main( int argc, char** argv )
 		waitKey(1); // Wait Time
 
 		
-		GPSSapienza::calculateImageFeatures(featuresPtr);
-		CV_TIMER_STOP(B, "Image features ready")
 		superpixels_contours_img = features.rgb.clone();
 		seg_handler.segmentImage(features.rgb, features.gray);
 		features.superpixels_list = seg_handler.getSuperpixels();
 		superpixels_contours_img = seg_handler.getContoursImage();
 		features.seg_img = seg_handler.getSegmentedImage();
-		CV_TIMER_STOP(C, "Superpixels processed")
-		statistics.prior_img = ProbFns::getFloorPrior(features.rgb, features.superpixels_list);
-		// hough_searcher.doProbabilisticEstimation(features.rgb, features.gray, superpixels_contours_img, statistics.prior_img, features.superpixels_list);
-		// statistics.prior_img = hough_searcher.getProbabilisticFloorEstimate();
-		// hough_searcher.doBayesianEstimation(features.rgb, features.gray, superpixels_contours_img, statistics.prior_img, features.superpixels_list);
-		// statistics.prior_img = hough_searcher.getBayesianFloorEstimate();
-		// hough_searcher.showImages();
-		
-		cv::imshow("superpixel segmented image",features.seg_img);
-
-		
-		// GPSSapienza::superPixelStats(features, statisticsPtr);
-		// CV_TIMER_STOP(D, "Superpixels statistics calculated")
-	
-		// GPSSapienza::updatePrior(statisticsPtr, featuresPtr);
-		// CV_TIMER_STOP(E, "Prior probability updated")
-		
-		
-		// GPSSapienza::getModel(featuresPtr, safewindow_modelPtr);
-		// CV_TIMER_STOP(F, "Got model")
-		
-		// GPSSapienza::displayHistograms(safewindow_modelPtr);
-		// CV_TIMER_STOP(G, "Showing features histograms")
+		CV_TIMER_STOP(B, "Superpixels processed")
 		
 		showImages();
 		CV_TIMER_STOP(Z, "Loop finished")
