@@ -366,8 +366,8 @@ namespace GPSSapienza{
 	
 		for(int i=0; i<size; i++)
 		{
-			double M = histogram1.at<float>(i,0); //sample
-			double S = histogram2.at<float>(i,0); //model
+			double M = histogram1.at<float>(i,0); //model
+			double S = histogram2.at<float>(i,0); //sample
 			if(M == 0) M = SMALL;
 			if(S == 0) S = SMALL;
 			G += 2*(S*(log (S)) - S*(log (M)));

@@ -196,11 +196,14 @@ void HoughHorizon::findLinesHough()
 				{
 					if((line[1] < 2/3*img_H) || (line[3] < 2.0/3.0*img_H))
 					{
+						// if(line[1]>40)
+						{
 						aux_point = cv::Point(line[0], line[1]);
 						lines_points.push_back(aux_point);
 						aux_point = cv::Point(line[2], line[3]);
 						lines_points.push_back(aux_point);
 						cv::line(img_lines, cv::Point(line[0], line[1]), cv::Point(line[2], line[3]), cv::Scalar(0,0,255), 3, CV_AA);
+						}
 					}
 				}
 			}

@@ -92,9 +92,9 @@ void cameraSetup()
   
 
     // cap = VideoCapture(0);
-	cap = VideoCapture("eng_stat_obst.avi");
+	// cap = VideoCapture("eng_stat_obst.avi");
 	// cap = VideoCapture("Laboratorio.avi");
-	// cap = VideoCapture("LaboratorioMaleta.avi");
+	cap = VideoCapture("LaboratorioMaleta.avi");
 	// cap = VideoCapture("PasilloLabA.avi");
 	//cap = VideoCapture("PasilloLabB.avi");
  // cap = VideoCapture("Laboratorio4.avi");
@@ -199,24 +199,29 @@ int main( int argc, char** argv )
 		GPSSapienza::findObstacleBoundary(features.floor_boundary);
 		CV_TIMER_STOP(M, "Extracted the floor boundary")
 		
+		hough_searcher.setMinScoreHough(70);
 		hough_searcher.doProbabilisticEstimation(features.rgb, features.gray, superpixels_contours_img, statistics.prior_img, features.superpixels_list);
 		// statistics.prior_img = hough_searcher.getProbabilisticFloorEstimate();
-		// hough_searcher.doBayesianEstimation(features.rgb, features.gray, superpixels_contours_img, statistics.prior_img, features.superpixels_list);
-		// statistics.prior_img = hough_searcher.getBayesianFloorEstimate();
+		// // hough_searcher.doBayesianEstimation(features.rgb, features.gray, superpixels_contours_img, statistics.prior_img, features.superpixels_list);
+		// // statistics.prior_img = hough_searcher.getBayesianFloorEstimate();
 		// hough_searcher.showImages();
-		// CV_TIMER_STOP(M, "Hough-based floor boundary search")
-		// cv::Mat probMask = (hough_searcher.getProbabilisticFloorEstimate() > 0.7);
-		// cv::Mat resulting_mask;
-		// features.floor_boundary.copyTo(resulting_mask, probMask);
-		// cv::addWeighted(resulting_mask, 0.5, probMask, 0.5, 0, resulting_mask);
+		CV_TIMER_STOP(N, "Hough-based floor boundary search")
+		cv::Mat probMask = (hough_searcher.getProbabilisticFloorEstimate() > 0.7);
+			cv::imshow("hough search", hough_searcher.getTaggedSuperpixelsImage());
+			cv::imshow("hough probabilistic mask", probMask);
+		cv::Mat resulting_mask;
+		features.floor_boundary.copyTo(resulting_mask, probMask);
+		cv::addWeighted(resulting_mask, 0.5, probMask, 0.5, 0, resulting_mask);
+			cv::imshow("resulting_mask", (resulting_mask>200));
 		
-		// cv::imshow("hough poly", hough_searcher.getPolyBoundaryImage());
-		// cv::imshow("hough search", hough_searcher.getTaggedSuperpixelsImage());
+		// // cv::imshow("hough poly", hough_searcher.getPolyBoundaryImage());
 		
-		// cv::Mat fused_boundary = generateColorSegmentedImage((resulting_mask > 100), features.rgb, cv::Scalar(255,0,0));
-		// cv::imshow("hough probabilistic mask", probMask);
-		// cv::imshow("resulting_mask", resulting_mask);
+		
+		// cv::Mat fused_boundary = generateColorSegmentedImage((resulting_mask > 150), features.rgb, cv::Scalar(255,0,0));
+		
+		
 		// cv::imshow("fused_boundary", fused_boundary);
+		
 		
 		showImages();
 		CV_TIMER_STOP(Z, "Loop finished")
