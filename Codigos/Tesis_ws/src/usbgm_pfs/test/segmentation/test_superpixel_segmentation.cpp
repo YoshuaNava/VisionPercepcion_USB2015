@@ -16,7 +16,7 @@ cv::Mat bayes_prob_floor, coloured_bayes_floor;
 
 VideoCapture cap;
 
-const string segmentationAlgorithm = "EGBIS";
+const string segmentationAlgorithm = "SLIC";
 SegmentationHandler seg_handler(segmentationAlgorithm);
 HoughHorizon hough_searcher(proc_H, proc_W);
 
@@ -54,7 +54,7 @@ void cameraSetup()
 
 //    cap = VideoCapture(0);
 	cap = VideoCapture("eng_stat_obst.avi");
-	//cap = VideoCapture("Laboratorio.avi");
+	// cap = VideoCapture("Laboratorio.avi");
 	//cap = VideoCapture("LaboratorioMaleta.avi");
 	//cap = VideoCapture("PasilloLabA.avi");
 	//cap = VideoCapture("PasilloLabB.avi");
@@ -123,6 +123,9 @@ int main( int argc, char** argv )
 		superpixels_contours_img = seg_handler.getContoursImage();
 		features.seg_img = seg_handler.getSegmentedImage();
 		CV_TIMER_STOP(B, "Superpixels processed")
+		
+		cv::Mat color_clusters_img = seg_handler.getColorClustersImage();
+		cv::imshow("Color clusters image", color_clusters_img);
 		
 		showImages();
 		CV_TIMER_STOP(Z, "Loop finished")

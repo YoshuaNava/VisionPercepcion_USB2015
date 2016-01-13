@@ -94,8 +94,8 @@ void cameraSetup()
     // cap = VideoCapture(0);
 	// cap = VideoCapture("eng_stat_obst.avi");
 	// cap = VideoCapture("Laboratorio.avi");
-	cap = VideoCapture("LaboratorioMaleta.avi");
-	// cap = VideoCapture("PasilloLabA.avi");
+	// cap = VideoCapture("LaboratorioMaleta.avi");
+	cap = VideoCapture("PasilloLabA.avi");
 	//cap = VideoCapture("PasilloLabB.avi");
  // cap = VideoCapture("Laboratorio4.avi");
 //  cap = VideoCapture("Calle1.avi");

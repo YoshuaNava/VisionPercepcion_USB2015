@@ -196,7 +196,7 @@ void Slic::generate_superpixels(IplImage *image, int step, int nc) {
                 }
             }
         }
-
+        
         /* Normalize the clusters. */
         for (int j = 0; j < (int) centers.size(); j++) {
             centers[j][0] /= center_counts[j];
@@ -376,8 +376,15 @@ void Slic::colour_with_cluster_means(IplImage *image) {
     /* Fill in. */
     for (int i = 0; i < image->width; i++) {
         for (int j = 0; j < image->height; j++) {
-            CvScalar ncolour = colours[clusters[i][j]];
-            cvSet2D(image, j, i, ncolour);
+            if((clusters[i][j] >= 0) && (clusters[i][j] < colours.size()))
+            {   
+                CvScalar ncolour = colours[clusters[i][j]];
+                cvSet2D(image, j, i, ncolour);
+            }
+            else
+            {
+                std::cout << clusters[i][j] << std::endl;
+            }
         }
     }
 }

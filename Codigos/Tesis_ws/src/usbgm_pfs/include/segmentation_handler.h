@@ -11,7 +11,11 @@ namespace ProbFloorSearch
 	class SegmentationHandler
 	{
 		private:
-			cv::Mat frame, seg_image, gray, superpixels_contours_img;
+			cv::Mat rgb;
+			cv::Mat gray;
+			cv::Mat seg_image;
+			cv::Mat superpixels_contours_img;
+			cv::Mat color_clusters_img;
 			vector<Superpixel> superpixels_list;	
 			Slic slic;
 			Egbis egbis;
@@ -23,10 +27,11 @@ namespace ProbFloorSearch
 			SegmentationHandler(std::string segmentationType);
 			~SegmentationHandler();
 			
-			void segmentImage(cv::Mat frame, cv::Mat gray);
+			void segmentImage(cv::Mat rgb, cv::Mat gray);
 			vector<Superpixel> getSuperpixels();
 			cv::Mat getSegmentedImage();
 			cv::Mat getContoursImage();
+			cv::Mat getColorClustersImage();
 	};
 }
 
