@@ -111,55 +111,43 @@ cv::Mat SegmentationHandler::getContoursImage()
 
 cv::Mat SegmentationHandler::getColorClustersImage()
 {
-	if(this->segmentationType == "SLIC")
-	{
-		this->color_clusters_img = rgb.clone();
-		IplImage frame2 = (IplImage)color_clusters_img; // Reference on deallocating memory: http://stackoverflow.com/questions/12635978/memory-deallocation-of-iplimage-initialised-from-cvmat
-		slic.colour_with_cluster_means(&frame2);
-		// this->color_clusters_img = cv::cvarrToMat(&frame2, true, true, 0);
-	}
-	else if(this->segmentationType == "EGBIS")
-	{
-		this->color_clusters_img = rgb.clone();	
-	}
 	return this->color_clusters_img;
 }
 
 
-void Slic::colour_with_cluster_means(IplImage *image) {
-    vector<CvScalar> colours(centers.size());
-    
+void SegmentationHandler::colourWithClusterMeans() 
+{
+    vector<cv::Scalar> colours(superpixels_list.size());
+    color_clusters_img = rgb.clone();
     /* Gather the colour values per cluster. */
-    for (int i = 0; i < image->width; i++) {
-        for (int j = 0; j < image->height; j++) {
-            int index = clusters[i][j];
-            CvScalar colour = cvGet2D(image, j, i);
-            
-            colours[index].val[0] += colour.val[0];
-            colours[index].val[1] += colour.val[1];
-            colours[index].val[2] += colour.val[2];
+    for (int i=0; i < superpixels_list.size() ;i++)
+	{
+		vector<cv::Point> points = superpixels_list[i].get_points();
+        for (int j=0; j < points.size() ;j++)
+		{
+			colours[i].val[0] += rgb.at<cv::Vec3b>(points[j].y, points[j].x).val[0];
+			colours[i].val[1] += rgb.at<cv::Vec3b>(points[j].y, points[j].x).val[1];
+			colours[i].val[2] += rgb.at<cv::Vec3b>(points[j].y, points[j].x).val[2]; 
         }
     }
     
     /* Divide by the number of pixels per cluster to get the mean colour. */
-    for (int i = 0; i < (int)colours.size(); i++) {
-        colours[i].val[0] /= center_counts[i];
-        colours[i].val[1] /= center_counts[i];
-        colours[i].val[2] /= center_counts[i];
+    for (int i=0; i < (int)colours.size() ;i++) 
+	{
+        colours[i].val[0] /= superpixels_list[i].get_points().size();
+        colours[i].val[1] /= superpixels_list[i].get_points().size();
+        colours[i].val[2] /= superpixels_list[i].get_points().size();
     }
     
     /* Fill in. */
-    for (int i = 0; i < image->width; i++) {
-        for (int j = 0; j < image->height; j++) {
-            if((clusters[i][j] >= 0) && (clusters[i][j] < colours.size()))
-            {   
-                CvScalar ncolour = colours[clusters[i][j]];
-                cvSet2D(image, j, i, ncolour);
-            }
-            else
-            {
-                std::cout << clusters[i][j] << std::endl;
-            }
+    for (int i=0; i < superpixels_list.size() ;i++)		
+	{
+		vector<cv::Point> points = superpixels_list[i].get_points();
+        for (int j=0; j < points.size() ;j++)
+		{
+			color_clusters_img.at<cv::Vec3b>(points[j].y, points[j].x).val[0] = colours[i].val[0];
+			color_clusters_img.at<cv::Vec3b>(points[j].y, points[j].x).val[1] = colours[i].val[1];
+			color_clusters_img.at<cv::Vec3b>(points[j].y, points[j].x).val[2] = colours[i].val[2]; 
         }
     }
 }

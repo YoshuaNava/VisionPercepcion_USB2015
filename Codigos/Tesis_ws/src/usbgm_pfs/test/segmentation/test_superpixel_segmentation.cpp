@@ -124,7 +124,9 @@ int main( int argc, char** argv )
 		features.seg_img = seg_handler.getSegmentedImage();
 		CV_TIMER_STOP(B, "Superpixels processed")
 		
+		seg_handler.colourWithClusterMeans();
 		cv::Mat color_clusters_img = seg_handler.getColorClustersImage();
+		CV_TIMER_STOP(C, "Average colour clusters estimated")
 		cv::imshow("Color clusters image", color_clusters_img);
 		
 		showImages();

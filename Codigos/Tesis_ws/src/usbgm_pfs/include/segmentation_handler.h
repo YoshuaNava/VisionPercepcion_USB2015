@@ -28,6 +28,7 @@ namespace ProbFloorSearch
 			~SegmentationHandler();
 			
 			void segmentImage(cv::Mat rgb, cv::Mat gray);
+			void colourWithClusterMeans();
 			vector<Superpixel> getSuperpixels();
 			cv::Mat getSegmentedImage();
 			cv::Mat getContoursImage();
