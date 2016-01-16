@@ -92,10 +92,10 @@ void cameraSetup()
   
 
     // cap = VideoCapture(0);
-	// cap = VideoCapture("eng_stat_obst.avi");
+	cap = VideoCapture("eng_stat_obst.avi");
 	// cap = VideoCapture("Laboratorio.avi");
 	// cap = VideoCapture("LaboratorioMaleta.avi");
-	cap = VideoCapture("PasilloLabA.avi");
+	// cap = VideoCapture("PasilloLabA.avi");
 	//cap = VideoCapture("PasilloLabB.avi");
  // cap = VideoCapture("Laboratorio4.avi");
 //  cap = VideoCapture("Calle1.avi");
@@ -182,37 +182,37 @@ int main( int argc, char** argv )
 		CV_TIMER_STOP(H, "Showing features histograms")
 
 
-		GPSSapienza::featureAnalysis(featuresPtr, safewindow_modelPtr, statisticsPtr);
-		CV_TIMER_STOP(I, "Analyzing features with G-stat")
+		// GPSSapienza::featureAnalysis(featuresPtr, safewindow_modelPtr, statisticsPtr);
+		// CV_TIMER_STOP(I, "Analyzing features with G-stat")
 
-		GPSSapienza::displayAnalyzedFeatures(features);
-		CV_TIMER_STOP(J, "Showing analyzed features")
+		// GPSSapienza::displayAnalyzedFeatures(features);
+		// CV_TIMER_STOP(J, "Showing analyzed features")
 
-		GPSSapienza::probAnalysis2(featuresPtr, statisticsPtr);
-		CV_TIMER_STOP(K, "Probabilistic analysis ready")
+		// GPSSapienza::probAnalysis2(featuresPtr, statisticsPtr);
+		// CV_TIMER_STOP(K, "Probabilistic analysis ready")
 
-		GPSSapienza::updateParams(features.bin_class_result, statisticsPtr, featuresPtr);
-		CV_TIMER_STOP(L, "Expectation-Maximization completed")
+		// GPSSapienza::updateParams(features.bin_class_result, statisticsPtr, featuresPtr);
+		// CV_TIMER_STOP(L, "Expectation-Maximization completed")
 		
 		features.floor_boundary = features.bin_class_result.clone();
 
-		GPSSapienza::findObstacleBoundary(features.floor_boundary);
-		CV_TIMER_STOP(M, "Extracted the floor boundary")
+		// GPSSapienza::findObstacleBoundary(features.floor_boundary);
+		// CV_TIMER_STOP(M, "Extracted the floor boundary")
 		
-		hough_searcher.setMinScoreHough(70);
-		hough_searcher.doProbabilisticEstimation(features.rgb, features.gray, superpixels_contours_img, statistics.prior_img, features.superpixels_list);
-		// statistics.prior_img = hough_searcher.getProbabilisticFloorEstimate();
-		// // hough_searcher.doBayesianEstimation(features.rgb, features.gray, superpixels_contours_img, statistics.prior_img, features.superpixels_list);
-		// // statistics.prior_img = hough_searcher.getBayesianFloorEstimate();
-		// hough_searcher.showImages();
-		CV_TIMER_STOP(N, "Hough-based floor boundary search")
-		cv::Mat probMask = (hough_searcher.getProbabilisticFloorEstimate() > 0.7);
-			cv::imshow("hough search", hough_searcher.getTaggedSuperpixelsImage());
-			cv::imshow("hough probabilistic mask", probMask);
-		cv::Mat resulting_mask;
-		features.floor_boundary.copyTo(resulting_mask, probMask);
-		cv::addWeighted(resulting_mask, 0.5, probMask, 0.5, 0, resulting_mask);
-			cv::imshow("resulting_mask", (resulting_mask>200));
+		// hough_searcher.setMinScoreHough(70);
+		// hough_searcher.doProbabilisticEstimation(features.rgb, features.gray, superpixels_contours_img, statistics.prior_img, features.superpixels_list);
+		// // statistics.prior_img = hough_searcher.getProbabilisticFloorEstimate();
+		// // // hough_searcher.doBayesianEstimation(features.rgb, features.gray, superpixels_contours_img, statistics.prior_img, features.superpixels_list);
+		// // // statistics.prior_img = hough_searcher.getBayesianFloorEstimate();
+		// // hough_searcher.showImages();
+		// CV_TIMER_STOP(N, "Hough-based floor boundary search")
+		// cv::Mat probMask = (hough_searcher.getProbabilisticFloorEstimate() > 0.7);
+		// 	cv::imshow("hough search", hough_searcher.getTaggedSuperpixelsImage());
+		// 	cv::imshow("hough probabilistic mask", probMask);
+		// cv::Mat resulting_mask;
+		// features.floor_boundary.copyTo(resulting_mask, probMask);
+		// cv::addWeighted(resulting_mask, 0.5, probMask, 0.5, 0, resulting_mask);
+		// 	cv::imshow("resulting_mask", (resulting_mask>200));
 		
 		// // cv::imshow("hough poly", hough_searcher.getPolyBoundaryImage());
 		

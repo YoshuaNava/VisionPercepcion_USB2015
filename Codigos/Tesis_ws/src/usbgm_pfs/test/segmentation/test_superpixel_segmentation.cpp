@@ -16,7 +16,7 @@ cv::Mat bayes_prob_floor, coloured_bayes_floor;
 
 VideoCapture cap;
 
-const string segmentationAlgorithm = "SLIC";
+const string segmentationAlgorithm = "EGBIS";
 SegmentationHandler seg_handler(segmentationAlgorithm);
 HoughHorizon hough_searcher(proc_H, proc_W);
 
