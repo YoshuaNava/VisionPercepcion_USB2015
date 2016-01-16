@@ -339,10 +339,10 @@ int main(int argc, char** argv)
         }
         //}
 
-//         //for(int em=0; em<10;em++){
-//         //static bool converged = 0;
-//         FeatureAnalysis(FPtr, StatModelPtr, StatsPtr, gbs_img, p.dynamic);
-//         CV_TIMER_STOP(G, "Feature analysis")
+        //for(int em=0; em<10;em++){
+        //static bool converged = 0;
+        FeatureAnalysis(FPtr, StatModelPtr, StatsPtr, gbs_img, p.dynamic);
+        CV_TIMER_STOP(G, "Feature analysis")
 
 //         ProbAnalysis2(FPtr, StatsPtr, gbs_img);
 //         if (p.disp_img){ DISPLAY_IMAGE_XY(p.refresh, F.post1, 0 , 4);

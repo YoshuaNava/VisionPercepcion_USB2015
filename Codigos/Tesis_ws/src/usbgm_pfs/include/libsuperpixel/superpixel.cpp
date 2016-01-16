@@ -142,8 +142,8 @@ void Superpixel::add_pixels_information(cv::Mat img, cv::Mat gray, vector<vector
 		}
 	}
 //	cout << "min_x " << min_x << "  max_x " << max_x << "   min_y " << min_y << "  max_y " << max_y << "\n";
-	sp_height = max_y - min_y;
-	sp_width = max_x - min_x;
+	sp_height = max_y - min_y + 1;
+	sp_width = max_x - min_x + 1;
 	this->bounding_rect = cv::Rect(min_x, min_y, sp_width, sp_height);
 	CvScalar colour;
 	this->pixels = cv::Mat::zeros(sp_height, sp_width, CV_8UC3);

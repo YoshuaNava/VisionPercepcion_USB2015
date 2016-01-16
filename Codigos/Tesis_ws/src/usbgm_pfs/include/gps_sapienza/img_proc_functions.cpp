@@ -154,7 +154,7 @@ namespace GPSSapienza{
 		stats_disp.setTo(cv::Scalar(255,255,255));
 		for(int i=0; i < hist_size ;i++)
 		{
-			if ((cvRound(superpixels_histogram.at<float>(0,1)) > 0) && (features.superpixels_list.size() > i))
+			if ((cvRound(superpixels_histogram.at<float>(i,1)) > 0) && (features.superpixels_list.size() > i))
 			{
 				Superpixel curr_superpixel = features.superpixels_list[i];
 				stats->id[k] = k;
@@ -164,7 +164,20 @@ namespace GPSSapienza{
 				stats->size[k] = curr_superpixel.get_points().size(); //count number of pixels in current segment
 					
 				cv::meanStdDev(curr_superpixel.get_pixels_gray(), stats->mean[k], stats->stdDev[k], curr_superpixel.get_pixels_mask());
+					cout << "comp" << endl;
+					cout << stats->mean[k] << endl;
+					cout << stats->stdDev[k] << endl;
+				// cv::meanStdDev(features.gray, stats->mean[k], stats->stdDev[k], mask[0]);
+				// 	cout << stats->mean[k] << endl;
+				// 	cout << stats->stdDev[k] << endl;
 				stats->box[k] = curr_superpixel.get_bounding_rect();
+				
+					// cout << "comp" << endl;
+					// cout << stats->box[k].size() << endl;
+					// cv::Mat Points;
+					// cv::findNonZero(mask[0],Points);
+					// cout << boundingRect(Points).size() << endl;
+				
 				// stats->P_Gt[k] = GetPrior(stats->img_h, &stats->box[k]);
 				stats->P_Gt[k] = stats->prior_img.at<float>(curr_superpixel.get_center().y, curr_superpixel.get_center().x);
 				stats->P_Gf[k] =  1. - stats->P_Gt[k];

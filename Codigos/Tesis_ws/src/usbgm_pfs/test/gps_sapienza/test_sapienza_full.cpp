@@ -182,11 +182,11 @@ int main( int argc, char** argv )
 		CV_TIMER_STOP(H, "Showing features histograms")
 
 
-		// GPSSapienza::featureAnalysis(featuresPtr, safewindow_modelPtr, statisticsPtr);
-		// CV_TIMER_STOP(I, "Analyzing features with G-stat")
+		GPSSapienza::featureAnalysis(featuresPtr, safewindow_modelPtr, statisticsPtr);
+		CV_TIMER_STOP(I, "Analyzing features with G-stat")
 
-		// GPSSapienza::displayAnalyzedFeatures(features);
-		// CV_TIMER_STOP(J, "Showing analyzed features")
+		GPSSapienza::displayAnalyzedFeatures(features);
+		CV_TIMER_STOP(J, "Showing analyzed features")
 
 		// GPSSapienza::probAnalysis2(featuresPtr, statisticsPtr);
 		// CV_TIMER_STOP(K, "Probabilistic analysis ready")
