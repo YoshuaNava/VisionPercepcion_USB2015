@@ -30,18 +30,17 @@ namespace GPSSapienza{
 
 		F_mag = abs(temp_grad[0]) + abs(temp_grad[1]);  //abs_grad_x + abs_grad_y
 		F_mag = 255 - F_mag;
-		F_ang = 0*F_mag;
-		float result;
+		// F_ang = 0*F_mag;
 		float valueX;
 		float valueY;
-		for (int y = 0; y < temp_grad[1].rows; y++)
+		for (int y=0; y < F_ang.rows ;y++)
 		{
-			for (int x = 0; x < temp_grad[1].cols; x++)
+			for (int x=0; x < F_ang.cols ;x++)
 			{
 				valueX = sobel[1].at<uchar>(y,x);
 				valueY = sobel[2].at<uchar>(y,x);
-				result = cv::fastAtan2(valueY,valueX);
-				F_ang.at<uchar>(y, x) = (uchar)result;
+				float result = (cv::fastAtan2(valueY,valueX) / 360.0) * 255.0;
+				F_ang.at<uchar>(y, x) = result;
 			}
 		}
 		normalize(F_mag, F_mag, 0, 255, CV_MINMAX);
@@ -229,6 +228,8 @@ namespace GPSSapienza{
 			acc = false;
 			j = 0;
 		}
+		
+		std::cout << j << std::endl;
 
 		cv:inRange(features->hsv, cv::Scalar(0, smin, min(vmin,vmax), 0), cv::Scalar(180, 256, max(vmin,vmax), 0), bin[0]);
 		cv::bitwise_and(bin[0], model->mask, bin[1]);
@@ -249,15 +250,10 @@ namespace GPSSapienza{
 	void displayHistograms(Model* model)
 	{
 		static int row = 1;
-		for(int i=0;i<NUM_FEATURES;i++)
+		for(int i=0; i<NUM_FEATURES ;i++)
 		{
 			model->Hgram_M_DISP[i] = (model->Hgram_M[i]).clone();
 		}
-		// for(int i = 0; i < hist_size; i++ )
-		// {
-		//     int val = cvRound(model->Hgram_M_DISP[5].at<float>(i,0));
-		// 	cout << "i = " << i << "   val = " << val << "\n";
-		// }
 		
 		printHistogram(dim_32, model->Hgram_M[0], HistImgV, HIST_VAL, 1);
 		printHistogram(dim_9, model->Hgram_M_DISP[1], EdgeHist_img, HIST_EDGE, 0);
@@ -328,6 +324,7 @@ namespace GPSSapienza{
 	{
 		float max_value;
 		int bin_w = cvRound((double) hist_img.cols/hist_size);
+		// cv::normalize(histogram, histogram, 0, (4*hist_img.rows)/5, CV_MINMAX, -1, cv::Mat());
 		cv::normalize(histogram, histogram, 0, (4*hist_img.rows)/5, CV_MINMAX, -1, cv::Mat());
 	
 		if(flag==0)
