@@ -777,6 +777,7 @@ void UpdatePrior(IplImage *gbs, Statistics *sts, Features* F){
             cvSmooth(F->post1, F->post1, CV_GAUSSIAN, 5, 5);
             cvSmooth(F->post0, F->post0, CV_GAUSSIAN, 5, 5);
 
+            cvShowImage("post1", F->post1);
             cvAvgSdv(F->post1, &mean1, 0, mask[0]);
             cvAvgSdv(F->post0, &mean0, 0, mask[0]);
             // /*

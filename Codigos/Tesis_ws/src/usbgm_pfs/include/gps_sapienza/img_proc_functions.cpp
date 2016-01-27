@@ -192,15 +192,13 @@ namespace GPSSapienza{
 		mean1.val[0] = cv::mean(features->post1, cv::Mat()).val[0];
 		if(mean1.val[0] > 0)
 		{
-			for(int i = 0; i < stats->nos; i++ )
+			for(int i=0; i<stats->nos ;i++)
 			{
 				cv::compare(features->seg_img, stats->gray_id[i], mask[0], CV_CMP_EQ);
 				cv::GaussianBlur(features->post1, features->post1, cv::Size(5, 5), 0, 0);
 				cv::GaussianBlur(features->post0, features->post0, cv::Size(5, 5), 0, 0);
-
 				mean1.val[0] = cv::mean(features->post1, mask[0]).val[0];
 				mean0.val[0] = cv::mean(features->post0, mask[0]).val[0];
-
 				if(mean1.val[0] > 0)
 				{
 					double prior1 = alpha*stats->P_Gt[i] + beta*mean1.val[0];
