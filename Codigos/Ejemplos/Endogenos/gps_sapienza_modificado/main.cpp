@@ -435,7 +435,7 @@ int main(int argc, char** argv)
         if(key == 'q' || key == 'x' || key == 1048689 || key == 1048603)
         break;
         p.refresh=0;
-        cv::waitKey(0);
+        //cv::waitKey(0);
     }
 
 
