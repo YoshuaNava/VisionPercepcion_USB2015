@@ -138,7 +138,6 @@ namespace GPSSapienza{
 		}
 	}
 
-
 	static inline double getPrior(int h, cv::Rect* R){
 		//const static int hmax = h-1;
 		const static double lambda = 3./(double)h;
@@ -147,11 +146,11 @@ namespace GPSSapienza{
 		return exp(-lambda*height);
 	}
 
+
 	void superPixelStats(Features features, Statistics* stats)
 	{
 		int k = 0;
 		cv::calcHist(&features.seg_img, 1, 0, cv::Mat(), superpixels_histogram, 1, &hist_size, &hist_range, true, false);
-		stats_disp.setTo(cv::Scalar(255,255,255));
 		for(int i=0; i < hist_size ;i++)
 		{
 			if ((cvRound(superpixels_histogram.at<float>(i,1)) > 0) && (features.superpixels_list.size() > i))
@@ -162,38 +161,28 @@ namespace GPSSapienza{
 				cv::compare(features.seg_img, cv::Scalar(i), mask[0], cv::CMP_EQ);
 					// cv::imshow("mascara superpixel", mask[0]);
 				stats->size[k] = curr_superpixel.get_points().size(); //count number of pixels in current segment
-					
 				cv::meanStdDev(curr_superpixel.get_pixels_gray(), stats->mean[k], stats->stdDev[k], curr_superpixel.get_pixels_mask());
-					cout << "comp" << endl;
-					cout << stats->mean[k] << endl;
-					cout << stats->stdDev[k] << endl;
 				// cv::meanStdDev(features.gray, stats->mean[k], stats->stdDev[k], mask[0]);
-				// 	cout << stats->mean[k] << endl;
-				// 	cout << stats->stdDev[k] << endl;
 				stats->box[k] = curr_superpixel.get_bounding_rect();
-				
+				// printf("id=%d, size=%d, mean=%0.2f, stdDev=%0.2f\n", stats->id[k], stats->size[k], stats->mean[k].val[0], stats->stdDev[k].val[0]);
 					// cout << "comp" << endl;
 					// cout << stats->box[k].size() << endl;
 					// cv::Mat Points;
 					// cv::findNonZero(mask[0],Points);
 					// cout << boundingRect(Points).size() << endl;
-				
-				// stats->P_Gt[k] = GetPrior(stats->img_h, &stats->box[k]);
-				stats->P_Gt[k] = stats->prior_img.at<float>(curr_superpixel.get_center().y, curr_superpixel.get_center().x);
+				// printf("1x=%f, 2x=%f\n",getPrior(stats->img_h, &stats->box[k]),stats->prior_img.at<float>(curr_superpixel.get_center().y, curr_superpixel.get_center().x));  
+				stats->P_Gt[k] = getPrior(stats->img_h, &stats->box[k]);
+				// stats->P_Gt[k] = stats->prior_img.at<float>(curr_superpixel.get_center().y, curr_superpixel.get_center().x);
 				stats->P_Gf[k] =  1. - stats->P_Gt[k];
-				
-				stats_disp.setTo(cv::Scalar(stats->mean[k].val[0]), mask[0]);
-				// stats->prior_img.setTo(cv::Scalar(stats->P_Gt[k]), mask[0]);
-
-				cv::rectangle(stats_disp, cvPoint(stats->box[k].x,stats->box[k].y), cvPoint(stats->box[k].x+stats->box[k].width,stats->box[k].y+stats->box[k].height), CV_RGB(255,0,0), 1, 8, 0);
-
-				cv::line(stats_disp, cvPoint(stats->box[k].x + (stats->box[k].width)/2 , stats->box[k].y + (stats->box[k].height)/2 ), cvPoint(stats->img_w/2,stats->img_h), CV_RGB(255,0,0), 1, 8, 0);
+				stats->prior_img.setTo(cv::Scalar(stats->P_Gt[k]), mask[0]);
 
 				k++;
 			}
 		}
 		stats->nos = k;
 	}
+	
+
 
 	void updatePrior(Statistics *stats, Features* features)
 	{
