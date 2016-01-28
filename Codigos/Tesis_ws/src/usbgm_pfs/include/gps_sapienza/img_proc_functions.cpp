@@ -30,23 +30,26 @@ namespace GPSSapienza{
 
 		F_mag = abs(temp_grad[0]) + abs(temp_grad[1]);  //abs_grad_x + abs_grad_y
 		F_mag = 255 - F_mag;
-		// F_ang = 0*F_mag;
+		F_ang = cv::Mat::zeros(F_mag.rows, F_mag.cols, CV_32FC1);
 		float valueX;
 		float valueY;
+		float result;
 		for (int y=0; y < F_ang.rows ;y++)
 		{
 			for (int x=0; x < F_ang.cols ;x++)
 			{
-				valueX = sobel[1].at<uchar>(y,x);
-				valueY = sobel[2].at<uchar>(y,x);
-				float result = (cv::fastAtan2(valueY,valueX) / 360.0) * 255.0;
-				F_ang.at<uchar>(y, x) = result;
+				valueX = temp_grad[0].at<float>(y,x);
+				valueY = temp_grad[1].at<float>(y,x);
+				result = std::atan2(valueY,valueX);
+				F_ang.at<float>(y, x) = result;
 			}
 		}
 		normalize(F_mag, F_mag, 0, 255, CV_MINMAX);
 		convertScaleAbs(F_mag, F_mag, 1, 0);
-		normalize(F_ang, F_ang, 0, 255, CV_MINMAX);
-		convertScaleAbs(F_ang, F_ang, 1, 0);
+		// normalize(F_ang, F_ang, 0, 255, CV_MINMAX);
+		// convertScaleAbs(F_ang, F_ang, 1, 0);
+		
+		cv::imshow("temp_grad", temp_grad[1]);
 	}
 
 
@@ -228,11 +231,29 @@ namespace GPSSapienza{
 			acc = false;
 			j = 0;
 		}
-		
-		std::cout << j << std::endl;
 
 		cv:inRange(features->hsv, cv::Scalar(0, smin, min(vmin,vmax), 0), cv::Scalar(180, 256, max(vmin,vmax), 0), bin[0]);
 		cv::bitwise_and(bin[0], model->mask, bin[1]);
+		// features->ang32 = (features->ang32 + CV_PI)/(2*CV_PI);
+		cv::Mat pruebaang;
+		normalize(features->ang32, pruebaang, 0, 255, CV_MINMAX);
+		
+		// for(int i=0; i<features->ang32.rows ;i++)
+		// {
+		// 	for(int j=0; j<features->ang32.cols ;j++)
+		// 	{
+		// 		float angle = features->ang32.at<float>(i,j);
+		// 		float value = cv::fastAtan2(std::sin(angle), std::cos(angle));
+		// 		if(abs(angle) > 0.1)
+		// 		{
+		// 		std::cout << "angle" << std::endl;
+		// 		std::cout << angle << std::endl;
+		// 		std::cout << value << std::endl;
+		// 		std::cout << features->ang32.depth() << std::endl;
+		// 		}
+		// 	}
+		// }
+		cv::imshow("ang32", pruebaang);
 		cv::calcHist(&features->mag, 1, 0, model->mask, model->Hgram_M[0], 1, &model->dim[0], &range_256_ptr, true, acc);
 		cv::calcHist(&features->ang32, 1, 0, model->mask, model->Hgram_M[1], 1, &model->dim[1], &range_2pi_ptr, true, acc);
 		cv::calcHist(&features->hue, 1, 0, bin[1], model->Hgram_M[2], 1, &model->dim[2], &range_181_ptr, true, acc);
