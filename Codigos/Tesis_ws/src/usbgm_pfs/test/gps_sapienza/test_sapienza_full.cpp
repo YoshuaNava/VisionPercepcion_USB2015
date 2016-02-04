@@ -67,14 +67,14 @@ void showImages()
 	}
 	DISPLAY_IMAGE_XY(true, features.seg_img, 3, 0);
 	cv::resizeWindow("features.seg_img", proc_W, proc_H);
-	DISPLAY_IMAGE_XY(true, features.hue, 0, 1);
-	cv::resizeWindow("features.hue", proc_W, proc_H);
-	DISPLAY_IMAGE_XY(true, features.sat, 1, 1);
-	cv::resizeWindow("features.sat", proc_W, proc_H);
-	DISPLAY_IMAGE_XY(true, features.mag, 2, 1);
+	DISPLAY_IMAGE_XY(true, features.mag, 0, 1);
 	cv::resizeWindow("features.mag", proc_W, proc_H);
-	DISPLAY_IMAGE_XY(true, features.ang32, 3, 1);
+	DISPLAY_IMAGE_XY(true, features.ang32, 1, 1);
 	cv::resizeWindow("features.ang32", proc_W, proc_H);
+	DISPLAY_IMAGE_XY(true, features.hue, 2, 1);
+	cv::resizeWindow("features.hue", proc_W, proc_H);
+	DISPLAY_IMAGE_XY(true, features.sat, 3, 1);
+	cv::resizeWindow("features.sat", proc_W, proc_H);
 	DISPLAY_IMAGE_XY(true, features.lbp, 4, 1);
 	cv::resizeWindow("features.lbp", proc_W, proc_H);
 	DISPLAY_IMAGE_XY(true, features.iic, 5, 1);

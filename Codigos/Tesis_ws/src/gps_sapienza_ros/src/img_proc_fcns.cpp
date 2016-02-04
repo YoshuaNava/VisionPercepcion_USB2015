@@ -1203,7 +1203,6 @@ void UpdateParams(IplImage* T, Statistics *S, Features *F, bool dynamic){
         }
 
         S->L1[i] = (1./(mean1)) > 0 ? (1./(mean1)) : 1;
-        std::cout << mean1 << std::endl;
 
         //printf("%0.4f\n", mean.val[0]);
         cvSet( hist_temp, cvScalarAll(255), 0 );
@@ -1294,7 +1293,11 @@ void UpdateParams(IplImage* T, Statistics *S, Features *F, bool dynamic){
 
         S->Z1[i] = (1/S->L1[i])*(1-exp(-S->L1[i]*S->gmax[i]));
         S->Z0[i] = (1/S->L0[i])*(exp(S->L0[i]*S->gmax[i])-1);
-
+            std::cout << "feature #" << i << std::endl;
+			std::cout << mean1 << std::endl;
+			std::cout << mean0 << std::endl;
+			std::cout << gmax/(exp(gmax/mean0)-1) << std::endl;
+			std::cout << gmax << std::endl;	
     }
 
 

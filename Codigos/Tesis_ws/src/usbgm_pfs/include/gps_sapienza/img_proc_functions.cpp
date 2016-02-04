@@ -246,7 +246,7 @@ namespace GPSSapienza{
 		// cv::bitwise_and(features->mag, model->mask, features->mag);
 		// cv::imshow("mag", features->mag);
 		// cv::imshow("roi", features->mag(model->SafeRegion));
-		cv::imshow("roi", features->ang32(model->SafeRegion));
+		// cv::imshow("roi", features->ang32(model->SafeRegion));
 	}
 
 
@@ -258,21 +258,21 @@ namespace GPSSapienza{
 			model->Hgram_M_DISP[i] = (model->Hgram_M[i]).clone();
 		}
 		
-		printHistogram(dim_32, model->Hgram_M[0], HistImgV, HIST_VAL, 1);
+		printHistogram(dim_32, model->Hgram_M_DISP[0], HistImgV, HIST_VAL, 1);
 		printHistogram(dim_32, model->Hgram_M_DISP[1], EdgeHist_img, HIST_EDGE, 0);
 		printHistogram(dim_32, model->Hgram_M_DISP[2], HistImgH, HIST_HUE, 1);
 		printHistogram(dim_32, model->Hgram_M_DISP[3], HistImgS, HIST_SAT, 1);
 		printHistogram(dim_32, model->Hgram_M_DISP[4], LBPhist_img, LBP_HIST, 0);
 		printHistogram(dim_32, model->Hgram_M_DISP[5], iichist_img, iic_HIST, 0);
 		
-		DISPLAY_IMAGE_XY(true, HistImgH, 0, 2);
-		cv::resizeWindow("HistImgH", HistImgH.cols, HistImgH.rows);
-		DISPLAY_IMAGE_XY(true, HistImgS, 1, 2);
-		cv::resizeWindow("HistImgS", HistImgS.cols, HistImgS.rows);
-		DISPLAY_IMAGE_XY(true, HistImgV, 2, 2);
+		DISPLAY_IMAGE_XY(true, HistImgV, 0, 2);
 		cv::resizeWindow("HistImgV", HistImgV.cols, HistImgV.rows);
-		DISPLAY_IMAGE_XY(true, EdgeHist_img, 3, 2);
+		DISPLAY_IMAGE_XY(true, EdgeHist_img, 1, 2);
 		cv::resizeWindow("EdgeHist_img", EdgeHist_img.cols, EdgeHist_img.rows);
+		DISPLAY_IMAGE_XY(true, HistImgH, 2, 2);
+		cv::resizeWindow("HistImgH", HistImgH.cols, HistImgH.rows);
+		DISPLAY_IMAGE_XY(true, HistImgS, 3, 2);
+		cv::resizeWindow("HistImgS", HistImgS.cols, HistImgS.rows);
 		DISPLAY_IMAGE_XY(true, LBPhist_img, 4, 2);
 		cv::resizeWindow("LBPhist_img", LBPhist_img.cols, LBPhist_img.rows);
 		DISPLAY_IMAGE_XY(true, iichist_img, 5, 2);
@@ -360,13 +360,13 @@ namespace GPSSapienza{
 	{
 		double G = 0.;
 		const static double SMALL = 0.000001;
-		cv::normalize(histogram1, histogram1, 0, 1, cv::NORM_MINMAX, -1, cv::Mat());
-		cv::normalize(histogram2, histogram2, 0, 1, cv::NORM_MINMAX, -1, cv::Mat());
+		cv::normalize(histogram1, histogram1, 0, 1, cv::NORM_MINMAX);
+		cv::normalize(histogram2, histogram2, 0, 1, cv::NORM_MINMAX);
 	
 		for(int i=0; i<size; i++)
 		{
-			double M = histogram1.at<float>(i,0); //model
-			double S = histogram2.at<float>(i,0); //sample
+			double M = histogram1.at<double>(i,0); //model
+			double S = histogram2.at<double>(i,0); //sample
 			if(M == 0) M = SMALL;
 			if(S == 0) S = SMALL;
 			G += 2*(S*(log (S)) - S*(log (M)));
@@ -412,13 +412,14 @@ namespace GPSSapienza{
 			cv::calcHist(&features->iic, 1, 0, mask[0], stats->Hgram_SF[5], 1, &model->dim[5], &range_256_ptr, true, false);
 	
 			// cout << i << " A)  Segundo ciclo	" << (cvGetTickCount() - time)/((double)cvGetTickFrequency()*1000.) << "ms\n";
-	
 			for(int j=0; j<stats->no_features ;j++)
 			{
 				stats->G_score[j] = Gstat(model->Hgram_M[j], stats->Hgram_SF[j], model->dim[j]);
 				stats->P_FgGt[stats->no_features*i+j] = EXP_DIST_1(stats->Z1[j], stats->L1[j], stats->G_score[j]); //0.9*exp(-lambda*G_scoreV);
 				stats->P_FgGf[stats->no_features*i+j] = EXP_DIST_0(stats->Z0[j], stats->L0[j], stats->G_score[j]); //1. - S->P_VgGt[i];
 				PG[j].setTo(cv::Scalar(stats->G_score[j]), mask[0]);
+				std::cout << "pg # " << j << std::endl;
+				std::cout << stats->G_score[j] << std::endl;
 				features->P_X1[j].setTo(cv::Scalar(stats->P_FgGt[stats->no_features*i+j]	/	(stats->P_FgGt[stats->no_features*i+j] + stats->P_FgGf[stats->no_features*i+j])), mask[0]);
 				features->P_X0[j].setTo(cv::Scalar(stats->P_FgGf[stats->no_features*i+j]	/	(stats->P_FgGt[stats->no_features*i+j] + stats->P_FgGf[stats->no_features*i+j])), mask[0]);
 			}
@@ -427,7 +428,6 @@ namespace GPSSapienza{
 		// cout << "Segundo ciclo	" << (cvGetTickCount() - time)/((double)cvGetTickFrequency()*1000.) << "ms\n";
 		// time = cvGetTickCount();
 		
-	
 		static bool flag = 0;
 		for(int i=0; i<stats->no_features ;i++)
 		{
@@ -457,6 +457,19 @@ namespace GPSSapienza{
 		cv::resizeWindow("features.P_X1[4]", features.P_X1[4].cols, features.P_X1[4].rows);
 		DISPLAY_IMAGE_XY(true, features.P_X1[5], 5, 3);
 		cv::resizeWindow("features.P_X1[5]", features.P_X1[5].cols, features.P_X1[5].rows);
+		
+		// DISPLAY_IMAGE_XY(true, features.P_X0[0], 0, 5);
+		// cv::resizeWindow("features.P_X0[0]", features.P_X1[0].cols, features.P_X1[0].rows);
+		// DISPLAY_IMAGE_XY(true, features.P_X0[1], 1, 5);
+		// cv::resizeWindow("features.P_X0[1]", features.P_X1[1].cols, features.P_X1[1].rows);
+		// DISPLAY_IMAGE_XY(true, features.P_X0[2], 2, 5);
+		// cv::resizeWindow("features.P_X0[2]", features.P_X1[2].cols, features.P_X1[2].rows);
+		// DISPLAY_IMAGE_XY(true, features.P_X0[3], 3, 5);
+		// cv::resizeWindow("features.P_X0[3]", features.P_X1[3].cols, features.P_X1[3].rows);
+		// DISPLAY_IMAGE_XY(true, features.P_X0[4], 4, 5);
+		// cv::resizeWindow("features.P_X0[4]", features.P_X1[4].cols, features.P_X1[4].rows);
+		// DISPLAY_IMAGE_XY(true, features.P_X0[5], 5, 5);
+		// cv::resizeWindow("features.P_X0[5]", features.P_X1[5].cols, features.P_X1[5].rows);
 	}
 	
 	
@@ -477,7 +490,8 @@ namespace GPSSapienza{
 			post1 = post1 * (stats->P_FgGt[stats->no_features*i+1]) * (stats->P_FgGt[stats->no_features*i+2]);
 			post1 = post1 * (stats->P_FgGt[stats->no_features*i+3]) * (stats->P_FgGt[stats->no_features*i+4]) * (stats->P_FgGt[stats->no_features*i+5]);
 	
-			double post0 = (stats->P_Gf[i]) * (stats->P_FgGf[stats->no_features*i+0]) * (stats->P_FgGf[stats->no_features*i+1]) * (stats->P_FgGf[stats->no_features*i+2]);
+			double post0 = (stats->P_Gf[i]) * (stats->P_FgGf[stats->no_features*i+0]);
+			post0 = post0 * (stats->P_FgGf[stats->no_features*i+1]) * (stats->P_FgGf[stats->no_features*i+2]);
 			post0 = post0 * (stats->P_FgGf[stats->no_features*i+3]) * (stats->P_FgGf[stats->no_features*i+4]) * (stats->P_FgGf[stats->no_features*i+5]);
 	
 			stats->P_GtgF[i] = post1 / (post1 + post0);
@@ -573,14 +587,16 @@ namespace GPSSapienza{
 	
 		for(int i=0; i<stats->no_features ;i++)
 		{
-			temp[5] = PG[i].clone();
-			cv::normalize(temp[5], temp[5], 0, 39, CV_MINMAX);
+			// temp[5] = PG[i].clone();
+			// cv::normalize(temp[5], temp[5], 0, 39, CV_MINMAX);
 			// cv::calcHist(&temp[5], 1, 0, cv::Mat(), Ghist2, 1, &dim_40, &range_40_ptr, true, false);
 			// Ghist2DISP = Ghist2.clone();
+				cv::Mat pruebapg;
+				cv::normalize(PG[0], pruebapg, 0, 255, CV_MINMAX);
+				cv::imshow("PG[0]", pruebapg);
+			
 			cv::minMaxLoc(PG[i], NULL, &gmax, NULL, NULL, cv::Mat());
-	
 			stats->gmax[i] = (0.5*gmax + 0.5*stats->gmax[i]) > 0 ? (0.5*gmax + 0.5*stats->gmax[i]) : 0.5;
-	
 			if(weighted_mean)
 			{
 				inv_prob[1] = inv_prob[0] * PG[i];
@@ -592,7 +608,6 @@ namespace GPSSapienza{
 			}
 			mean.val[0] = mean.val[0] > min_mean1 ? mean.val[0] : min_mean1;
 			mean.val[0] = mean.val[0] > max_mean1 ? max_mean1 : mean.val[0];
-	
 			if (mean1==0) 
 			{
 				mean1 = mean.val[0];
@@ -613,16 +628,13 @@ namespace GPSSapienza{
 					}
 			}
 	
-			stats->L1[i] = (1./(mean1)) > 0 ? (1./(mean1)) : 1 ;
+			// stats->L1[i] = (1./(mean1)) > 0 ? (1./(mean1)) : 1 ;
 	
-			// hist_temp = cv::Scalar(255, 255, 255);
-	
-			cv::calcHist(&PG[i], 1, 0, bin[4], stats->Hgram_G1[i], 1, &dim_40, &range_40_ptr, true, acc);
-			stats->Hgram_G1_DISP[i] = stats->Hgram_G1[i].clone();
+			// hist_temp = cv::Scalar(255, 255, 255);	
+			// cv::calcHist(&PG[i], 1, 0, bin[4], stats->Hgram_G1[i], 1, &dim_40, &range_40_ptr, true, acc);
+			// stats->Hgram_G1_DISP[i] = stats->Hgram_G1[i].clone();
 			// draw_dist(40, stats->gmax[i], stats->Z1[i], stats->L1[i], hist_temp, 1);
 			// cv::addWeighted(hist_temp, 0.5, PG1_DISP[i], 0.5, 0, PG1_DISP[i]);
-		
-	
 			// hist_temp = cv::Scalar(255, 255, 255);
 		
 			if(weighted_mean)
@@ -659,21 +671,20 @@ namespace GPSSapienza{
 						mean0 = mean.val[0];
 					}
 			}
-			std::cout << "feature #" << i << std::endl;
-			std::cout << mean0 << std::endl;
-			std::cout << mean.val[0] << std::endl;
-			std::cout << gmax/(exp(gmax/mean0)-1) << std::endl;
 
-			stats->L0[i] = (1./(mean0)) > 0 ? (1./(mean0)) : 1 ;
-			cv::calcHist(&PG[i], 1, 0, bin[3], stats->Hgram_G0[i], 1, &dim_40, &range_40_ptr, true, acc);
-			stats->Hgram_G0_DISP[i] = stats->Hgram_G0[i].clone();
-		
+			// stats->L0[i] = (1./(mean0)) > 0 ? (1./(mean0)) : 1 ;
+			// cv::calcHist(&PG[i], 1, 0, bin[3], stats->Hgram_G0[i], 1, &dim_40, &range_40_ptr, true, acc);
+			// stats->Hgram_G0_DISP[i] = stats->Hgram_G0[i].clone();
 			// draw_dist(40, stats->gmax[i], stats->Z0[i], stats->L0[i], hist_temp, 0);
-		
 			// cv::addWeighted(hist_temp, 0.5, PG0_DISP[i], 0.5, 0, PG0_DISP[i]);
 		
-			stats->Z1[i] = (1/stats->L1[i]) * (1-exp(-stats->L1[i] * stats->gmax[i]));
-			stats->Z0[i] = (1/stats->L0[i]) * (exp(stats->L0[i] * stats->gmax[i])-1);	
+			// stats->Z1[i] = (1/stats->L1[i]) * (1-exp(-stats->L1[i] * stats->gmax[i]));
+			// stats->Z0[i] = (1/stats->L0[i]) * (exp(stats->L0[i] * stats->gmax[i])-1);
+				std::cout << "feature #" << i << std::endl;
+				std::cout << mean1 << std::endl;
+				std::cout << mean0 << std::endl;
+				std::cout << gmax/(exp(gmax/mean0)-1) << std::endl;
+				std::cout << gmax << std::endl;	
 		}
 	}
 
