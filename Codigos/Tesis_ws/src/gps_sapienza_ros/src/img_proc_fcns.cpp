@@ -996,6 +996,7 @@ void FeatureAnalysis(Features *F, Model* M, Statistics *S, IplImage *gbs, bool d
 
     }
 
+    cvShowImage("pg", PG[0]);
 
     if (p.disp_img){
         static int row = 2;
@@ -1293,11 +1294,11 @@ void UpdateParams(IplImage* T, Statistics *S, Features *F, bool dynamic){
 
         S->Z1[i] = (1/S->L1[i])*(1-exp(-S->L1[i]*S->gmax[i]));
         S->Z0[i] = (1/S->L0[i])*(exp(S->L0[i]*S->gmax[i])-1);
-            std::cout << "feature #" << i << std::endl;
-			std::cout << mean1 << std::endl;
-			std::cout << mean0 << std::endl;
-			std::cout << gmax/(exp(gmax/mean0)-1) << std::endl;
-			std::cout << gmax << std::endl;	
+            // std::cout << "feature #" << i << std::endl;
+			// std::cout << mean1 << std::endl;
+			// std::cout << mean0 << std::endl;
+			// std::cout << gmax/(exp(gmax/mean0)-1) << std::endl;
+			// std::cout << gmax << std::endl;	
     }
 
 
