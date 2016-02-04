@@ -123,7 +123,7 @@ namespace GPSSapienza{
 		iichist_img = cv::Mat::zeros(HistSize, CV_8UC1);
 		GhistImg = cv::Mat::zeros(cv::Size(512,100), CV_8UC1);
 		GhistImg2 = cv::Mat::zeros(cv::Size(120,100), CV_8UC1);
-		hist_temp = cv::Mat::zeros(cv::Size(120,100), CV_8UC3);
+		// hist_temp = cv::Mat::zeros(cv::Size(120,100), CV_8UC3);
 
 		for(i=0; i<NUM_FEATURES ;++i)
 		{
@@ -575,8 +575,8 @@ namespace GPSSapienza{
 		{
 			temp[5] = PG[i].clone();
 			cv::normalize(temp[5], temp[5], 0, 39, CV_MINMAX);
-			cv::calcHist(&temp[5], 1, 0, cv::Mat(), Ghist2, 1, &dim_40, &range_40_ptr, true, false);
-			Ghist2DISP = Ghist2.clone();
+			// cv::calcHist(&temp[5], 1, 0, cv::Mat(), Ghist2, 1, &dim_40, &range_40_ptr, true, false);
+			// Ghist2DISP = Ghist2.clone();
 			cv::minMaxLoc(PG[i], NULL, &gmax, NULL, NULL, cv::Mat());
 	
 			stats->gmax[i] = (0.5*gmax + 0.5*stats->gmax[i]) > 0 ? (0.5*gmax + 0.5*stats->gmax[i]) : 0.5;
@@ -588,32 +588,42 @@ namespace GPSSapienza{
 			}
 			else
 			{
-				cv::meanStdDev(PG[i], mean, stddev);
+				cv::meanStdDev(PG[i], mean, stddev, bin[4]);
 			}
 			mean.val[0] = mean.val[0] > min_mean1 ? mean.val[0] : min_mean1;
 			mean.val[0] = mean.val[0] > max_mean1 ? max_mean1 : mean.val[0];
 	
-			if (mean1==0.) 
+			if (mean1==0) 
 			{
 				mean1 = mean.val[0];
 			}
 			mean1 = 0.5*mean1 + 0.5*mean.val[0];
 			if(truncated){
-				if(mean1<(gmax/2)) mean1 = mean1 - gmax/(exp(gmax/mean1)-1);
-				if(mean1>=(gmax/2)) mean1 = (gmax/2);
+				if(mean1<(gmax/2)) 
+				{
+					mean1 = mean1 - gmax/(exp(gmax/mean1)-1);
+				}
+				if(mean1>=(gmax/2)) 
+				{
+					mean1 = (gmax/2);
+				}
+					if (mean1==0) 
+					{
+						mean1 = mean.val[0];
+					}
 			}
 	
 			stats->L1[i] = (1./(mean1)) > 0 ? (1./(mean1)) : 1 ;
 	
-			hist_temp = cv::Scalar(255, 255, 255);
+			// hist_temp = cv::Scalar(255, 255, 255);
 	
 			cv::calcHist(&PG[i], 1, 0, bin[4], stats->Hgram_G1[i], 1, &dim_40, &range_40_ptr, true, acc);
 			stats->Hgram_G1_DISP[i] = stats->Hgram_G1[i].clone();
-			draw_dist(40, stats->gmax[i], stats->Z1[i], stats->L1[i], hist_temp, 1);
-			cv::addWeighted(hist_temp, 0.5, PG1_DISP[i], 0.5, 0, PG1_DISP[i]);
+			// draw_dist(40, stats->gmax[i], stats->Z1[i], stats->L1[i], hist_temp, 1);
+			// cv::addWeighted(hist_temp, 0.5, PG1_DISP[i], 0.5, 0, PG1_DISP[i]);
 		
 	
-			hist_temp = cv::Scalar(255, 255, 255);
+			// hist_temp = cv::Scalar(255, 255, 255);
 		
 			if(weighted_mean)
 			{
@@ -622,7 +632,7 @@ namespace GPSSapienza{
 			}
 			else
 			{
-				cv::meanStdDev(PG[i], mean, stddev);
+				cv::meanStdDev(PG[i], mean, stddev, bin[3]);
 			}
 	
 			mean.val[0] = gmax-mean.val[0];
@@ -644,18 +654,26 @@ namespace GPSSapienza{
 				{
 					mean0 = (gmax/2);
 				}
+					if (mean0==0) 
+					{
+						mean0 = mean.val[0];
+					}
 			}
+			std::cout << "feature #" << i << std::endl;
+			std::cout << mean0 << std::endl;
+			std::cout << mean.val[0] << std::endl;
+			std::cout << gmax/(exp(gmax/mean0)-1) << std::endl;
+
 			stats->L0[i] = (1./(mean0)) > 0 ? (1./(mean0)) : 1 ;
 			cv::calcHist(&PG[i], 1, 0, bin[3], stats->Hgram_G0[i], 1, &dim_40, &range_40_ptr, true, acc);
 			stats->Hgram_G0_DISP[i] = stats->Hgram_G0[i].clone();
 		
-			draw_dist(40, stats->gmax[i], stats->Z0[i], stats->L0[i], hist_temp, 0);
+			// draw_dist(40, stats->gmax[i], stats->Z0[i], stats->L0[i], hist_temp, 0);
 		
-			cv::addWeighted(hist_temp, 0.5, PG0_DISP[i], 0.5, 0, PG0_DISP[i]);
+			// cv::addWeighted(hist_temp, 0.5, PG0_DISP[i], 0.5, 0, PG0_DISP[i]);
 		
 			stats->Z1[i] = (1/stats->L1[i]) * (1-exp(-stats->L1[i] * stats->gmax[i]));
-			stats->Z0[i] = (1/stats->L0[i]) * (exp(stats->L0[i] * stats->gmax[i])-1);
-	
+			stats->Z0[i] = (1/stats->L0[i]) * (exp(stats->L0[i] * stats->gmax[i])-1);	
 		}
 	}
 

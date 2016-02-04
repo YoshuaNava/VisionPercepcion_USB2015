@@ -344,52 +344,52 @@ int main(int argc, char** argv)
         FeatureAnalysis(FPtr, StatModelPtr, StatsPtr, gbs_img, p.dynamic);
         CV_TIMER_STOP(G, "Feature analysis")
 
-//         ProbAnalysis2(FPtr, StatsPtr, gbs_img);
-//         if (p.disp_img){ DISPLAY_IMAGE_XY(p.refresh, F.post1, 0 , 4);
-//         //cvShowImage(POSTERIOR, F.post1);
+        ProbAnalysis2(FPtr, StatsPtr, gbs_img);
+        if (p.disp_img){ DISPLAY_IMAGE_XY(p.refresh, F.post1, 0 , 4);
+        //cvShowImage(POSTERIOR, F.post1);
 
-//         }
-//         CV_TIMER_STOP(H, "Prob Analysis")
+        }
+        CV_TIMER_STOP(H, "Prob Analysis")
 
-//         UpdateParams(F.bin_class_result, StatsPtr, FPtr, p.dynamic);
-//         CV_TIMER_STOP(I, "EM Analysis")
+        UpdateParams(F.bin_class_result, StatsPtr, FPtr, p.dynamic);
+        CV_TIMER_STOP(I, "EM Analysis")
 
 
-// // EstimarFronteraObstaculo();
-//         //FIND OBSTACLE BOUNDARY AND COMPUTE STEERING DIRECTION
-//         //cvCopy(gbs_img,Bound.Bimg);
-//         cvMerge(F.bin_class_result, F.bin_class_result, F.bin_class_result, NULL, result_img);
-//         cvCopy(F.bin_class_result,Bound.Bimg);
+// EstimarFronteraObstaculo();
+        //FIND OBSTACLE BOUNDARY AND COMPUTE STEERING DIRECTION
+        //cvCopy(gbs_img,Bound.Bimg);
+        cvMerge(F.bin_class_result, F.bin_class_result, F.bin_class_result, NULL, result_img);
+        cvCopy(F.bin_class_result,Bound.Bimg);
 
-//         //cvSmooth(Bound.Bimg, Bound.Bimg, CV_MEDIAN, 3, 3);//Smooth image
-//         cvDilate(Bound.Bimg,Bound.Bimg, NULL, 1);
-//         cvErode(Bound.Bimg,Bound.Bimg, NULL, 3);
-//         cvSmooth( Bound.Bimg,  Bound.Bimg, CV_MEDIAN, 3, 3);
-//         FindObstacleBoundary(Bound.Bimg);
-//         if (p.disp_img){ DISPLAY_IMAGE_XY(p.refresh, Bound.Bimg, 1 , 4); //cvShowImage(OBSTACLE_BOUND, Bound.Bimg);
+        //cvSmooth(Bound.Bimg, Bound.Bimg, CV_MEDIAN, 3, 3);//Smooth image
+        cvDilate(Bound.Bimg,Bound.Bimg, NULL, 1);
+        cvErode(Bound.Bimg,Bound.Bimg, NULL, 3);
+        cvSmooth( Bound.Bimg,  Bound.Bimg, CV_MEDIAN, 3, 3);
+        FindObstacleBoundary(Bound.Bimg);
+        if (p.disp_img){ DISPLAY_IMAGE_XY(p.refresh, Bound.Bimg, 1 , 4); //cvShowImage(OBSTACLE_BOUND, Bound.Bimg);
 
-//         }
-//         cvCopy(Bound.Bimg, bin_img);
+        }
+        cvCopy(Bound.Bimg, bin_img);
 
-//         //UpdateParams(Bound.Bimg, StatsPtr, FPtr, p.dynamic);
+        //UpdateParams(Bound.Bimg, StatsPtr, FPtr, p.dynamic);
 
-//         ExtractBoundary(FrameSize, BoundPtr);
-//         CalculateDistances(FrameSize, BoundPtr, p.camera, p.bot);
+        ExtractBoundary(FrameSize, BoundPtr);
+        CalculateDistances(FrameSize, BoundPtr, p.camera, p.bot);
 
-//         InterpretDepthArray(FrameSize, BoundPtr, p.bot);
-//         CV_TIMER_STOP(J, "Path analysis")
+        InterpretDepthArray(FrameSize, BoundPtr, p.bot);
+        CV_TIMER_STOP(J, "Path analysis")
 
-//         Contours(F.bin_class_result); //Find contours
-//         DrawContours(contour[0], CV_RGB( 0, 150, 0 ), SafeRegion); //Draw contours
-//         Contours(Bound.Bimg); //Find contours
-//         DrawContours(contour[1], CV_RGB( 255, 0, 0 ), SafeRegion); //Draw contours
+        Contours(F.bin_class_result); //Find contours
+        DrawContours(contour[0], CV_RGB( 0, 150, 0 ), SafeRegion); //Draw contours
+        Contours(Bound.Bimg); //Find contours
+        DrawContours(contour[1], CV_RGB( 255, 0, 0 ), SafeRegion); //Draw contours
 
-//         cvAddWeighted( contour[0], 0.5, contour[1], 1, 0, contour[0] );
-//         cvAddWeighted( contour[0], 0.5, source_img, 1, 0, source_img );
-//         // //checking for memory leaks
-//         DISPLAY_IMAGE(source_img)
-//         //cvNamedWindow("test");
-//         //cvShowImage("test", source_img);
+        cvAddWeighted( contour[0], 0.5, contour[1], 1, 0, contour[0] );
+        cvAddWeighted( contour[0], 0.5, source_img, 1, 0, source_img );
+        // //checking for memory leaks
+        DISPLAY_IMAGE(source_img)
+        //cvNamedWindow("test");
+        //cvShowImage("test", source_img);
 
 
 
@@ -435,7 +435,7 @@ int main(int argc, char** argv)
         if(key == 'q' || key == 'x' || key == 1048689 || key == 1048603)
         break;
         p.refresh=0;
-        cv::waitKey(0);
+        // cv::waitKey(0);
     }
 
 

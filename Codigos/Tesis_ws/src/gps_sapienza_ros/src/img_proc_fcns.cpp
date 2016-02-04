@@ -1202,7 +1202,8 @@ void UpdateParams(IplImage* T, Statistics *S, Features *F, bool dynamic){
             if(mean1>=(gmax/2)) mean1 = (gmax/2);
         }
 
-        S->L1[i] = (1./(mean1)) > 0 ? (1./(mean1)) : 1 ;
+        S->L1[i] = (1./(mean1)) > 0 ? (1./(mean1)) : 1;
+        std::cout << mean1 << std::endl;
 
         //printf("%0.4f\n", mean.val[0]);
         cvSet( hist_temp, cvScalarAll(255), 0 );

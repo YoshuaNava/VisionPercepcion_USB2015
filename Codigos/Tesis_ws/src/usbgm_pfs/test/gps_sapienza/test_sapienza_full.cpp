@@ -185,19 +185,19 @@ int main( int argc, char** argv )
 		GPSSapienza::featureAnalysis(featuresPtr, safewindow_modelPtr, statisticsPtr);
 		CV_TIMER_STOP(I, "Analyzing features with G-stat")
 
-		// GPSSapienza::displayAnalyzedFeatures(features);
-		// CV_TIMER_STOP(J, "Showing analyzed features")
+		GPSSapienza::displayAnalyzedFeatures(features);
+		CV_TIMER_STOP(J, "Showing analyzed features")
 
-		// GPSSapienza::probAnalysis2(featuresPtr, statisticsPtr);
-		// CV_TIMER_STOP(K, "Probabilistic analysis ready")
+		GPSSapienza::probAnalysis2(featuresPtr, statisticsPtr);
+		CV_TIMER_STOP(K, "Probabilistic analysis ready")
 
-		// GPSSapienza::updateParams(features.bin_class_result, statisticsPtr, featuresPtr);
-		// CV_TIMER_STOP(L, "Expectation-Maximization completed")
+		GPSSapienza::updateParams(features.bin_class_result, statisticsPtr, featuresPtr);
+		CV_TIMER_STOP(L, "Expectation-Maximization completed")
 		
 		features.floor_boundary = features.bin_class_result.clone();
 
-		// GPSSapienza::findObstacleBoundary(features.floor_boundary);
-		// CV_TIMER_STOP(M, "Extracted the floor boundary")
+		GPSSapienza::findObstacleBoundary(features.floor_boundary);
+		CV_TIMER_STOP(M, "Extracted the floor boundary")
 		
 		// hough_searcher.setMinScoreHough(70);
 		// hough_searcher.doProbabilisticEstimation(features.rgb, features.gray, superpixels_contours_img, statistics.prior_img, features.superpixels_list);
@@ -227,7 +227,7 @@ int main( int argc, char** argv )
 		CV_TIMER_STOP(Z, "Loop finished")
 		printf("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n");
 	 	ros::spinOnce();
-        cv::waitKey(0);
+        // cv::waitKey(0);
 	}
 
 
