@@ -30,7 +30,7 @@ namespace GPSSapienza{
 
 		F_mag = abs(temp_grad[0]) + abs(temp_grad[1]);  //abs_grad_x + abs_grad_y
 		F_mag = 255 - F_mag;
-		F_ang = cv::Mat::zeros(F_mag.rows, F_mag.cols, CV_32FC1);
+		F_ang = 0*F_mag;
 		float valueX;
 		float valueY;
 		float result;
@@ -38,18 +38,17 @@ namespace GPSSapienza{
 		{
 			for (int x=0; x < F_ang.cols ;x++)
 			{
-				valueX = temp_grad[0].at<float>(y,x);
-				valueY = temp_grad[1].at<float>(y,x);
-				result = std::atan2(valueY,valueX);
-				F_ang.at<float>(y, x) = result;
+				valueX = sobel[1].at<uchar>(y,x);
+				valueY = sobel[2].at<uchar>(y,x);
+				result = (cv::fastAtan2(valueY, valueX)/360.0)*255.0;
+				F_ang.at<uchar>(y, x) = (uchar) result;
+				// std::cout << (int)F_ang.at<uchar>(y, x) << std::endl;
 			}
 		}
 		normalize(F_mag, F_mag, 0, 255, CV_MINMAX);
 		convertScaleAbs(F_mag, F_mag, 1, 0);
-		// normalize(F_ang, F_ang, 0, 255, CV_MINMAX);
-		// convertScaleAbs(F_ang, F_ang, 1, 0);
-		
-		cv::imshow("temp_grad", temp_grad[1]);
+		normalize(F_ang, F_ang, 0, 255, CV_MINMAX);
+		convertScaleAbs(F_ang, F_ang, 1, 0);
 	}
 
 
@@ -234,28 +233,10 @@ namespace GPSSapienza{
 
 		cv:inRange(features->hsv, cv::Scalar(0, smin, min(vmin,vmax), 0), cv::Scalar(180, 256, max(vmin,vmax), 0), bin[0]);
 		cv::bitwise_and(bin[0], model->mask, bin[1]);
-		// features->ang32 = (features->ang32 + CV_PI)/(2*CV_PI);
-		cv::Mat pruebaang;
-		normalize(features->ang32, pruebaang, 0, 255, CV_MINMAX);
+		// features->ang32(model->SafeRegion) = j;
 		
-		// for(int i=0; i<features->ang32.rows ;i++)
-		// {
-		// 	for(int j=0; j<features->ang32.cols ;j++)
-		// 	{
-		// 		float angle = features->ang32.at<float>(i,j);
-		// 		float value = cv::fastAtan2(std::sin(angle), std::cos(angle));
-		// 		if(abs(angle) > 0.1)
-		// 		{
-		// 		std::cout << "angle" << std::endl;
-		// 		std::cout << angle << std::endl;
-		// 		std::cout << value << std::endl;
-		// 		std::cout << features->ang32.depth() << std::endl;
-		// 		}
-		// 	}
-		// }
-		cv::imshow("ang32", pruebaang);
 		cv::calcHist(&features->mag, 1, 0, model->mask, model->Hgram_M[0], 1, &model->dim[0], &range_256_ptr, true, acc);
-		cv::calcHist(&features->ang32, 1, 0, model->mask, model->Hgram_M[1], 1, &model->dim[1], &range_2pi_ptr, true, acc);
+		cv::calcHist(&features->ang32, 1, 0, model->mask, model->Hgram_M[1], 1, &model->dim[1], &range_256_ptr, true, acc);
 		cv::calcHist(&features->hue, 1, 0, bin[1], model->Hgram_M[2], 1, &model->dim[2], &range_181_ptr, true, acc);
 		cv::calcHist(&features->sat, 1, 0, model->mask, model->Hgram_M[3], 1, &model->dim[3], &range_256_ptr, true, acc);
 		cv::calcHist(&features->lbp, 1, 0, model->mask, model->Hgram_M[4], 1, &model->dim[4], &range_256_ptr, true, acc);
@@ -265,6 +246,7 @@ namespace GPSSapienza{
 		// cv::bitwise_and(features->mag, model->mask, features->mag);
 		// cv::imshow("mag", features->mag);
 		// cv::imshow("roi", features->mag(model->SafeRegion));
+		cv::imshow("roi", features->ang32(model->SafeRegion));
 	}
 
 
@@ -277,7 +259,7 @@ namespace GPSSapienza{
 		}
 		
 		printHistogram(dim_32, model->Hgram_M[0], HistImgV, HIST_VAL, 1);
-		printHistogram(dim_9, model->Hgram_M_DISP[1], EdgeHist_img, HIST_EDGE, 0);
+		printHistogram(dim_32, model->Hgram_M_DISP[1], EdgeHist_img, HIST_EDGE, 0);
 		printHistogram(dim_32, model->Hgram_M_DISP[2], HistImgH, HIST_HUE, 1);
 		printHistogram(dim_32, model->Hgram_M_DISP[3], HistImgS, HIST_SAT, 1);
 		printHistogram(dim_32, model->Hgram_M_DISP[4], LBPhist_img, LBP_HIST, 0);
@@ -345,7 +327,6 @@ namespace GPSSapienza{
 	{
 		float max_value;
 		int bin_w = cvRound((double) hist_img.cols/hist_size);
-		// cv::normalize(histogram, histogram, 0, (4*hist_img.rows)/5, CV_MINMAX, -1, cv::Mat());
 		cv::normalize(histogram, histogram, 0, (4*hist_img.rows)/5, CV_MINMAX, -1, cv::Mat());
 	
 		if(flag==0)
@@ -424,7 +405,7 @@ namespace GPSSapienza{
 			cv::compare(features->seg_img, stats->gray_id[i], mask[0], CV_CMP_EQ);
 			cv::bitwise_and(bin[0], mask[0], bin[1]);
 			cv::calcHist(&features->mag, 1, 0, mask[0], stats->Hgram_SF[0], 1, &model->dim[0], &range_256_ptr, true, false);
-			cv::calcHist(&features->ang32, 1, 0, mask[0], stats->Hgram_SF[1], 1, &model->dim[1], &range_2pi_ptr, true, false);
+			cv::calcHist(&features->ang32, 1, 0, mask[0], stats->Hgram_SF[1], 1, &model->dim[1], &range_256_ptr, true, false);
 			cv::calcHist(&features->hue, 1, 0, bin[1], stats->Hgram_SF[2], 1, &model->dim[2], &range_181_ptr, true, false);
 			cv::calcHist(&features->sat, 1, 0, mask[0], stats->Hgram_SF[3], 1, &model->dim[3], &range_256_ptr, true, false);
 			cv::calcHist(&features->lbp, 1, 0, mask[0], stats->Hgram_SF[4], 1, &model->dim[4], &range_256_ptr, true, false);

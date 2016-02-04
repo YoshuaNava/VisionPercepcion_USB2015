@@ -73,8 +73,6 @@ void showImages()
 	cv::resizeWindow("features.sat", proc_W, proc_H);
 	DISPLAY_IMAGE_XY(true, features.mag, 2, 1);
 	cv::resizeWindow("features.mag", proc_W, proc_H);
-	// normalize(features.ang32, features.ang32, 0, 255, CV_MINMAX);
-	// convertScaleAbs(features.ang32, features.ang32, 1, 0);
 	DISPLAY_IMAGE_XY(true, features.ang32, 3, 1);
 	cv::resizeWindow("features.ang32", proc_W, proc_H);
 	DISPLAY_IMAGE_XY(true, features.lbp, 4, 1);

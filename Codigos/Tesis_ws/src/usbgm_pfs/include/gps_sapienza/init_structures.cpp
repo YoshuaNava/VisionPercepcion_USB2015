@@ -209,9 +209,9 @@ namespace GPSSapienza
 		float* range_2pi_ptr = range_2pi_arr;
 	
 		model->dim = new int[NUM_FEATURES];
-		model->dim[0] = 32;
-		model->dim[1] = 9;
-		for (int i=2; i<NUM_FEATURES; i++){
+		// model->dim[0] = 32;
+		// model->dim[1] = 9;
+		for (int i=0; i<NUM_FEATURES; i++){
 			model->dim[i] = 32;
 		}
 			
