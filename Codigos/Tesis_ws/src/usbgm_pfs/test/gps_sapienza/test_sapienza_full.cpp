@@ -96,7 +96,7 @@ void cameraSetup()
 	// cap = VideoCapture("Laboratorio.avi");
 	// cap = VideoCapture("LaboratorioMaleta.avi");
 	// cap = VideoCapture("PasilloLabA.avi");
-	//cap = VideoCapture("PasilloLabB.avi");
+	// cap = VideoCapture("PasilloLabB.avi");
  // cap = VideoCapture("Laboratorio4.avi");
 //  cap = VideoCapture("Calle1.avi");
 	//VideoCapture cap(1); //Otra camara, conectada a la computadora mediante USB, por ejemplo.

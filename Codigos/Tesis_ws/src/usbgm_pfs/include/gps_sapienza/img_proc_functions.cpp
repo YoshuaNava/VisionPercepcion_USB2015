@@ -451,16 +451,16 @@ namespace GPSSapienza{
 			
 			// cv::imshow("pg0", PG_prev[0]);
 			// cv::imshow("pg1", PG_prev[1]);
-			if(Gstat(model->Hgram_M[0], stats->Hgram_SF[0], dim_32) < 1)
-			{
-				cv::Mat pruebahist = cv::Mat::zeros(cv::Size(128,100), CV_8UC1);
-				printHistogram(dim_32, stats->Hgram_SF[0], pruebahist, "magprueba", 1);
-				// std::cout << stats->Hgram_SF[3].size() << std::endl;
-				// std::cout << pruebahist.size() << std::endl;
-				DISPLAY_IMAGE_XY(true, pruebahist, 0, 5);
-				cv::resizeWindow("pruebahist", pruebahist.cols, pruebahist.rows);
-				std::cout<< " Gstat= " << Gstat(model->Hgram_M[0], stats->Hgram_SF[0], dim_32) << std::endl;
-			}
+			// if(Gstat(model->Hgram_M[0], stats->Hgram_SF[0], dim_32) < 1)
+			// {
+			// 	cv::Mat pruebahist = cv::Mat::zeros(cv::Size(128,100), CV_8UC1);
+			// 	printHistogram(dim_32, stats->Hgram_SF[0], pruebahist, "magprueba", 1);
+			// 	// std::cout << stats->Hgram_SF[3].size() << std::endl;
+			// 	// std::cout << pruebahist.size() << std::endl;
+			// 	DISPLAY_IMAGE_XY(true, pruebahist, 0, 5);
+			// 	cv::resizeWindow("pruebahist", pruebahist.cols, pruebahist.rows);
+			// 	std::cout<< " Gstat= " << Gstat(model->Hgram_M[0], stats->Hgram_SF[0], dim_32) << std::endl;
+			// }
 	}
 	
 	
