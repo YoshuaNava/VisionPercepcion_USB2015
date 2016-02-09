@@ -419,11 +419,17 @@ namespace GPSSapienza{
 				stats->G_score[j] = Gstat(model->Hgram_M[j], stats->Hgram_SF[j], model->dim[j]);
 				stats->P_FgGt[stats->no_features*i+j] = EXP_DIST_1(stats->Z1[j], stats->L1[j], stats->G_score[j]); //0.9*exp(-lambda*G_scoreV);
 				stats->P_FgGf[stats->no_features*i+j] = EXP_DIST_0(stats->Z0[j], stats->L0[j], stats->G_score[j]); //1. - S->P_VgGt[i];
-				PG[j].setTo(cv::Scalar(stats->G_score[j]), mask[0]);
+				PG[j].setTo(stats->G_score[j], mask[0]);
+				// PG[j].setTo(0.5, mask[0]);
+				// PG[j].setTo(255, mask[0]);
 					// cv::imshow("mask[0]", mask[0]);
 					// std::cout << "superpixel # " << i << std::endl;
 					// std::cout << "feature # " << j << std::endl;
 					// std::cout << stats->G_score[j] << std::endl;
+					// double min, max;
+					// cv::minMaxLoc(PG[j], &min, &max, NULL, NULL, mask[0]);
+					// std::cout << min << std::endl;
+					// std::cout << max << std::endl;
 				features->P_X1[j].setTo(cv::Scalar(stats->P_FgGt[stats->no_features*i+j]	/	(stats->P_FgGt[stats->no_features*i+j] + stats->P_FgGf[stats->no_features*i+j])), mask[0]);
 				features->P_X0[j].setTo(cv::Scalar(stats->P_FgGf[stats->no_features*i+j]	/	(stats->P_FgGt[stats->no_features*i+j] + stats->P_FgGf[stats->no_features*i+j])), mask[0]);
 			}
@@ -432,19 +438,19 @@ namespace GPSSapienza{
 		// cout << "Segundo ciclo	" << (cvGetTickCount() - time)/((double)cvGetTickFrequency()*1000.) << "ms\n";
 		// time = cvGetTickCount();
 		
-		static bool flag = 0;
 		for(int i=0; i<stats->no_features ;i++)
 		{
-			if(flag)
-			{
-				cv::addWeighted(PG[i], 0.5, PG_prev[i], 0.5, 0, PG[i]);
-			}
+			double min, max;
+			// cv::minMaxLoc(PG[i], &min, &max, NULL, NULL, mask[0]);
+			// std::cout << min << std::endl;
+			// std::cout << max << std::endl;
+			cv::normalize(PG[i], PG_prev[i], 0, 1, CV_MINMAX);
 			PG_prev[i] = PG[i].clone();
 		}
-		flag =1;
 		// cout << "Tercer ciclo	" << (cvGetTickCount() - time)/((double)cvGetTickFrequency()*1000.) << "ms\n"
 			
-			cv::imshow("pg", PG[0]);
+			// cv::imshow("pg0", PG_prev[0]);
+			// cv::imshow("pg1", PG_prev[1]);
 			if(Gstat(model->Hgram_M[0], stats->Hgram_SF[0], dim_32) < 1)
 			{
 				cv::Mat pruebahist = cv::Mat::zeros(cv::Size(128,100), CV_8UC1);
