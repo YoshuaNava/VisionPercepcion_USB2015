@@ -7,7 +7,7 @@ future navigation system for a mobile robot.
 Authors:
 	Yoshua Nava and Rafael Colmenares
 
-## Instructions to compile code:
+## How to compile the code:
 
 **1)** Open a terminal and change directory to this repository root folder ("VisionPercepcion_USB2015/").
 
@@ -18,7 +18,7 @@ Authors:
 bash
 ```
 
-## Instructions to run the algorithms:
+## Instructions for running the algorithms:
 
 **3)** To run the EGBIS superpixel segmentation test, type:
 
