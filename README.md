@@ -20,17 +20,27 @@ bash
 
 ## Instructions for running the algorithms:
 
-**3)** To run the EGBIS superpixel segmentation test, type:
+**1)** Open a terminal and change directory to the catkin workspace root folder ("VisionPercepcion_USB2015/Code/Thesis_ws").
 
-```./test_egbis_superpixel_segmentation ```
+**2)** To run the EGBIS superpixel segmentation test, type:
 
-**4)** To run the SLIC superpixel segmentation test, type:
+```rosrun usbgm_pfs test_superpixel_segmentation ```
 
-```./test_slic_superpixel_segmentation ```
+**3)** To run an histogram comparison routine for superpixels, type:
 
-**5)** To run the superpixel histogram comparison test, type:
+```rosrun usbgm_pfs test_histogram_superpixel_comparison ```
 
-```./test_histogram_superpixel_comparison ```
+**4)** To run the original version of the GPS algorithm by Sapienza et al, type:
+
+```rosrun gps_sapienza_ros gps_sapienza ```
+
+**5)** To run the re-implementation of the GPS algorithm by Sapienza et al, type:
+
+```rosrun usbgm_pfs test_sapienza_full ```
+
+**6)** To run the Hough Horizon search algorithm, enter:
+
+```rosrun usbgm_pfs test_encapsulated_horizon_search ```
 
 
 If you want to change the algorithm that is used for generating and comparing superpixels, change the value of the constant SUPERPIXEL_ALGORITHM (line 18) for either "EGBIS" or "SLIC"
