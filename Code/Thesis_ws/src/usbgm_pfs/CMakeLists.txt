@@ -110,14 +110,3 @@ TARGET_LINK_LIBRARIES(test_sapienza_full gps_sapienza_mod)
 ADD_EXECUTABLE(test_superpixel_segmentation test/segmentation/test_superpixel_segmentation.cpp)
 TARGET_LINK_LIBRARIES(test_superpixel_segmentation fps)
 TARGET_LINK_LIBRARIES(test_superpixel_segmentation gps_sapienza_mod)
-
-
-# ADD_EXECUTABLE(test_sapienza_features test/gps_sapienza/test_sapienza_features.cpp)
-# TARGET_LINK_LIBRARIES(test_sapienza_features fps)
-# TARGET_LINK_LIBRARIES(test_sapienza_features gps_sapienza_mod)
-
-
-
-
-
-

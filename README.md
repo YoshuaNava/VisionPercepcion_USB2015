@@ -43,17 +43,19 @@ Eigen, OpenCV 2.4+, cmake 2.8+, gcc, g++, and make.
 
 ## Contributions:
 
-**gps_sapienza_ros**: A ROS node that wraps the original GPS algorithm by Michael Sapienza.
+**1) gps_sapienza_ros** (working): A ROS node that wraps the original GPS algorithm by Michael Sapienza.
 
-**libsuperpixels**: A library for handling superpixels, that can be found in the folder usbgm_pfs/include/libsuperpixel.
+**2) usbgm_pfs**: A ROS packages to wrap the following libraries:
 
-**slid_modified and egbis**: Modified versions of the original SLIC and EGBIS libraries for superpixel segmentation, so that they can be compliant with libsuperpixel.
+**2.1) libsuperpixels** (working): A library for handling superpixels, that can be found in the folder usbgm_pfs/include/libsuperpixel.
 
-**hough_horizon_search**: A novel algorithm for identifying the floor using the structure of the scene.
+**2.2) slid_modified and egbis** (working): Modified versions of the original SLIC and EGBIS libraries for superpixel segmentation, so that they can be compliant with libsuperpixel.
 
-**gps_sapienza and gps_sapienza_encapsulated**: Re-implementations of the original GPS algorithm by Michael Sapienza, introducing (1) Modern OpenCV methods, and (2) Genericity to image features generation and superpixels histogram comparison.
+**2.3) hough_horizon_search** (working): A novel algorithm for identifying the floor using the structure of the scene.
 
-**usbgm_pfs**: A ROS packages that wrap all the aforementioned algorithms as libraries.
+**2.4) gps_sapienza** (working): Re-implementations of the original GPS algorithm by Michael Sapienza as a C++ library, using Modern OpenCV methods.
+
+**2.5) gps_sapienza_encapsulated** (in early stage of development): Re-implementations of the original GPS algorithm by Michael Sapienza, introducing genericity to image features generation and superpixels histogram comparison.
 
 
 

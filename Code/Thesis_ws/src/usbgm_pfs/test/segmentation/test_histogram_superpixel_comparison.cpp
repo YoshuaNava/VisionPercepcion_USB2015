@@ -47,8 +47,8 @@ void showImages()
 
 void cameraSetup()
 {
-  	cap = VideoCapture(0);
-	//cap = VideoCapture("../eng_stat_obst.avi");
+  	// cap = VideoCapture(0);
+	cap = VideoCapture("../eng_stat_obst.avi");
 	
 	cap.set(CV_CAP_PROP_FRAME_WIDTH, 640);
 	cap.set(CV_CAP_PROP_FRAME_HEIGHT, 480);
