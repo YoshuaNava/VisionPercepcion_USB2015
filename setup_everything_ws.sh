@@ -30,7 +30,7 @@ fi
 # git submodule init
 # git submodule update --depth=1
 
-# cd Codigos/Tesis_ws/src/Sophus
+#cd Code/Thesis_ws/src/Sophus
 # git checkout a621ff
 # mkdir build
 # cd build
@@ -64,9 +64,10 @@ fi
 # make -j$CPU_CORES -l$CPU_CORES
 
 # cd ../../../
-cd ../../
+cd Code/Thesis_ws/
 catkin_make
 
+echo "source $(pwd)/devel/setup.bash";
 sudo echo "source $(pwd)/devel/setup.bash" >> ~/.bashrc
 
 # REFERENCE: http://answers.ros.org/question/53353/autocomplete-not-working-anymore/
