@@ -43,8 +43,6 @@ bash
 ```rosrun usbgm_pfs test_encapsulated_horizon_search ```
 
 
-If you want to change the algorithm that is used for generating and comparing superpixels, change the value of the constant SUPERPIXEL_ALGORITHM (line 18) for either "EGBIS" or "SLIC"
-
 
 ## Dependencies:
 Eigen, OpenCV 2.4+, cmake 2.8+, gcc, g++, and make.
@@ -63,9 +61,9 @@ Eigen, OpenCV 2.4+, cmake 2.8+, gcc, g++, and make.
 
 **2.3) hough_horizon_search** (working): A novel algorithm for identifying the floor using the structure of the scene.
 
-**2.4) gps_sapienza** (working): Re-implementations of the original GPS algorithm by Michael Sapienza as a C++ library, using Modern OpenCV methods.
+**2.4) gps_sapienza** (working): Re-implementation of the original GPS algorithm by Michael Sapienza as a C++ library, using Modern OpenCV methods.
 
-**2.5) gps_sapienza_encapsulated** (in early stage of development): Re-implementations of the original GPS algorithm by Michael Sapienza, introducing genericity to image features generation and superpixels histogram comparison.
+**2.5) gps_sapienza_encapsulated** (in early stage of development): Re-implementation of the original GPS algorithm by Michael Sapienza, introducing genericity to image features generation and superpixels histogram comparison.
 
 
 
