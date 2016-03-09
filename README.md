@@ -45,7 +45,7 @@ bash
 
 
 ## Dependencies:
-Eigen, OpenCV 2.4+, cmake 2.8+, gcc, g++, and make.
+Eigen, OpenCV 2.4+, ROS índigo igloo, roscpp, cmake 2.8+, gcc, g++, and make.
 
 
 
