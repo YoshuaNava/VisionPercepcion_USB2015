@@ -59,7 +59,16 @@ Eigen, OpenCV 2.4+, ROS índigo igloo, roscpp, cmake 2.8+, gcc, g++, and make.
 
 **2.2) slid_modified and egbis** (working): Modified versions of the original SLIC and EGBIS libraries for superpixel segmentation, so that they can be compliant with libsuperpixel.
 
-**2.3) hough_horizon_search** (working): A novel algorithm for identifying the floor using the structure of the scene.
+**2.3) hough_horizon_search** (working): A novel algorithm for identifying the floor using the structure of the scene. To do so, it follows these steps:
+
+* Takes an RGB image from an offline dataset.
+* Divides the RBG image into superpixels, using the SLIC/EGBIS algorithm.
+* Converts the RGB image to grayscale.
+* Applies Canny and Sobel edge detectors, and combines them. 
+* Calculates the Hough transform of the edges image to find horizontal lines that can represent the floor borderline.
+* Approximates the floor boundary with a 2nd degree least-squares polynomial, using Hough lines start and end points as features.
+* Identifies which superpixels are below the boundary marked by the polynomial, and estimates the probability of a superpixel belonging to the floor class based on its 10 most recent classifications (as floor or not floor).
+* Draws the floor boundary and point features on the original image, and colours the superpixels that are identified as part of the floor in colours that range from pure red (not sure if it is floor), to pure blue (highly certain that it is floor).
 
 **2.4) gps_sapienza** (working): Re-implementation of the original GPS algorithm by Michael Sapienza as a C++ library, using Modern OpenCV methods.
 
